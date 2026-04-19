@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source "../src/**/*.{ts,tsx}";
+@source "../stories/**/*.{ts,tsx}";
+
+#storybook-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

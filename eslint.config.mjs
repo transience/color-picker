@@ -7,6 +7,6 @@ export default [
   ...vitest,
   ...testingLibrary,
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ['dist/**', 'node_modules/**', 'storybook-static/**'],
   },
 ];
