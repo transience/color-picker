@@ -1,0 +1,48 @@
+import { useMemo } from 'react';
+
+import GradientSlider from './components/GradientSlider';
+import transparentBg from './images/transparent-bg.gif';
+import type { GradientSliderClassNames } from './types';
+
+interface AlphaSliderProps {
+  /** Per-part className overrides forwarded to the inner `GradientSlider`. */
+  classNames?: GradientSliderClassNames;
+  /**
+   * CSS color (fully opaque) used as the right-hand endpoint of the gradient
+   * track. A checkerboard is layered behind it so lower alpha values show
+   * through as translucency.
+   */
+  color: string;
+  /**
+   * Disables pointer and keyboard interaction and dims the track.
+   * @default false
+   */
+  isDisabled?: boolean;
+  /** Called on every drag/keyboard change with the new alpha in `[0, 1]`. */
+  onChange: (alpha: number) => void;
+  /** Current alpha value as a float in `[0, 1]`. */
+  value: number;
+}
+
+export default function AlphaSlider(props: AlphaSliderProps) {
+  const { classNames, color, isDisabled, onChange, value } = props;
+
+  const gradient = useMemo(
+    () => `linear-gradient(to right, transparent, ${color}), url(${transparentBg})`,
+    [color],
+  );
+
+  return (
+    <GradientSlider
+      aria-label="Alpha"
+      classNames={classNames}
+      gradient={gradient}
+      isDisabled={isDisabled}
+      maxValue={1}
+      minValue={0}
+      onValueChange={onChange}
+      step={0.01}
+      value={value}
+    />
+  );
+}

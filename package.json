@@ -1,12 +1,29 @@
 {
   "name": "@transience/color-picker",
   "version": "0.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "description": "A modern color picker component with support for OKLCH color space.",
+  "author": "Gil Barbara <gilbarbara@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/transience/color-picker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/transience/color-picker/issues"
+  },
+  "keywords": [
+    "color-picker",
+    "color",
+    "picker",
+    "react",
+    "oklch"
+  ],
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -17,7 +34,12 @@
   "sideEffects": false,
   "license": "MIT",
   "peerDependencies": {
-    "react": "17 - 19"
+    "react": "16.8 - 19"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "colorizr": "^5.0.1",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
@@ -59,8 +81,7 @@
     "format": "prettier \"**/*.{css,graphql,js,json,jsx,less,md,mdx,scss,ts,tsx,yaml,yml}\" --write",
     "size": "size-limit",
     "validate": "npm run lint && npm run typecheck && npm run test:coverage && npm run build && npm run size && npm run typevalidation",
-    "prepare": "husky",
-    "prepublishOnly": "npm run validate"
+    "prepare": "husky"
   },
   "tsup": {
     "bundle": true,
@@ -72,6 +93,9 @@
       "cjs",
       "esm"
     ],
+    "loader": {
+      ".gif": "dataurl"
+    },
     "sourcemap": true,
     "splitting": false
   },
@@ -79,18 +103,13 @@
   "size-limit": [
     {
       "name": "commonjs",
-      "path": "./dist/index.js",
-      "limit": "10 kB"
+      "path": "./dist/index.cjs",
+      "limit": "30 kB"
     },
     {
       "name": "esm",
-      "path": "./dist/index.mjs",
-      "limit": "10 kB"
+      "path": "./dist/index.js",
+      "limit": "25 kB"
     }
-  ],
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "colorizr": "^5.0.1",
-    "tailwind-merge": "^3.5.0"
-  }
+  ]
 }

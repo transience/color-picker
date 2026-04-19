@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SaturationPanel > Render > renders correctly 1`] = `
+<div>
+  <div
+    class="relative h-32 w-full cursor-crosshair overflow-hidden"
+    data-testid="SaturationPanel"
+    style="background-color: rgb(0, 0, 255); touch-action: none;"
+  >
+    <div
+      class="absolute inset-0 bg-linear-to-r from-white to-transparent"
+    />
+    <div
+      class="absolute inset-0 bg-linear-to-b from-transparent to-black"
+    />
+    <div
+      class="pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md"
+      style="left: 50%; top: 50%;"
+    />
+  </div>
+</div>
+`;
