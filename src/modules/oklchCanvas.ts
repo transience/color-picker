@@ -1,4 +1,10 @@
-import { hsvToRgb, isP3HSVInSRGB, oklchHueToHsvHue, p3HsvToOKLCH } from './colorSpace';
+import {
+  hsvToRgb,
+  isP3HSVInSRGB,
+  oklchHueToHsvHue,
+  oklchToP3Hsv,
+  p3HsvToOKLCH,
+} from './colorSpace';
 import { clamp } from './helpers';
 
 export interface OKLCHCanvasResult {
@@ -7,60 +13,67 @@ export interface OKLCHCanvasResult {
 }
 
 /**
- * OKLCH (l, c) → canvas pointer position (0-100%).
- * X: chroma normalized by OKLCH max chroma → x=100% at max chroma.
- * Y: binary search for the canvas V that produces the target lightness at the
- *    canvas hue, ensuring exact round-trip with pointerToLC on both axes.
+ * OKLCH (l, c, h) → canvas pointer position (0-100%).
+ * Mirrors Chrome DevTools' Spectrum picker: convert to P3 HSV and place the
+ * thumb at raw (saturation, value) with no normalization.
  */
-export function lcToPointer(
+export function lcToPointer(oklchHue: number, l: number, c: number): { x: number; y: number } {
+  const { s, v } = oklchToP3Hsv(l, c, oklchHue);
+
+  return {
+    x: clamp(s * 100, 0, 100),
+    y: clamp((1 - v) * 100, 0, 100),
+  };
+}
+
+/**
+ * Canvas pointer position → OKLCH (l, c) that round-trips exactly with
+ * `lcToPointer` at the given oklchHue.
+ *
+ * A naive `p3HsvToOKLCH(canvasHue, ...)` would drift: the OKLCH hue returned
+ * by the conversion is not the user's oklchHue (the canvas HSV hue comes from
+ * a fixed reference, not the color's actual HSV hue). Feeding that (l, c)
+ * back through `lcToPointer(oklchHue, l, c)` lands the thumb at a different
+ * x than the cursor — visible as drag acceleration and sticking near the
+ * gamut edge.
+ *
+ * Instead, binary-search for the HSV hue that, at cursor (x, y), converts to
+ * an OKLCH color with exactly `oklchHue`. This guarantees the round-trip.
+ */
+export function pointerToLC(
   oklchHue: number,
-  l: number,
-  c: number,
-  maxChromaFn: (l: number, h: number) => number,
-): { x: number; y: number } {
-  const hsvHue = oklchHueToHsvHue(oklchHue);
-  const maxC = maxChromaFn(l, oklchHue);
-  const x = maxC > 1e-6 ? c / maxC : 0;
+  xNorm: number,
+  yNorm: number,
+): { c: number; l: number } {
+  const v = 1 - yNorm;
+  const target = ((oklchHue % 360) + 360) % 360;
 
-  // Binary search for v at canvas hue: p3HsvToOKLCH(hsvHue, x, v).l ≈ l
-  // l is monotonically increasing with v (proven: RGB scales linearly with v)
-  let lo = 0;
-  let hi = 1;
+  const hueDelta = (h: number) => {
+    const result = p3HsvToOKLCH(((h % 360) + 360) % 360, xNorm, v).h;
 
-  for (let index = 0; index < 12; index++) {
+    return ((result - target + 540) % 360) - 180;
+  };
+
+  // Bracket around the reference-point HSV hue (a much better initial guess
+  // than oklchHue itself, whose offset from its HSV hue varies up to ~40°).
+  const estimate = oklchHueToHsvHue(oklchHue);
+  let lo = estimate - 40;
+  let hi = estimate + 40;
+
+  for (let index = 0; index < 16; index++) {
     const mid = (lo + hi) / 2;
 
-    if (p3HsvToOKLCH(hsvHue, x, mid).l < l) {
+    if (hueDelta(mid) < 0) {
       lo = mid;
     } else {
       hi = mid;
     }
   }
 
-  const v = (lo + hi) / 2;
+  const hsvHue = ((((lo + hi) / 2) % 360) + 360) % 360;
+  const { c, l } = p3HsvToOKLCH(hsvHue, xNorm, v);
 
-  return {
-    x: clamp(x * 100, 0, 100),
-    y: clamp((1 - v) * 100, 0, 100),
-  };
-}
-
-/**
- * Canvas pointer position → OKLCH (l, c).
- * Lightness from P3 HSV→OKLCH at canvas hue. Chroma from X × OKLCH max chroma
- * (matching lcToPointer's normalization for consistent round-trips).
- */
-export function pointerToLC(
-  hsvHue: number,
-  oklchHue: number,
-  xNorm: number,
-  yNorm: number,
-  maxChromaFn: (l: number, h: number) => number,
-): { c: number; l: number } {
-  const { l } = p3HsvToOKLCH(hsvHue, xNorm, 1 - yNorm);
-  const maxC = maxChromaFn(l, oklchHue);
-
-  return { c: Math.min(xNorm * maxC, maxC), l };
+  return { c, l };
 }
 
 /**
