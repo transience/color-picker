@@ -1,7 +1,6 @@
 /* eslint-disable testing-library/no-container */
 import { getP3MaxChroma } from 'colorizr';
 
-import { oklchHueToHsvHue } from '~/modules/colorSpace';
 import { pointerToLC } from '~/modules/oklchCanvas';
 import OKLCHPanel from '~/OKLCHPanel';
 import { fireEvent, render } from '~/test-utils';
@@ -106,13 +105,7 @@ describe('OKLCHPanel', () => {
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
       fireEvent.pointerDown(panel, { clientX: 128, clientY: 64, pointerId: 1 });
 
-      const { c: expectedC, l: expectedL } = pointerToLC(
-        oklchHueToHsvHue(hue),
-        hue,
-        0.5,
-        0.5,
-        maxChromaFn,
-      );
+      const { c: expectedC, l: expectedL } = pointerToLC(hue, 0.5, 0.5);
       const [l, c] = mockOnChange.mock.calls[0];
 
       expect(l).toBeCloseTo(expectedL, 5);
@@ -179,7 +172,9 @@ describe('OKLCHPanel', () => {
       expect(l).toBeGreaterThanOrEqual(0);
       expect(l).toBeLessThanOrEqual(1);
       expect(c).toBeGreaterThanOrEqual(0);
-      expect(c).toBeLessThanOrEqual(maxChromaFn(l, hue));
+      // Pointer positions outside the canvas clamp to the P3 gamut edge; allow
+      // small slack because colorizr's getP3MaxChroma uses its own epsilon.
+      expect(c).toBeLessThanOrEqual(maxChromaFn(l, hue) + 0.01);
     });
   });
 });

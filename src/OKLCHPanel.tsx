@@ -1,5 +1,4 @@
 import { type PointerEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { getP3MaxChroma } from 'colorizr';
 
 import { clamp, cn, relativePosition } from './modules/helpers';
 import {
@@ -61,8 +60,6 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     return points[points.length - 2];
   }, [canvasResult]);
 
-  const maxChromaFn = (l: number, h: number) => getP3MaxChroma({ l, c: 0, h });
-
   const rafRef = useRef(0);
 
   const handleMove = (event: PointerEvent) => {
@@ -70,8 +67,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
 
     const rect = containerRef.current.getBoundingClientRect();
     const { x, y } = relativePosition(event, rect);
-    const { hsvHue } = renderRef.current;
-    const { c, l } = pointerToLC(hsvHue, hue, x, y, maxChromaFn);
+    const { c, l } = pointerToLC(hue, x, y);
 
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -91,7 +87,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     }
   };
 
-  const thumb = lcToPointer(hue, lightness, chroma, maxChromaFn);
+  const thumb = lcToPointer(hue, lightness, chroma);
 
   return (
     <div

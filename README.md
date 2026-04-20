@@ -1,7 +1,6 @@
 # Color Picker
 
-![NPM Version](https://img.shields.io/npm/v/%40transience%2Fcolor-picker)
- [![CI](https://github.com/transience/color-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/transience/color-picker/actions/workflows/ci.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=transience_color-picker) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=coverage)](https://sonarcloud.io/summary/new_code?id=transience_color-picker)
+![NPM Version](https://img.shields.io/npm/v/%40transience%2Fcolor-picker) [![CI](https://github.com/transience/color-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/transience/color-picker/actions/workflows/ci.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=transience_color-picker) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=coverage)](https://sonarcloud.io/summary/new_code?id=transience_color-picker)
 
 A modern, OKLCH-first React color picker powered by [colorizr](https://github.com/gilbarbara/colorizr).
 
