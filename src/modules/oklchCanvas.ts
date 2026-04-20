@@ -77,29 +77,15 @@ export function pointerToLC(
 }
 
 /**
- * Convert boundary points to a smooth SVG path using Catmull-Rom → cubic bezier.
+ * Convert boundary points to an SVG polyline path (M + L commands).
+ * Matches Chrome DevTools' sRGB overlay, which uses straight segments.
  */
-export function pointsToSmoothPath(points: Array<{ x: number; y: number }>, tension = 0.2): string {
+export function pointsToPath(points: Array<{ x: number; y: number }>): string {
   if (points.length < 2) return '';
 
-  const t = tension;
-  const parts: string[] = [`M${points[0].x},${points[0].y}`];
+  const [first, ...rest] = points;
 
-  for (let index = 0; index < points.length - 1; index++) {
-    const p0 = points[Math.max(0, index - 1)];
-    const p1 = points[index];
-    const p2 = points[index + 1];
-    const p3 = points[Math.min(points.length - 1, index + 2)];
-
-    const cp1x = p1.x + ((p2.x - p0.x) / 6) * t;
-    const cp1y = p1.y + ((p2.y - p0.y) / 6) * t;
-    const cp2x = p2.x - ((p3.x - p1.x) / 6) * t;
-    const cp2y = p2.y - ((p3.y - p1.y) / 6) * t;
-
-    parts.push(`C${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`);
-  }
-
-  return parts.join(' ');
+  return `M${first.x},${first.y} ${rest.map(p => `L${p.x},${p.y}`).join(' ')}`;
 }
 
 /**
@@ -139,25 +125,22 @@ export function renderOKLCHCanvas(
 
   // Compute sRGB boundary with binary search refinement per row
   const srgbBoundary: Array<{ x: number; y: number }> = [];
-  let coarseX = 0;
-  const rowCount = 80;
+  const rowCount = height;
   const coarseSteps = 80;
 
   for (let index = 0; index <= rowCount; index++) {
     const yNorm = index / rowCount;
     const value = 1 - yNorm;
 
-    if (value < 0.01) continue;
-
-    // Coarse scan to find the first out-of-gamut saturation
+    // coarseX resets per row: near the P3-HSV purple cusp the boundary
+    // saturation is non-monotonic in y, so persisting sx across rows would
+    // skip real crossings.
     let found = false;
 
-    for (let sx = coarseX; sx <= coarseSteps; sx++) {
+    for (let sx = 0; sx <= coarseSteps; sx++) {
       const saturation = sx / coarseSteps;
 
       if (!isP3HSVInSRGB(hsvHue, saturation, value)) {
-        coarseX = sx;
-
         // Binary search between previous (in-gamut) and current (out-of-gamut) for exact boundary
         let lo = Math.max(0, (sx - 1) / coarseSteps);
         let hi = saturation;
@@ -181,17 +164,20 @@ export function renderOKLCHCanvas(
       }
     }
 
-    if (!found) continue;
+    // Near the blue-violet cusp (≈ hue 282), saturated P3 blue sits inside the
+    // default GAMUT_EPSILON of sRGB blue, so the loose check misses every
+    // mid/low-value row. Fall back to a strict (epsilon=0) check at sat=1:
+    // if strictly out-of-gamut, anchor the boundary at the right edge so the
+    // overlay traces down the edge instead of terminating mid-panel.
+    if (!found && !isP3HSVInSRGB(hsvHue, 1, value, 0)) {
+      srgbBoundary.push({ x: 100, y: clamp(yNorm * 100, 0, 100) });
+    }
   }
 
-  // Extend to panel edges
-  if (srgbBoundary.length > 1) {
-    const first = srgbBoundary[0];
+  // Close off the polyline to the right edge if the last detected point
+  // stopped before saturation = 1. Mirrors Chromium DevTools' overlay.
+  if (srgbBoundary.length > 0) {
     const last = srgbBoundary[srgbBoundary.length - 1];
-
-    if (first.y > 0) {
-      srgbBoundary.unshift({ x: first.x, y: 0 });
-    }
 
     if (last.x < 100) {
       srgbBoundary.push({ x: 100, y: last.y });
