@@ -1,11 +1,11 @@
-import { type PointerEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { type PointerEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { clamp, cn, relativePosition } from './modules/helpers';
 import {
   lcToPointer,
   type OKLCHCanvasResult,
   pointerToLC,
-  pointsToSmoothPath,
+  pointsToPath,
   renderOKLCHCanvas,
 } from './modules/oklchCanvas';
 import type { PanelClassNames } from './types';
@@ -38,26 +38,55 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     hsvHue: 0,
     srgbBoundary: [],
   });
+  const [width, setWidth] = useState(CANVAS_WIDTH);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) return undefined;
+
+    const observer = new ResizeObserver(entries => {
+      const next = Math.round(entries[0].contentRect.width);
+
+      if (next > 0) setWidth(next);
+    });
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
 
     if (!canvas) return;
 
-    const result = renderOKLCHCanvas(canvas, CANVAS_WIDTH, CANVAS_HEIGHT, hue);
+    const result = renderOKLCHCanvas(canvas, width, CANVAS_HEIGHT, hue);
 
     renderRef.current = result;
     setCanvasResult(result);
-  }, [hue]);
+  }, [hue, width]);
 
-  const boundaryPath = useMemo(() => pointsToSmoothPath(canvasResult.srgbBoundary), [canvasResult]);
+  const boundaryPath = useMemo(() => pointsToPath(canvasResult.srgbBoundary), [canvasResult]);
 
   const labelPosition = useMemo(() => {
     const points = canvasResult.srgbBoundary;
 
     if (points.length <= 2) return null;
 
-    return points[points.length - 2];
+    // Anchor the label at the left-most boundary point in the panel's lower band.
+    // Skipping higher rows avoids the curve's vertical segment at the purple
+    // cusp; picking the left-most avoids the synthetic right-edge fill points
+    // that the scanner adds when the default epsilon misses a row.
+    const bandMinY = 85;
+    let anchor: { x: number; y: number } | null = null;
+
+    for (const point of points) {
+      if (point.y < bandMinY) continue;
+      if (!anchor || point.x < anchor.x) anchor = point;
+    }
+
+    return anchor;
   }, [canvasResult]);
 
   const rafRef = useRef(0);
@@ -102,7 +131,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
         ref={canvasRef}
         className="absolute inset-0 size-full"
         height={CANVAS_HEIGHT}
-        width={CANVAS_WIDTH}
+        width={width}
       />
       {boundaryPath && (
         <>
@@ -123,11 +152,11 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
           </svg>
           {labelPosition && (
             <span
-              className="pointer-events-none absolute text-[12px] leading-none text-white/50 transition-transform"
+              className="pointer-events-none absolute text-sm leading-none text-white/50"
               style={{
-                left: `${labelPosition.x}%`,
-                top: `${labelPosition.y}%`,
-                transform: `translate(-${hue > 144 && hue < 230 ? '180' : '150'}%, -100%)`,
+                right: `${Math.round(100 - labelPosition.x)}%`,
+                bottom: 4,
+                marginRight: 10,
               }}
             >
               sRGB
@@ -137,7 +166,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
       )}
       <div
         className={cn(
-          'pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md',
+          'pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black outline-2 outline-white/20',
           classNames?.thumb,
         )}
         style={{

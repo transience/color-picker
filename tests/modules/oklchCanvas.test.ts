@@ -1,5 +1,5 @@
 import { oklchHueToHsvHue, oklchToP3Hsv } from '~/modules/colorSpace';
-import { lcToPointer, pointerToLC, pointsToSmoothPath } from '~/modules/oklchCanvas';
+import { lcToPointer, pointerToLC, pointsToPath } from '~/modules/oklchCanvas';
 
 // Test hues covering different gamut shapes
 const testHues = [30, 80, 160, 265, 300];
@@ -69,17 +69,17 @@ describe('oklchCanvas', () => {
     });
   });
 
-  describe('pointsToSmoothPath', () => {
+  describe('pointsToPath', () => {
     it('returns empty string for empty array', () => {
-      expect(pointsToSmoothPath([])).toBe('');
+      expect(pointsToPath([])).toBe('');
     });
 
     it('returns empty string for single point', () => {
-      expect(pointsToSmoothPath([{ x: 1, y: 2 }])).toBe('');
+      expect(pointsToPath([{ x: 1, y: 2 }])).toBe('');
     });
 
     it('starts with M command for the first point', () => {
-      const path = pointsToSmoothPath([
+      const path = pointsToPath([
         { x: 0, y: 0 },
         { x: 10, y: 10 },
       ]);
@@ -87,37 +87,24 @@ describe('oklchCanvas', () => {
       expect(path.startsWith('M0,0')).toBe(true);
     });
 
-    it('includes a cubic bezier for each segment', () => {
-      const path = pointsToSmoothPath([
+    it('emits an L command for each additional point', () => {
+      const path = pointsToPath([
         { x: 0, y: 0 },
         { x: 10, y: 10 },
         { x: 20, y: 5 },
       ]);
 
-      // Two segments → two C commands
-      expect(path.match(/C/g)).toHaveLength(2);
+      expect(path.match(/L/g)).toHaveLength(2);
     });
 
     it('terminates at the last point', () => {
-      const path = pointsToSmoothPath([
+      const path = pointsToPath([
         { x: 0, y: 0 },
         { x: 10, y: 10 },
         { x: 20, y: 5 },
       ]);
 
       expect(path).toMatch(/20,5$/);
-    });
-
-    it('uses tension parameter to scale control points', () => {
-      const points = [
-        { x: 0, y: 0 },
-        { x: 10, y: 10 },
-        { x: 20, y: 0 },
-      ];
-      const low = pointsToSmoothPath(points, 0);
-      const high = pointsToSmoothPath(points, 1);
-
-      expect(low).not.toBe(high);
     });
   });
 });

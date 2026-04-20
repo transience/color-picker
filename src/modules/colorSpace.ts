@@ -2,7 +2,6 @@ import {
   CLMS_TO_OKLAB,
   DEG2RAD,
   formatCSS,
-  GAMUT_EPSILON,
   isInGamut,
   LMS_TO_LRGB,
   LRGB_TO_LMS,
@@ -25,6 +24,8 @@ export interface HSV {
   s: number; // 0-1
   v: number; // 0-1
 }
+
+const GAMUT_EPSILON = 0.0001;
 
 /**
  * RGB (0-1) → HSV. Standard formula.
@@ -128,8 +129,13 @@ export function isOklchInSRGB(l: number, c: number, h: number): boolean {
 /**
  * Check if a P3 HSV color is within the sRGB gamut.
  * P3 RGB → linear P3 → XYZ D50 → linear sRGB → bounds check.
+ *
+ * `epsilon` defaults to `GAMUT_EPSILON`. Pass `0` for a strict check — needed
+ * by the OKLCH panel's boundary scan near the blue-violet cusp (≈ hue 282),
+ * where saturated P3 blue sits within the default tolerance of sRGB blue and
+ * would otherwise register as in-gamut for every mid/low-value row.
  */
-export function isP3HSVInSRGB(h: number, s: number, v: number): boolean {
+export function isP3HSVInSRGB(h: number, s: number, v: number, epsilon = GAMUT_EPSILON): boolean {
   const [r, g, b] = hsvToRgb(h, s, v);
 
   const rLin = srgbGammaDecode(r);
@@ -144,8 +150,8 @@ export function isP3HSVInSRGB(h: number, s: number, v: number): boolean {
   const sg = XYZ_TO_SRGB[1][0] * x + XYZ_TO_SRGB[1][1] * y + XYZ_TO_SRGB[1][2] * z;
   const sb = XYZ_TO_SRGB[2][0] * x + XYZ_TO_SRGB[2][1] * y + XYZ_TO_SRGB[2][2] * z;
 
-  const min = -GAMUT_EPSILON;
-  const max = 1 + GAMUT_EPSILON;
+  const min = -epsilon;
+  const max = 1 + epsilon;
 
   return sr >= min && sr <= max && sg >= min && sg <= max && sb >= min && sb <= max;
 }

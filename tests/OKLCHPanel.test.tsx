@@ -78,7 +78,7 @@ describe('OKLCHPanel', () => {
       const { container } = render(
         <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
       );
-      const thumb = container.querySelector('[class*="border-white"]') as HTMLElement;
+      const thumb = container.querySelector('[class*="border-black"]') as HTMLElement;
 
       expect(thumb.style.left).toMatch(/%$/);
       expect(thumb.style.top).toMatch(/%$/);
