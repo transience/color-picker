@@ -3,9 +3,11 @@ import {
   DEG2RAD,
   formatCSS,
   GAMUT_EPSILON,
+  isInGamut,
   LMS_TO_LRGB,
   LRGB_TO_LMS,
   OKLAB_TO_CLMS,
+  oklabToLinearSRGB,
   P3_TO_SRGB,
   P3_TO_XYZ,
   parseCSS,
@@ -107,6 +109,20 @@ export function hsvToRgb(h: number, s: number, v: number): [number, number, numb
   }
 
   return [r + m, g + m, b + m];
+}
+
+/**
+ * Check whether the OKLCH color is in sRGB using the same rule colorizr
+ * itself applies when converting OKLCH to hex/rgb/hsl (direct OKLab →
+ * linear sRGB → `isInGamut`). If this returns true, colorizr will not
+ * clip the color on output.
+ */
+export function isOklchInSRGB(l: number, c: number, h: number): boolean {
+  const hRad = h * DEG2RAD;
+  const labA = c * Math.cos(hRad);
+  const labB = c * Math.sin(hRad);
+
+  return isInGamut(oklabToLinearSRGB(l, labA, labB));
 }
 
 /**

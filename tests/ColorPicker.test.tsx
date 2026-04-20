@@ -228,16 +228,29 @@ describe('ColorPicker', () => {
       expect(screen.queryByTestId('SettingsTrigger')).not.toBeInTheDocument();
     });
 
-    it('shows the gamut warning in OKLCH mode when displayFormat is narrow', () => {
+    it('shows the gamut warning for an out-of-sRGB OKLCH color when displayFormat is narrow', () => {
       render(
-        <ColorPicker color="#ff0044" defaultMode="oklch" displayFormat="hex" onChange={() => {}} />,
+        <ColorPicker
+          color="oklch(0.7 0.3 20)"
+          defaultMode="oklch"
+          displayFormat="hex"
+          onChange={() => {}}
+        />,
       );
 
       expect(screen.getByTestId('GamutWarning')).toBeInTheDocument();
     });
 
+    it('hides the gamut warning for an in-sRGB color even when displayFormat is narrow', () => {
+      render(
+        <ColorPicker color="#ff0044" defaultMode="oklch" displayFormat="hex" onChange={() => {}} />,
+      );
+
+      expect(screen.queryByTestId('GamutWarning')).not.toBeInTheDocument();
+    });
+
     it('hides the gamut warning when displayFormat is oklch', () => {
-      render(<ColorPicker color="#ff0044" defaultMode="oklch" onChange={() => {}} />);
+      render(<ColorPicker color="oklch(0.7 0.3 20)" defaultMode="oklch" onChange={() => {}} />);
 
       expect(screen.queryByTestId('GamutWarning')).not.toBeInTheDocument();
     });

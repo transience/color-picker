@@ -1,6 +1,9 @@
+import { parseCSS } from 'colorizr';
+
 import {
   colorToHsv,
   hsvToHex,
+  isOklchInSRGB,
   oklchHueToHsvHue,
   oklchToP3Hsv,
   p3HsvToOKLCH,
@@ -99,6 +102,26 @@ describe('colorSpace', () => {
       expect(back.h).toBeCloseTo(original.h, 0);
       expect(back.s).toBeCloseTo(original.s, 2);
       expect(back.v).toBeCloseTo(original.v, 2);
+    });
+  });
+
+  describe('isOklchInSRGB', () => {
+    it('returns true for black', () => {
+      expect(isOklchInSRGB(0, 0, 0)).toBe(true);
+    });
+
+    it('returns true for white', () => {
+      expect(isOklchInSRGB(1, 0, 0)).toBe(true);
+    });
+
+    it('returns true for a color parsed from an sRGB hex', () => {
+      const { c, h, l } = parseCSS('#ff0044', 'oklch');
+
+      expect(isOklchInSRGB(l, c, h)).toBe(true);
+    });
+
+    it('returns false for a high-chroma red outside P3', () => {
+      expect(isOklchInSRGB(0.7, 0.3, 20)).toBe(false);
     });
   });
 

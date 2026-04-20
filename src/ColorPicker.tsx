@@ -11,7 +11,7 @@ import Controls from './Controls';
 import EyeDropper from './EyeDropper';
 import GamutWarning from './GamutWarning';
 import ModeSelector from './ModeSelector';
-import { colorToHsv, type HSV, hsvToHex } from './modules/colorSpace';
+import { colorToHsv, type HSV, hsvToHex, isOklchInSRGB } from './modules/colorSpace';
 import {
   formatColor,
   isNarrowFormat,
@@ -344,7 +344,8 @@ export default function ColorPicker(props: ColorPickerProps) {
     precision,
   );
   const swatchColor = displayValue;
-  const showGamutWarning = isOklch && isNarrowFormat(resolvedDisplayFormat);
+  const showGamutWarning =
+    isOklch && isNarrowFormat(resolvedDisplayFormat) && !isOklchInSRGB(oklch.l, oklch.c, oklch.h);
 
   const hueBar =
     showHueBar && !hueConfig?.hidden ? (
