@@ -67,14 +67,17 @@ export default function ColorInput(props: ColorInputProps) {
   return (
     <div
       className={cn(
-        'flex items-center gap-2 w-full h-8 min-h-8 border-2 border-neutral-300 dark:border-neutral-600 rounded-lg px-2',
+        'flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2',
+        {
+          'ring-1 ring-neutral-300 dark:ring-neutral-600': isEditing,
+        },
         classNames?.root,
       )}
       data-testid="ColorInput"
     >
       <input
         aria-label="Color value"
-        className={cn('w-full text-sm outline-none', classNames?.input)}
+        className={cn('w-full bg-transparent text-sm outline-none', classNames?.input)}
         onBlur={handleBlur}
         onChange={event => handleChange(event.target.value)}
         onFocus={handleFocus}

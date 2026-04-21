@@ -39,7 +39,7 @@ describe('EyeDropper', () => {
 
     render(<EyeDropper onChange={() => {}} />);
 
-    expect(screen.getByTestId('EyeDropper')).toBeInTheDocument();
+    expect(screen.getByTestId('EyeDropper')).toMatchSnapshot();
   });
 
   it('emits the selected hex color', async () => {

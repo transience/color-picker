@@ -10,10 +10,10 @@ const withTheme: Decorator = (Story, context) => {
   if (theme === 'side') {
     return (
       <div className="grid flex-1 grid-cols-2">
-        <div className="flex items-center justify-center bg-white p-6 text-neutral-900">
+        <div className="flex items-center justify-center bg-neutral-100 p-6 text-neutral-900">
           <Story />
         </div>
-        <div className="dark flex items-center justify-center bg-neutral-900 p-6 text-neutral-50">
+        <div className="dark flex items-center justify-center bg-neutral-800 p-6 text-neutral-50">
           <Story />
         </div>
       </div>
@@ -23,7 +23,7 @@ const withTheme: Decorator = (Story, context) => {
   const wrapper =
     theme === 'dark'
       ? 'dark flex flex-1 items-center justify-center bg-neutral-900 p-6 text-neutral-50'
-      : 'flex flex-1 items-center justify-center bg-white p-6 text-neutral-900';
+      : 'flex flex-1 items-center justify-center bg-neutral-100 p-6 text-neutral-900';
 
   return (
     <div className={wrapper}>
@@ -53,11 +53,13 @@ const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
     controls: {
+      expanded: true,
       disableSaveFromUI: true,
       matchers: {
-        color: /(background|color)$/i,
-        date: /date$/i,
+        color: /^(background|color)$/i,
+        date: /^date$/i,
       },
+      sort: 'alpha',
     },
     backgrounds: { disable: true },
     a11y: { test: 'error' },

@@ -183,7 +183,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
   return (
     <div
-      className={cn('flex items-start justify-center gap-3 px-3', className)}
+      className={cn('flex items-start justify-center gap-3', className)}
       data-testid="ChannelInputs"
     >
       {fields.map(field => (

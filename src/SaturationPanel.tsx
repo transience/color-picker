@@ -1,5 +1,6 @@
 import { type PointerEvent, useRef } from 'react';
 
+import { panelClasses } from './constants';
 import { cn, relativePosition } from './modules/helpers';
 import type { PanelClassNames } from './types';
 
@@ -51,22 +52,17 @@ export default function SaturationPanel(props: SaturationPanelProps) {
   return (
     <div
       ref={containerRef}
-      className={cn('relative h-32 w-full cursor-crosshair overflow-hidden', classNames?.root)}
+      className={cn(panelClasses.root, classNames?.root)}
       data-testid="SaturationPanel"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       style={{
-        backgroundColor: `hsl(${hue}, 100%, 50%)`,
+        background: `linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, transparent), hsl(${hue}, 100%, 50%)`,
         touchAction: 'none',
       }}
     >
-      <div className="absolute inset-0 bg-linear-to-r from-white to-transparent" />
-      <div className="absolute inset-0 bg-linear-to-b from-transparent to-black" />
       <div
-        className={cn(
-          'pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md',
-          classNames?.thumb,
-        )}
+        className={cn(panelClasses.thumb, classNames?.thumb)}
         style={{
           left: `${saturation * 100}%`,
           top: `${(1 - value) * 100}%`,

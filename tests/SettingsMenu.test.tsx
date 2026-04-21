@@ -1,5 +1,9 @@
+import { useRef } from 'react';
+
 import SettingsMenu from '~/SettingsMenu';
-import { fireEvent, render, screen, within } from '~/test-utils';
+import { act, fireEvent, render, screen, within } from '~/test-utils';
+
+type Props = Parameters<typeof SettingsMenu>[0];
 
 function getGroup(title: 'Display format' | 'Output format'): HTMLElement {
   const titleEl = screen.getByText(title);
@@ -12,63 +16,46 @@ function getGroup(title: 'Display format' | 'Output format'): HTMLElement {
   return group;
 }
 
+function Host(props: Omit<Partial<Props>, 'containerRef'>) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  return (
+    <div ref={containerRef} data-testid="host">
+      <SettingsMenu
+        containerRef={containerRef}
+        displayFormat="auto"
+        onChangeDisplayFormat={() => {}}
+        onChangeOutputFormat={() => {}}
+        outputFormat="auto"
+        {...props}
+      />
+    </div>
+  );
+}
+
+function renderMenu(props: Omit<Partial<Props>, 'containerRef'> = {}) {
+  return render(<Host {...props} />);
+}
+
 describe('SettingsMenu', () => {
   it('renders only the trigger when closed', () => {
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu();
 
-    expect(screen.getByTestId('SettingsTrigger')).toBeInTheDocument();
-    expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
-  });
-
-  it('sets aria-expanded=false on the trigger when closed', () => {
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
-
-    expect(screen.getByTestId('SettingsTrigger')).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('SettingsMenuWrapper')).toMatchSnapshot();
   });
 
   it('opens the panel and flips aria-expanded on trigger click', () => {
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu();
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
 
-    expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
-    expect(screen.getByTestId('SettingsTrigger')).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('Display format')).toBeInTheDocument();
-    expect(screen.getByText('Output format')).toBeInTheDocument();
+    expect(screen.getByTestId('SettingsMenuWrapper')).toMatchSnapshot();
   });
 
   it('fires onChangeDisplayFormat with the selected value', () => {
     const onChangeDisplayFormat = vi.fn();
 
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={onChangeDisplayFormat}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu({ onChangeDisplayFormat });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
     fireEvent.click(within(getGroup('Display format')).getByRole('button', { name: 'Hex' }));
@@ -79,14 +66,7 @@ describe('SettingsMenu', () => {
   it('fires onChangeOutputFormat with the selected value', () => {
     const onChangeOutputFormat = vi.fn();
 
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={onChangeOutputFormat}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu({ onChangeOutputFormat });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
     fireEvent.click(within(getGroup('Output format')).getByRole('button', { name: 'RGB' }));
@@ -98,14 +78,7 @@ describe('SettingsMenu', () => {
     const onChangeDisplayFormat = vi.fn();
     const onChangeOutputFormat = vi.fn();
 
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={onChangeDisplayFormat}
-        onChangeOutputFormat={onChangeOutputFormat}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu({ onChangeDisplayFormat, onChangeOutputFormat });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
     fireEvent.click(within(getGroup('Output format')).getByRole('button', { name: 'Hex' }));
@@ -115,14 +88,7 @@ describe('SettingsMenu', () => {
   });
 
   it('returns focus to the trigger after a selection', () => {
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu();
 
     const trigger = screen.getByTestId('SettingsTrigger');
 
@@ -133,53 +99,86 @@ describe('SettingsMenu', () => {
   });
 
   it('closes on Escape', () => {
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
+    vi.useFakeTimers({ shouldAdvanceTime: true });
 
-    fireEvent.click(screen.getByTestId('SettingsTrigger'));
-    expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
+    try {
+      renderMenu();
 
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+      const panel = screen.getByTestId('SettingsMenu');
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      expect(panel).toHaveAttribute('aria-hidden', 'true');
+
+      act(() => {
+        vi.advanceTimersByTime(250);
+      });
+
+      expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('closes on outside mousedown', () => {
-    render(
-      <>
-        <button data-testid="outside" type="button">
-          outside
-        </button>
-        <SettingsMenu
-          displayFormat="auto"
-          onChangeDisplayFormat={() => {}}
-          onChangeOutputFormat={() => {}}
-          outputFormat="auto"
-        />
-      </>,
-    );
+    vi.useFakeTimers({ shouldAdvanceTime: true });
 
-    fireEvent.click(screen.getByTestId('SettingsTrigger'));
-    expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
+    try {
+      render(
+        <>
+          <button data-testid="outside" type="button">
+            outside
+          </button>
+          <Host />
+        </>,
+      );
 
-    fireEvent.mouseDown(screen.getByTestId('outside'));
-    expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+      const panel = screen.getByTestId('SettingsMenu');
+
+      fireEvent.mouseDown(screen.getByTestId('outside'));
+
+      expect(panel).toHaveAttribute('aria-hidden', 'true');
+
+      act(() => {
+        vi.advanceTimersByTime(250);
+      });
+
+      expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('unmounts after timeout even when transitionend never fires', () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+
+    try {
+      renderMenu();
+
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+      expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(screen.getByTestId('SettingsMenu')).toHaveAttribute('aria-hidden', 'true');
+
+      act(() => {
+        vi.advanceTimersByTime(249);
+      });
+      expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('stays open when clicking inside the panel (but outside a button)', () => {
-    render(
-      <SettingsMenu
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-      />,
-    );
+    renderMenu();
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
     fireEvent.mouseDown(screen.getByTestId('SettingsMenu'));
@@ -188,14 +187,7 @@ describe('SettingsMenu', () => {
   });
 
   it('marks the current selection in each group', () => {
-    render(
-      <SettingsMenu
-        displayFormat="hex"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="rgb"
-      />,
-    );
+    renderMenu({ displayFormat: 'hex', outputFormat: 'rgb' });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
 
@@ -203,8 +195,39 @@ describe('SettingsMenu', () => {
     const outputRgb = within(getGroup('Output format')).getByRole('button', { name: 'RGB' });
     const outputHex = within(getGroup('Output format')).getByRole('button', { name: 'Hex' });
 
-    expect(displayHex.className).toMatch(/text-neutral-900|text-neutral-50/);
-    expect(outputRgb.className).toMatch(/text-neutral-900|text-neutral-50/);
-    expect(outputHex.className).not.toMatch(/text-neutral-900 /);
+    expect(displayHex).toHaveClass(/text-neutral-900|text-neutral-50/);
+    expect(outputRgb).toHaveClass(/text-neutral-900|text-neutral-50/);
+    expect(outputHex).not.toHaveClass('text-neutral-900');
+  });
+
+  describe('Layout', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('renders column layout when container is narrow', () => {
+      vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(280);
+      renderMenu();
+
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+      const groups = getGroup('Display format').parentElement as HTMLElement;
+
+      expect(groups).not.toHaveClass('flex-row');
+      expect(groups.querySelector('.h-px')).toBeInTheDocument();
+    });
+
+    it('renders row layout when container is wide', () => {
+      vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(400);
+      renderMenu();
+
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+      const groups = getGroup('Display format').parentElement as HTMLElement;
+
+      expect(groups).toHaveClass('flex-row');
+      expect(groups).toHaveClass('justify-center');
+      expect(groups.querySelector('.h-px')).not.toBeInTheDocument();
+    });
   });
 });

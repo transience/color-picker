@@ -1,5 +1,6 @@
 import { type PointerEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { panelClasses } from './constants';
 import { clamp, cn, relativePosition } from './modules/helpers';
 import {
   lcToPointer,
@@ -44,6 +45,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     const container = containerRef.current;
 
     if (!container) return undefined;
+    if (typeof ResizeObserver === 'undefined') return undefined;
 
     const observer = new ResizeObserver(entries => {
       const next = Math.round(entries[0].contentRect.width);
@@ -121,7 +123,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
   return (
     <div
       ref={containerRef}
-      className={cn('relative h-32 w-full cursor-crosshair overflow-hidden', classNames?.root)}
+      className={cn(panelClasses.root, classNames?.root)}
       data-testid="OKLCHPanel"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -165,10 +167,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
         </>
       )}
       <div
-        className={cn(
-          'pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black outline-2 outline-white/20',
-          classNames?.thumb,
-        )}
+        className={cn(panelClasses.thumb, classNames?.thumb)}
         style={{
           left: `${thumb.x}%`,
           top: `${thumb.y}%`,

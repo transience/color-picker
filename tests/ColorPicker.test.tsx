@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-container */
 import { useState } from 'react';
 
 import ColorPicker from '~/ColorPicker';
@@ -10,6 +9,7 @@ import {
   mockRect,
   render,
   screen,
+  within,
 } from '~/test-utils';
 
 const mockOnChange = vi.fn();
@@ -52,102 +52,76 @@ describe('ColorPicker', () => {
 
   describe('Render', () => {
     it('renders OKLCH mode by default', () => {
-      const { container } = render(<Controlled />);
-
-      // OKLCHPanel (canvas) present; SaturationPanel crosshair still rendered on the shared panel root
-      expect(container.querySelector('canvas')).toBeInTheDocument();
-    });
-
-    it('renders HSL mode when defaultMode is hsl', () => {
-      const { container } = render(<Controlled defaultMode="hsl" />);
-
-      expect(container.querySelector('.cursor-crosshair')).toBeInTheDocument();
-      expect(container.querySelector('canvas')).not.toBeInTheDocument();
-    });
-
-    it('renders RGB mode with SaturationPanel', () => {
-      const { container } = render(<Controlled defaultMode="rgb" />);
-
-      expect(container.querySelector('.cursor-crosshair')).toBeInTheDocument();
-      expect(container.querySelector('canvas')).not.toBeInTheDocument();
-    });
-
-    it('renders mode toggle buttons', () => {
       render(<Controlled />);
 
-      expect(screen.getByRole('button', { name: 'Switch to OKLCH' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Switch to HSL' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Switch to RGB' })).toBeInTheDocument();
+      expect(screen.getByTestId('ColorPicker')).toMatchSnapshot();
     });
 
-    it('renders hue slider by default', () => {
-      render(<Controlled />);
+    it('renders HSL mode when defaultMode is "hsl"', () => {
+      render(<Controlled defaultMode="hsl" />);
 
-      expect(screen.getByRole('slider', { name: /hue/i })).toBeInTheDocument();
+      expect(screen.getByTestId('ColorPicker')).toMatchSnapshot();
     });
 
-    it('hides hue slider when channels.h.hidden is true', () => {
-      render(<Controlled channels={{ h: { hidden: true } }} />);
+    it('renders RGB mode with defaultMode is "rgb""', () => {
+      render(<Controlled defaultMode="rgb" />);
 
-      expect(screen.queryByRole('slider', { name: /hue/i })).not.toBeInTheDocument();
-    });
-
-    it('disables hue slider when channels.h.disabled is true', () => {
-      render(<Controlled channels={{ h: { disabled: true } }} />);
-
-      expect(screen.getByRole('slider', { name: /hue/i })).toHaveAttribute('aria-disabled', 'true');
-    });
-
-    it('renders the swatch by default', () => {
-      render(<Controlled />);
-
-      expect(screen.getByTestId('Swatch')).toBeInTheDocument();
+      expect(screen.getByTestId('ColorPicker')).toMatchSnapshot();
     });
 
     it('hides the swatch when showSwatch is false', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showSwatch={false} />);
+      render(<ColorPicker color="#ff0044" showSwatch={false} />);
 
       expect(screen.queryByTestId('Swatch')).not.toBeInTheDocument();
     });
 
-    it('hides the hue bar when showHueBar is false', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showHueBar={false} />);
+    it('render the hue bar when showHueBar is true', () => {
+      render(<ColorPicker color="#ff0044" showHueBar />);
 
-      expect(screen.queryByRole('slider', { name: /hue/i })).not.toBeInTheDocument();
+      expect(screen.getByRole('slider', { name: 'HueBar' })).toBeInTheDocument();
     });
 
-    it('hides the 2D panel when showPicker is false', () => {
-      const { container } = render(
-        <ColorPicker color="#ff0044" onChange={() => {}} showPicker={false} />,
-      );
+    it('hides the 2D panel when showPanel is false', () => {
+      render(<ColorPicker color="#ff0044" showPanel={false} />);
 
-      expect(container.querySelector('.cursor-crosshair')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('OKLCHPanel')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('SaturationPanel')).not.toBeInTheDocument();
     });
 
     it('limits the mode switcher to the provided modes', () => {
-      render(<ColorPicker color="#ff0044" modes={['hsl', 'rgb']} onChange={() => {}} />);
+      render(<ColorPicker color="#ff0044" modes={['hsl', 'rgb']} />);
 
       expect(screen.queryByRole('button', { name: 'Switch to OKLCH' })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Switch to HSL' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Switch to RGB' })).toBeInTheDocument();
     });
 
-    it('omits the middle layer when swatch and hue bar are both hidden', () => {
-      render(
-        <ColorPicker color="#ff0044" onChange={() => {}} showHueBar={false} showSwatch={false} />,
-      );
+    it('omits the toolbar when all elements are hidden', () => {
+      render(<ColorPicker color="#ff0044" />);
 
-      expect(screen.queryByTestId('ColorPickerMiddleLayer')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('Toolbar')).not.toBeInTheDocument();
+    });
+
+    it('renders the toolbar when showAlpha is true', () => {
+      render(<ColorPicker color="#ff0044" showAlpha />);
+
+      expect(screen.getByTestId('Toolbar')).toBeInTheDocument();
+    });
+
+    it('renders the toolbar when showHueBar is true', () => {
+      render(<ColorPicker color="#ff0044" showHueBar />);
+
+      expect(screen.getByTestId('Toolbar')).toBeInTheDocument();
     });
 
     it('renders the alpha slider when showAlpha is true', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showAlpha />);
+      render(<ColorPicker color="#ff0044" showAlpha />);
 
       expect(screen.getByRole('slider', { name: 'Alpha' })).toBeInTheDocument();
     });
 
     it('does not render the alpha slider by default', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} />);
+      render(<ColorPicker color="#ff0044" />);
 
       expect(screen.queryByRole('slider', { name: 'Alpha' })).not.toBeInTheDocument();
     });
@@ -157,7 +131,7 @@ describe('ColorPicker', () => {
         return { open: () => Promise.resolve({ sRGBHex: '#000000' }) };
       };
 
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showEyeDropper />);
+      render(<ColorPicker color="#ff0044" showEyeDropper />);
 
       expect(screen.getByTestId('EyeDropper')).toBeInTheDocument();
 
@@ -167,98 +141,104 @@ describe('ColorPicker', () => {
     it('omits the eyedropper when the API is not supported', () => {
       delete (globalThis as unknown as { EyeDropper?: unknown }).EyeDropper;
 
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showEyeDropper />);
+      render(<ColorPicker color="#ff0044" showEyeDropper />);
 
       expect(screen.queryByTestId('EyeDropper')).not.toBeInTheDocument();
     });
 
-    it('renders ChannelSliders when showSliders is true', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showSliders />);
+    it('renders ChannelSliders by default', () => {
+      render(<ColorPicker color="#ff0044" />);
 
       expect(screen.getByTestId('ChannelSliders')).toBeInTheDocument();
     });
 
-    it('does not render ChannelSliders by default', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} />);
-
-      expect(screen.queryByTestId('ChannelSliders')).not.toBeInTheDocument();
-    });
-
     it('passes showInputs through to ChannelSliders when showSliders is true', () => {
-      const { rerender } = render(
-        <ColorPicker color="#ff0044" defaultMode="hsl" onChange={() => {}} showSliders />,
-      );
+      render(<ColorPicker color="#ff0044" defaultMode="hsl" />);
 
-      expect(screen.queryByDisplayValue('100')).not.toBeInTheDocument();
+      expect(screen.getByDisplayValue('100')).toBeInTheDocument();
 
-      rerender(
-        <ColorPicker
-          color="#ff0044"
-          defaultMode="hsl"
-          onChange={() => {}}
-          showInputs
-          showSliders
-        />,
-      );
-
-      expect(screen.getAllByRole('textbox').length).toBeGreaterThan(1);
+      expect(within(screen.getByTestId('ChannelSliders')).getAllByRole('textbox')).toHaveLength(3);
     });
 
     it('renders ChannelInputs when showInputs is true and showSliders is false', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showInputs />);
+      render(<ColorPicker color="#ff0044" showInputs showSliders={false} />);
 
       expect(screen.getByTestId('ChannelInputs')).toBeInTheDocument();
     });
 
     it('does not render ChannelInputs when showSliders is true', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showInputs showSliders />);
+      render(<ColorPicker color="#ff0044" showInputs showSliders />);
 
       expect(screen.queryByTestId('ChannelInputs')).not.toBeInTheDocument();
     });
 
     it('renders the settings menu trigger when showSettings is true', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} showSettings />);
+      render(<ColorPicker color="#ff0044" showSettings />);
 
       expect(screen.getByTestId('SettingsTrigger')).toBeInTheDocument();
     });
 
     it('does not render the settings menu trigger by default', () => {
-      render(<ColorPicker color="#ff0044" onChange={() => {}} />);
+      render(<ColorPicker color="#ff0044" />);
 
       expect(screen.queryByTestId('SettingsTrigger')).not.toBeInTheDocument();
     });
 
-    it('shows the gamut warning for an out-of-sRGB OKLCH color when displayFormat is narrow', () => {
+    it('centers the options row when only one of eyeDropper/modeSelector/settings is visible', () => {
       render(
         <ColorPicker
-          color="oklch(0.7 0.3 20)"
-          defaultMode="oklch"
-          displayFormat="hex"
-          onChange={() => {}}
+          color="#ff0044"
+          showEyeDropper
+          showModeSelector={false}
+          showSettings={false}
         />,
       );
+
+      expect(screen.getByTestId('Options')).toHaveClass('justify-center');
+    });
+
+    it('uses justify-between for the options row when two or three options are visible', () => {
+      render(<ColorPicker color="#ff0044" showEyeDropper showModeSelector />);
+
+      const options = screen.getByTestId('Options');
+
+      expect(options).toHaveClass('justify-between');
+      expect(options).not.toHaveClass('justify-center');
+    });
+
+    it('does not render the options row when all three options are hidden', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          showEyeDropper={false}
+          showModeSelector={false}
+          showSettings={false}
+        />,
+      );
+
+      expect(screen.queryByTestId('Options')).not.toBeInTheDocument();
+    });
+
+    it('shows the gamut warning for an out-of-sRGB OKLCH color when displayFormat is narrow', () => {
+      render(<ColorPicker color="oklch(0.7 0.3 20)" displayFormat="hex" />);
 
       expect(screen.getByTestId('GamutWarning')).toBeInTheDocument();
     });
 
     it('hides the gamut warning for an in-sRGB color even when displayFormat is narrow', () => {
-      render(
-        <ColorPicker color="#ff0044" defaultMode="oklch" displayFormat="hex" onChange={() => {}} />,
-      );
+      render(<ColorPicker color="#ff0044" displayFormat="hex" />);
 
       expect(screen.queryByTestId('GamutWarning')).not.toBeInTheDocument();
     });
 
     it('hides the gamut warning when displayFormat is oklch', () => {
-      render(<ColorPicker color="oklch(0.7 0.3 20)" defaultMode="oklch" onChange={() => {}} />);
+      render(<ColorPicker color="oklch(0.7 0.3 20)" />);
 
       expect(screen.queryByTestId('GamutWarning')).not.toBeInTheDocument();
     });
 
     it('hides the gamut warning outside OKLCH mode', () => {
-      render(
-        <ColorPicker color="#ff0044" defaultMode="hsl" displayFormat="hex" onChange={() => {}} />,
-      );
+      render(<ColorPicker color="#ff0044" defaultMode="hsl" displayFormat="hex" />);
 
       expect(screen.queryByTestId('GamutWarning')).not.toBeInTheDocument();
     });
@@ -272,43 +252,44 @@ describe('ColorPicker', () => {
     });
 
     it('lands each slot on the expected element', () => {
-      const { container } = render(
+      render(
         <ColorPicker
           classNames={{
             root: 'slot-root',
             panel: { root: 'slot-panel-root', thumb: 'slot-panel-thumb' },
-            colorInputWrapper: 'slot-colorinput-wrapper',
             colorInput: { root: 'slot-colorinput-root', input: 'slot-colorinput-input' },
-            controls: 'slot-controls',
+            toolbar: 'slot-toolbar',
             hueSlider: { thumb: 'slot-hue-thumb' },
             swatch: { root: 'slot-swatch-root', color: 'slot-swatch-color' },
             eyeDropper: 'slot-eyedropper',
             modeSelector: 'slot-mode-selector',
           }}
           color="oklch(0.5 0.1 120)"
-          defaultMode="oklch"
-          onChange={() => {}}
-          showEyeDropper
+          showAlpha
+          showHueBar
         />,
       );
 
-      expect(container.firstElementChild?.className).toMatch(/slot-root/);
-      expect(container.querySelector('.slot-panel-root')).toBeInTheDocument();
-      expect(container.querySelector('.slot-panel-thumb')).toBeInTheDocument();
-      expect(container.querySelector('.slot-colorinput-wrapper')).toBeInTheDocument();
-      expect(container.querySelector('.slot-colorinput-root')).toBeInTheDocument();
-      expect(container.querySelector('.slot-colorinput-input')).toBeInTheDocument();
-      expect(container.querySelector('.slot-controls')).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /hue/i }).className).toMatch(/slot-hue-thumb/);
-      expect(screen.getByTestId('Swatch').className).toMatch(/slot-swatch-root/);
-      expect((screen.getByTestId('Swatch').firstChild as HTMLElement).className).toMatch(
-        /slot-swatch-color/,
+      expect(screen.getByTestId('ColorPicker')).toHaveClass('slot-root');
+      expect(screen.getByTestId('OKLCHPanel')).toHaveClass('slot-panel-root');
+      expect(
+        screen.getByTestId('OKLCHPanel').querySelector('.slot-panel-thumb'),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('ColorInput')).toHaveClass('slot-colorinput-root');
+      expect(screen.getByTestId('ColorInput').querySelector('input')).toHaveClass(
+        'slot-colorinput-input',
       );
-      expect(screen.getByTestId('EyeDropper').className).toMatch(/slot-eyedropper/);
+      expect(screen.getByTestId('Toolbar')).toHaveClass('slot-toolbar');
+      expect(screen.getByRole('slider', { name: 'HueBar' })).toHaveClass('slot-hue-thumb');
+      expect(screen.getByTestId('Swatch')).toHaveClass('slot-swatch-root');
+      expect(screen.getByTestId('Swatch').firstChild as HTMLElement).toHaveClass(
+        'slot-swatch-color',
+      );
+      expect(screen.getByTestId('EyeDropper')).toHaveClass('slot-eyedropper');
     });
 
     it('applies channel and numeric input classNames when sliders are shown', () => {
-      const { container } = render(
+      render(
         <ColorPicker
           classNames={{
             channelSliders: 'slot-channel-sliders',
@@ -316,16 +297,37 @@ describe('ColorPicker', () => {
             numericInput: { input: 'slot-numeric-input' },
           }}
           color="oklch(0.5 0.1 120)"
-          defaultMode="oklch"
-          onChange={() => {}}
           showInputs
           showSliders
         />,
       );
+      const sliders = screen.getByTestId('ChannelSliders');
 
-      expect(screen.getByTestId('ChannelSliders').className).toMatch(/slot-channel-sliders/);
-      expect(container.querySelectorAll('.slot-channel-thumb').length).toBeGreaterThan(0);
-      expect(container.querySelectorAll('.slot-numeric-input').length).toBeGreaterThan(0);
+      expect(sliders).toHaveClass('slot-channel-sliders');
+      expect(sliders.querySelectorAll('.slot-channel-thumb')).toHaveLength(3);
+      expect(sliders.querySelectorAll('.slot-numeric-input')).toHaveLength(3);
+    });
+
+    it('updates displayFormat and outputFormat through the settings menu', () => {
+      render(<ColorPicker color="#ff0044" onChange={mockOnChange} showSettings />);
+
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+      const displayGroup = screen
+        .getByText('Display format')
+        .closest('[data-testid="RadioGroup"]') as HTMLElement;
+      const outputGroup = screen
+        .getByText('Output format')
+        .closest('[data-testid="RadioGroup"]') as HTMLElement;
+
+      fireEvent.click(within(displayGroup).getByRole('button', { name: 'Hex' }));
+      expect(screen.getByLabelText('Color value')).toHaveValue('#ff0044');
+
+      mockOnChange.mockClear();
+      fireEvent.click(within(outputGroup).getByRole('button', { name: 'RGB' }));
+      fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
+
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^rgb\(/);
     });
 
     it('applies settingsMenu slots when the menu opens', () => {
@@ -335,16 +337,15 @@ describe('ColorPicker', () => {
             settingsMenu: { trigger: 'slot-settings-trigger', menu: 'slot-settings-menu' },
           }}
           color="#ff0044"
-          onChange={() => {}}
           showSettings
         />,
       );
 
       const trigger = screen.getByTestId('SettingsTrigger');
 
-      expect(trigger.className).toMatch(/slot-settings-trigger/);
+      expect(trigger).toHaveClass('slot-settings-trigger');
       fireEvent.click(trigger);
-      expect(screen.getByTestId('SettingsMenu').className).toMatch(/slot-settings-menu/);
+      expect(screen.getByTestId('SettingsMenu')).toHaveClass('slot-settings-menu');
     });
   });
 
@@ -352,14 +353,7 @@ describe('ColorPicker', () => {
     it('fires onChangeMode when the switcher changes mode', () => {
       const onChangeMode = vi.fn();
 
-      render(
-        <ColorPicker
-          color="#ff0044"
-          defaultMode="hsl"
-          onChange={() => {}}
-          onChangeMode={onChangeMode}
-        />,
-      );
+      render(<ColorPicker color="#ff0044" defaultMode="hsl" onChangeMode={onChangeMode} />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Switch to OKLCH' }));
 
@@ -369,14 +363,7 @@ describe('ColorPicker', () => {
     it('does not fire onChangeMode when clicking the current mode', () => {
       const onChangeMode = vi.fn();
 
-      render(
-        <ColorPicker
-          color="#ff0044"
-          defaultMode="hsl"
-          onChange={() => {}}
-          onChangeMode={onChangeMode}
-        />,
-      );
+      render(<ColorPicker color="#ff0044" defaultMode="hsl" onChangeMode={onChangeMode} />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Switch to HSL' }));
 
@@ -386,9 +373,7 @@ describe('ColorPicker', () => {
 
   describe('Display format', () => {
     it('displays hex when displayFormat="hex" regardless of mode', () => {
-      render(
-        <ColorPicker color="#ff0044" defaultMode="oklch" displayFormat="hex" onChange={() => {}} />,
-      );
+      render(<ColorPicker color="#ff0044" displayFormat="hex" />);
 
       const input = screen.getByLabelText('Color value') as HTMLInputElement;
 
@@ -396,7 +381,7 @@ describe('ColorPicker', () => {
     });
 
     it('displays oklch in OKLCH mode with displayFormat="auto"', () => {
-      render(<ColorPicker color="#ff0044" defaultMode="oklch" onChange={() => {}} />);
+      render(<ColorPicker color="#ff0044" />);
 
       const input = screen.getByLabelText('Color value') as HTMLInputElement;
 
@@ -443,39 +428,42 @@ describe('ColorPicker', () => {
 
       expect(last).not.toMatch(/\/\s*0\.5/);
     });
+
+    it('reflects alpha from the color prop when the prop changes under showAlpha', () => {
+      const { rerender } = render(<ColorPicker color="rgb(255 0 68 / 1)" showAlpha />);
+
+      expect(screen.getByRole('slider', { name: 'Alpha' })).toHaveAttribute('aria-valuenow', '1');
+
+      rerender(<ColorPicker color="rgb(255 0 68 / 0.5)" showAlpha />);
+
+      expect(screen.getByRole('slider', { name: 'Alpha' })).toHaveAttribute('aria-valuenow', '0.5');
+    });
   });
 
   describe('Mode switching', () => {
     it('switches from HSL to OKLCH on button click', () => {
-      const { container } = render(<Controlled />);
+      render(<Controlled defaultMode="hsl" />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Switch to OKLCH' }));
 
-      expect(container.querySelector('canvas')).toBeInTheDocument();
+      expect(screen.getByTestId('OKLCHPanel')).toBeInTheDocument();
+      expect(screen.queryByTestId('SaturationPanel')).not.toBeInTheDocument();
     });
 
     it('switches from OKLCH back to HSL', () => {
-      const { container } = render(<Controlled defaultMode="oklch" />);
+      render(<Controlled />);
 
       fireEvent.click(screen.getByRole('button', { name: 'Switch to HSL' }));
 
-      expect(container.querySelector('canvas')).not.toBeInTheDocument();
-      expect(container.querySelector('.cursor-crosshair')).toBeInTheDocument();
-    });
-
-    it('clicking the current mode is a no-op', () => {
-      const { container } = render(<Controlled />);
-
-      fireEvent.click(screen.getByRole('button', { name: 'Switch to HSL' }));
-
-      expect(container.querySelector('canvas')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('OKLCHPanel')).not.toBeInTheDocument();
+      expect(screen.getByTestId('SaturationPanel')).toBeInTheDocument();
     });
   });
 
   describe('Emission (output follows resolved format)', () => {
     it('emits hex in HSL mode with default (auto) output format', () => {
-      const { container } = render(<Controlled defaultMode="hsl" />);
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+      render(<Controlled defaultMode="hsl" />);
+      const panel = screen.getByTestId('SaturationPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
       fireEvent.pointerDown(panel, { clientX: 100, clientY: 50, pointerId: 1 });
@@ -485,8 +473,8 @@ describe('ColorPicker', () => {
     });
 
     it('emits OKLCH when OKLCHPanel is dragged in OKLCH mode', () => {
-      const { container } = render(<Controlled defaultMode="oklch" />);
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+      render(<Controlled />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
       fireEvent.pointerDown(panel, { clientX: 128, clientY: 64, pointerId: 1 });
@@ -503,9 +491,40 @@ describe('ColorPicker', () => {
     });
 
     it('emits OKLCH when the hue slider changes in OKLCH mode', () => {
-      render(<Controlled defaultMode="oklch" />);
+      render(<Controlled />);
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
+
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
+    });
+
+    it('emits hex when the toolbar hue bar changes in HSL mode', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          defaultMode="hsl"
+          onChange={mockOnChange}
+          showHueBar
+          showSliders={false}
+        />,
+      );
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'HueBar' }), { key: 'ArrowRight' });
+
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^#[\da-f]{6}$/i);
+    });
+
+    it('emits OKLCH when the toolbar hue bar changes in OKLCH mode', () => {
+      render(
+        <ColorPicker
+          color="oklch(0.5 0.1 120)"
+          onChange={mockOnChange}
+          showHueBar
+          showSliders={false}
+        />,
+      );
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'HueBar' }), { key: 'ArrowRight' });
 
       expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
@@ -536,14 +555,7 @@ describe('ColorPicker', () => {
     });
 
     it('respects outputFormat="rgb" in OKLCH mode', () => {
-      render(
-        <ColorPicker
-          color="#ff0044"
-          defaultMode="oklch"
-          onChange={mockOnChange}
-          outputFormat="rgb"
-        />,
-      );
+      render(<ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="rgb" />);
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
 
@@ -552,13 +564,7 @@ describe('ColorPicker', () => {
 
     it('respects precision on emitted oklch output', () => {
       render(
-        <ColorPicker
-          color="#ff0044"
-          defaultMode="oklch"
-          onChange={mockOnChange}
-          outputFormat="oklch"
-          precision={2}
-        />,
+        <ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="oklch" precision={2} />,
       );
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
@@ -577,13 +583,7 @@ describe('ColorPicker', () => {
 
     it('respects precision=0 (integer output)', () => {
       render(
-        <ColorPicker
-          color="#ff0044"
-          defaultMode="oklch"
-          onChange={mockOnChange}
-          outputFormat="oklch"
-          precision={0}
-        />,
+        <ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="oklch" precision={0} />,
       );
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
@@ -661,9 +661,9 @@ describe('ColorPicker', () => {
   });
 
   describe('Drag integration', () => {
-    it('firing a full drag on the SaturationPanel emits multiple OKLCH values', () => {
-      const { container } = render(<Controlled />);
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+    it('firing a full drag on the OKLCHPanel emits multiple OKLCH values', () => {
+      render(<Controlled />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
 

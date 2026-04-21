@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { convertCSS, formatCSS, opacity, parseCSS } from 'colorizr';
 
 import AlphaSlider from './AlphaSlider';
@@ -7,7 +7,6 @@ import ChannelSliders from './ChannelSliders';
 import ColorInput from './ColorInput';
 import GradientSlider from './components/GradientSlider';
 import { DEFAULT_COLOR, DEFAULT_MODES, hslHueGradient, oklchHueGradient } from './constants';
-import Controls from './Controls';
 import EyeDropper from './EyeDropper';
 import GamutWarning from './GamutWarning';
 import ModeSelector from './ModeSelector';
@@ -23,6 +22,7 @@ import OKLCHPanel from './OKLCHPanel';
 import SaturationPanel from './SaturationPanel';
 import SettingsMenu from './SettingsMenu';
 import Swatch from './Swatch';
+import Toolbar from './Toolbar';
 import type { ChannelsConfig, ColorFormat, ColorMode, ColorPickerClassNames } from './types';
 import useInteractionAttribute from './useInteractionAttribute';
 
@@ -34,126 +34,123 @@ interface OKLCHState {
 
 export interface ColorPickerProps {
   /**
-   * Per-channel overrides for label, hidden, and disabled state. Keys not
-   * relevant to the active mode are ignored (e.g. `s` is a no-op in OKLCH
-   * mode). Applies to both the middle-layer hue bar and any channel
-   * slider/input rendered for the mode.
+   * Per-channel overrides for label, hidden, and disabled state.
+   *
+   * Keys not relevant to the active mode are ignored.
    */
   channels?: ChannelsConfig;
   /**
-   * Slot-based className overrides for every internal part. Each slot is
-   * merged with the component's defaults via `cn()` (`clsx` + `tailwind-merge`)
-   * so Tailwind utilities override correctly. See `ColorPickerClassNames` for
-   * the full slot map.
+   * Slot-based className overrides for every internal element.
+   *
+   * See `ColorPickerClassNames` for the full slot map.
    */
   classNames?: ColorPickerClassNames;
   /**
-   * Controlled color value. Accepts any CSS color string (hex, `rgb()`,
-   * `hsl()`, `oklch()`, named colors, etc.) — parsed via `colorizr`. When
-   * `undefined`, the picker falls back to its internal default color.
+   * Controlled color value.
+   *
+   * Accepts any CSS color string (hex, `rgb()`, `hsl()`, `oklch()`, `oklab()`, named colors, etc.).
+   * Falls back to the internal default when `undefined`.
    */
   color?: string;
   /**
-   * Initial mode for the 2D panel and channel controls. Applies only on
-   * mount; use the mode switcher (or re-mount) to change mode afterwards.
+   * Initial mode for the 2D panel and channel controls.
    * @default 'oklch'
    */
   defaultMode?: ColorMode;
   /**
-   * Initial value for the ColorInput's text format. After mount, the settings
-   * menu mutates internal state — this prop is read once. `'auto'` resolves
-   * to `'oklch'` when `mode === 'oklch'`, otherwise `'hex'`.
+   * Initial text format for the `ColorInput`.
+   *
+   * `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.
    * @default 'auto'
    */
   displayFormat?: ColorFormat;
   /**
-   * Modes shown in the bottom mode switcher. Pass a subset to restrict the
-   * user to specific color spaces (e.g. `['oklch']` for an OKLCH-only picker).
+   * Modes available in the mode switcher.
    * @default ['oklch', 'hsl', 'rgb']
    */
   modes?: ColorMode[];
   /**
-   * Called on every color change — 2D panel, hue bar, alpha slider, channel
-   * slider/input, text input, or EyeDropper. Format follows the resolved
-   * `outputFormat` (defaults to the resolved `displayFormat`). Alpha is
-   * appended only when `showAlpha` is on and the current alpha is `< 1`.
+   * Called on every color change.
+   *
+   * Format follows the resolved `outputFormat`. Alpha is appended when
+   * `showAlpha` is on and the current alpha is `< 1`.
    */
   onChange?: (value: string) => void;
-  /** Called when the user flips the mode via the switcher. */
+  /** Called when the user changes mode via the switcher. */
   onChangeMode?: (mode: ColorMode) => void;
   /**
-   * Initial value for what `onChange` emits. After mount, the settings menu
-   * mutates internal state. `'auto'` follows the resolved `displayFormat`.
+   * Initial format `onChange` emits.
+   *
+   * `'auto'` follows the resolved `displayFormat`.
    * @default 'auto'
    */
   outputFormat?: ColorFormat;
   /**
-   * Decimal digits of precision used when emitting non-hex output and
-   * rendering the text input. Forwarded to colorizr's `formatCSS` — `0`
-   * rounds to integers, larger values give more digits. Unset uses
-   * colorizr's default (`5`). Ignored for hex output.
-   * @default undefined
+   * Decimal digits of precision for non-hex output.
+   *
+   * Ignored for hex output.
+   * @default 5
    */
   precision?: number;
   /**
-   * Adds an alpha slider to the middle layer and includes alpha in the
-   * emitted color. When `false`, any alpha on the incoming `color` prop is
-   * ignored and output is always fully opaque.
+   * Adds an alpha slider and includes alpha in the emitted color.
+   *
+   * When `false`, any alpha on the incoming `color` prop is ignored.
    * @default false
    */
   showAlpha?: boolean;
   /**
-   * Adds an EyeDropper button (screen color picker) to the middle layer.
-   * Silently omitted in browsers that do not implement `window.EyeDropper`
-   * (currently Chromium-only — Firefox and Safari do not support it).
-   * @default false
+   * Shows a text input with the current color value, formatted per `displayFormat`.
+   * @default true
+   */
+  showColorInput?: boolean;
+  /**
+   * Adds an EyeDropper button to the toolbar.
+   *
+   * Silently omitted when `window.EyeDropper` is unavailable.
+   * @default true
    */
   showEyeDropper?: boolean;
   /**
-   * Shows the rainbow hue bar in the middle layer. Disable when a hue
-   * channel slider is already surfaced via `showSliders`, or for compact,
-   * hue-locked variants of the picker.
-   * @default true
+   * Shows the hue bar in the toolbar.
+   * @default false
    */
   showHueBar?: boolean;
   /**
-   * Shows numeric input fields for each channel. When `showSliders` is also
-   * on, inputs render inline as each slider's `endContent`; when off, a
-   * standalone row of labelled boxed inputs renders below the mode switcher
-   * (with an extra alpha input when `showAlpha` is also on).
-   * @default false
+   * Shows numeric input fields for each channel.
+   *
+   * Renders inline with each slider when `showSliders` is on, as a standalone row otherwise.
+   * @default true
    */
   showInputs?: boolean;
   /**
-   * Shows the 2D color panel (saturation/value for HSL/RGB,
-   * chroma/lightness for OKLCH). Disable for a compact picker built around
-   * the middle layer and channel sliders/inputs only.
+   * Show the color mode selector.
    * @default true
    */
-  showPicker?: boolean;
+  showModeSelector?: boolean;
   /**
-   * Adds a ⋮ menu at the right of the mode switcher bar exposing display
-   * format and output format choices to end users. Off by default — these
-   * formats are primarily a developer API.
+   * Shows the 2D color panel.
+   * @default true
+   */
+  showPanel?: boolean;
+  /**
+   * Adds a settings menu exposing display and output format controls.
    * @default false
    */
   showSettings?: boolean;
   /**
-   * Shows a block of channel sliders matching the active mode (L/C/H in
-   * OKLCH, H/S/L in HSL, R/G/B in RGB). Each slider has a gradient track
-   * reflecting its channel's range for the current color.
-   * @default false
+   * Shows a block of channel sliders matching the active mode.
+   * @default true
    */
   showSliders?: boolean;
   /**
-   * Shows a circular color preview in the middle layer. The swatch renders
-   * the current color over a checkerboard so alpha is visible when
-   * `showAlpha` is on.
+   * Shows a circular color preview in the toolbar.
    * @default true
    */
   showSwatch?: boolean;
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function ColorPicker(props: ColorPickerProps) {
   const {
     channels,
@@ -167,12 +164,14 @@ export default function ColorPicker(props: ColorPickerProps) {
     outputFormat: outputFormatProp = 'auto',
     precision,
     showAlpha = false,
-    showEyeDropper = false,
-    showHueBar = true,
-    showInputs = false,
-    showPicker = true,
+    showColorInput = true,
+    showEyeDropper = true,
+    showHueBar = false,
+    showInputs = true,
+    showModeSelector = true,
+    showPanel = true,
     showSettings = false,
-    showSliders = false,
+    showSliders = true,
     showSwatch = true,
   } = props;
   const initialColor = color ?? DEFAULT_COLOR;
@@ -183,7 +182,8 @@ export default function ColorPicker(props: ColorPickerProps) {
   const [mode, setMode] = useState<ColorMode>(defaultMode);
   const [oklch, setOklch] = useState<OKLCHState>(() => parseCSS(initialColor, 'oklch'));
   const [outputFormat, setOutputFormat] = useState<ColorFormat>(outputFormatProp);
-  const rootRef = useInteractionAttribute();
+  const interactionRef = useInteractionAttribute();
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const lastEmittedRef = useRef(initialColor);
 
@@ -208,6 +208,14 @@ export default function ColorPicker(props: ColorPickerProps) {
   outputFormatRef.current = outputFormat;
   precisionRef.current = precision;
   showAlphaRef.current = showAlpha;
+
+  const rootRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      interactionRef(node);
+    },
+    [interactionRef],
+  );
 
   useEffect(() => {
     if (color !== undefined && color !== lastEmittedRef.current) {
@@ -236,47 +244,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     return final;
   }, []);
 
-  const handleSaturationChange = useCallback(
-    (s: number, v: number) => {
-      const next = { h: hsvRef.current.h, s, v };
-
-      setHsv(next);
-      emit(convertCSS(hsvToHex(next), 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleHsvHueChange = useCallback(
-    (h: number) => {
-      const next = { ...hsvRef.current, h };
-
-      setHsv(next);
-      emit(convertCSS(hsvToHex(next), 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleOklchPanelChange = useCallback(
-    (l: number, c: number) => {
-      const next = { ...oklchRef.current, c, l };
-
-      setOklch(next);
-      emit(formatCSS(next, 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleOklchHueChange = useCallback(
-    (h: number) => {
-      const next = { ...oklchRef.current, h };
-
-      setOklch(next);
-      emit(formatCSS(next, 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleAlphaChange = useCallback(
+  const handleChangeAlpha = useCallback(
     (next: number) => {
       setAlpha(next);
       alphaRef.current = next;
@@ -291,7 +259,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     [emit],
   );
 
-  const handleColorInput = useCallback(
+  const handleChangeColorInput = useCallback(
     (value: string) => {
       const oklchValue = convertCSS(value, 'oklch');
 
@@ -310,6 +278,56 @@ export default function ColorPicker(props: ColorPickerProps) {
     [emit],
   );
 
+  const handleChangeDisplayFormat = useCallback((format: ColorFormat) => {
+    setDisplayFormat(format);
+    displayFormatRef.current = format;
+  }, []);
+
+  const handleChangeHsvHue = useCallback(
+    (h: number) => {
+      const next = { ...hsvRef.current, h };
+
+      setHsv(next);
+      emit(convertCSS(hsvToHex(next), 'oklch'));
+    },
+    [emit],
+  );
+
+  const handleChangeOklchHue = useCallback(
+    (h: number) => {
+      const next = { ...oklchRef.current, h };
+
+      setOklch(next);
+      emit(formatCSS(next, 'oklch'));
+    },
+    [emit],
+  );
+
+  const handleChangeOklchPanel = useCallback(
+    (l: number, c: number) => {
+      const next = { ...oklchRef.current, c, l };
+
+      setOklch(next);
+      emit(formatCSS(next, 'oklch'));
+    },
+    [emit],
+  );
+
+  const handleChangeOutputFormat = useCallback((format: ColorFormat) => {
+    setOutputFormat(format);
+    outputFormatRef.current = format;
+  }, []);
+
+  const handleChangeSaturationPanel = useCallback(
+    (s: number, v: number) => {
+      const next = { h: hsvRef.current.h, s, v };
+
+      setHsv(next);
+      emit(convertCSS(hsvToHex(next), 'oklch'));
+    },
+    [emit],
+  );
+
   const handleClickMode = (value: ColorMode) => {
     if (value === mode) {
       return;
@@ -318,16 +336,6 @@ export default function ColorPicker(props: ColorPickerProps) {
     setMode(value);
     onChangeModeRef.current?.(value);
   };
-
-  const handleChangeDisplayFormat = useCallback((format: ColorFormat) => {
-    setDisplayFormat(format);
-    displayFormatRef.current = format;
-  }, []);
-
-  const handleChangeOutputFormat = useCallback((format: ColorFormat) => {
-    setOutputFormat(format);
-    outputFormatRef.current = format;
-  }, []);
 
   const isOklch = mode === 'oklch';
   const currentHue = isOklch ? oklch.h : hsv.h;
@@ -347,118 +355,185 @@ export default function ColorPicker(props: ColorPickerProps) {
   const showGamutWarning =
     isOklch && isNarrowFormat(resolvedDisplayFormat) && !isOklchInSRGB(oklch.l, oklch.c, oklch.h);
 
-  const hueBar =
-    showHueBar && !hueConfig?.hidden ? (
+  const content: Record<string, ReactNode> = {};
+
+  if (showPanel) {
+    content.panel = isOklch ? (
+      <OKLCHPanel
+        chroma={oklch.c}
+        classNames={classNames?.panel}
+        hue={oklch.h}
+        lightness={oklch.l}
+        onChange={handleChangeOklchPanel}
+      />
+    ) : (
+      <SaturationPanel
+        classNames={classNames?.panel}
+        hue={hsv.h}
+        onChange={handleChangeSaturationPanel}
+        saturation={hsv.s}
+        value={hsv.v}
+      />
+    );
+  }
+
+  if (showColorInput) {
+    content.colorInput = (
+      <ColorInput
+        classNames={classNames?.colorInput}
+        endContent={showGamutWarning ? <GamutWarning className={classNames?.gamutWarning} /> : null}
+        onChange={handleChangeColorInput}
+        value={displayValue}
+      />
+    );
+  }
+
+  if (showSwatch) {
+    content.swatch = <Swatch classNames={classNames?.swatch} color={swatchColor} />;
+  }
+
+  if (showColorInput || showSwatch) {
+    content.colorValue = (
+      <div className={cn('flex items-center gap-2', classNames?.colorValue)}>
+        {content.swatch}
+        {content.colorInput}
+      </div>
+    );
+  }
+
+  if (showAlpha) {
+    content.alphaSlider = (
+      <AlphaSlider
+        classNames={classNames?.alphaSlider}
+        color={solidColor}
+        onChange={handleChangeAlpha}
+        value={alpha}
+      />
+    );
+  }
+
+  if (showHueBar) {
+    content.hueBar = (
       <GradientSlider
         aria-label="HueBar"
         classNames={classNames?.hueSlider}
         gradient={isOklch ? oklchHueGradient : hslHueGradient}
         isDisabled={hueConfig?.disabled}
         maxValue={360}
-        onValueChange={isOklch ? handleOklchHueChange : handleHsvHueChange}
+        onValueChange={isOklch ? handleChangeOklchHue : handleChangeHsvHue}
+        startContent="H"
         value={currentHue}
       />
-    ) : null;
+    );
+  }
 
-  const alphaBar = showAlpha ? (
-    <AlphaSlider
-      classNames={classNames?.alphaSlider}
-      color={solidColor}
-      onChange={handleAlphaChange}
-      value={alpha}
-    />
-  ) : null;
+  if (showAlpha || showHueBar) {
+    content.toolbar = (
+      <Toolbar
+        alphaBar={content.alphaSlider}
+        className={classNames?.toolbar}
+        hueBar={content.hueBar}
+      />
+    );
+  }
+
+  if (showSliders) {
+    content.sliders = (
+      <ChannelSliders
+        channelSliderClassNames={classNames?.channelSlider}
+        channels={channels}
+        className={classNames?.channelSliders}
+        color={solidColor}
+        mode={mode}
+        numericInputClassNames={classNames?.numericInput}
+        onChangeColor={handleChangeColorInput}
+        showInputs={showInputs}
+      />
+    );
+  } else if (showInputs) {
+    content.inputs = (
+      <ChannelInputs
+        alpha={alpha}
+        channels={channels}
+        className={classNames?.channelInputs}
+        color={solidColor}
+        mode={mode}
+        numericInputClassNames={classNames?.numericInput}
+        onAlphaChange={handleChangeAlpha}
+        onChangeColor={handleChangeColorInput}
+        showAlpha={showAlpha}
+      />
+    );
+  }
+
+  if (showEyeDropper) {
+    content.eyeDropper = (
+      <EyeDropper
+        key="eyeDropper"
+        className={classNames?.eyeDropper}
+        onChange={handleChangeColorInput}
+      />
+    );
+  }
+
+  if (showModeSelector) {
+    content.modeSelector = (
+      <ModeSelector
+        key="modeSelector"
+        className={classNames?.modeSelector}
+        mode={mode}
+        modes={modes}
+        onClick={handleClickMode}
+      />
+    );
+  }
+
+  if (showSettings) {
+    content.settings = (
+      <SettingsMenu
+        key="settings"
+        classNames={classNames?.settingsMenu}
+        containerRef={containerRef}
+        displayFormat={displayFormat}
+        onChangeDisplayFormat={handleChangeDisplayFormat}
+        onChangeOutputFormat={handleChangeOutputFormat}
+        outputFormat={outputFormat}
+      />
+    );
+  }
+
+  const options = [content.eyeDropper, content.modeSelector, content.settings].filter(Boolean);
+
+  if (options.length) {
+    content.options = (
+      <div
+        className={cn(
+          'flex items-center gap-2 justify-between',
+          { 'justify-center': options.length === 1 },
+          classNames?.options,
+        )}
+        data-testid="Options"
+      >
+        {options}
+      </div>
+    );
+  }
 
   return (
     <div
       ref={rootRef}
-      className={cn('flex w-full max-w-xs flex-col gap-3', classNames?.root)}
+      className={cn(
+        'relative overflow-hidden flex w-full max-w-xs flex-col gap-4 p-3',
+        classNames?.root,
+      )}
       data-testid="ColorPicker"
     >
-      {showPicker && (
-        <div className="pt-3 px-3" data-testid="ColorPanel">
-          {isOklch ? (
-            <OKLCHPanel
-              chroma={oklch.c}
-              classNames={classNames?.panel}
-              hue={oklch.h}
-              lightness={oklch.l}
-              onChange={handleOklchPanelChange}
-            />
-          ) : (
-            <SaturationPanel
-              classNames={classNames?.panel}
-              hue={hsv.h}
-              onChange={handleSaturationChange}
-              saturation={hsv.s}
-              value={hsv.v}
-            />
-          )}
-        </div>
-      )}
-      <div className={cn('px-3', classNames?.colorInputWrapper)} data-testid="ColorInputWrapper">
-        <ColorInput
-          classNames={classNames?.colorInput}
-          endContent={
-            showGamutWarning ? <GamutWarning className={classNames?.gamutWarning} /> : null
-          }
-          onChange={handleColorInput}
-          value={displayValue}
-        />
-      </div>
-      <Controls
-        alphaBar={alphaBar}
-        className={classNames?.controls}
-        eyeDropper={
-          showEyeDropper ? (
-            <EyeDropper className={classNames?.eyeDropper} onChange={handleColorInput} />
-          ) : null
-        }
-        hueBar={hueBar}
-        swatch={showSwatch ? <Swatch classNames={classNames?.swatch} color={swatchColor} /> : null}
-      />
-      {showSliders && (
-        <ChannelSliders
-          channelSliderClassNames={classNames?.channelSlider}
-          channels={channels}
-          className={classNames?.channelSliders}
-          color={solidColor}
-          mode={mode}
-          numericInputClassNames={classNames?.numericInput}
-          onChangeColor={handleColorInput}
-          showInputs={showInputs}
-        />
-      )}
-      {!showSliders && showInputs && (
-        <ChannelInputs
-          alpha={alpha}
-          channels={channels}
-          className={classNames?.channelInputs}
-          color={solidColor}
-          mode={mode}
-          numericInputClassNames={classNames?.numericInput}
-          onAlphaChange={handleAlphaChange}
-          onChangeColor={handleColorInput}
-          showAlpha={showAlpha}
-        />
-      )}
-      <div className="flex items-center justify-between gap-2 pb-3 px-3">
-        <ModeSelector
-          className={classNames?.modeSelector}
-          mode={mode}
-          modes={modes}
-          onClick={handleClickMode}
-        />
-        {showSettings && (
-          <SettingsMenu
-            classNames={classNames?.settingsMenu}
-            displayFormat={displayFormat}
-            onChangeDisplayFormat={handleChangeDisplayFormat}
-            onChangeOutputFormat={handleChangeOutputFormat}
-            outputFormat={outputFormat}
-          />
-        )}
-      </div>
+      {content.panel}
+      {content.colorValue}
+      {content.toolbar}
+      {content.sliders}
+      {content.inputs}
+      {content.options}
     </div>
   );
 }

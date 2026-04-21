@@ -2,17 +2,27 @@ import { render, screen } from '~/test-utils';
 
 import GamutWarning from '../src/GamutWarning';
 
+let mockIdCounter = 0;
+
+vi.mock('~/modules/helpers', async importOriginal => {
+  const actual = await importOriginal<typeof import('~/modules/helpers')>();
+
+  return {
+    ...actual,
+    createId: (prefix: string) => {
+      mockIdCounter += 1;
+
+      return `${prefix}-${mockIdCounter}`;
+    },
+  };
+});
+
+beforeEach(() => {
+  mockIdCounter = 0;
+});
+
 describe('GamutWarning', () => {
-  it('renders with a descriptive tooltip', () => {
-    render(<GamutWarning />);
-
-    const node = screen.getByTestId('GamutWarning');
-
-    expect(node).toBeInTheDocument();
-    expect(node).toHaveAttribute('title', expect.stringMatching(/narrow srgb format|clipped/i));
-  });
-
-  it('renders an icon (svg)', () => {
+  it('renders correctly', () => {
     render(<GamutWarning />);
 
     expect(screen.getByTestId('GamutWarning')).toMatchSnapshot();
@@ -21,6 +31,18 @@ describe('GamutWarning', () => {
   it('appends custom className', () => {
     render(<GamutWarning className="extra-gamut" />);
 
-    expect(screen.getByTestId('GamutWarning').className).toMatch(/extra-gamut/);
+    expect(screen.getByTestId('GamutWarning')).toHaveClass('extra-gamut');
+  });
+
+  it('generates unique ids per instance', () => {
+    render(
+      <>
+        <GamutWarning />
+        <GamutWarning />
+      </>,
+    );
+    const [a, b] = screen.getAllByTestId('GamutWarning');
+
+    expect(a.getAttribute('popovertarget')).not.toBe(b.getAttribute('popovertarget'));
   });
 });

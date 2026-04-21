@@ -1,0 +1,601 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] = `
+<div
+  class="relative overflow-hidden flex w-full max-w-xs flex-col gap-4 p-3"
+  data-testid="ColorPicker"
+>
+  <div
+    class="relative h-32 w-full cursor-crosshair overflow-hidden"
+    data-testid="SaturationPanel"
+    style="background: linear-gradient(transparent, rgb(0, 0, 0)), linear-gradient(to right, rgb(255, 255, 255), transparent), rgb(255, 0, 68); touch-action: none;"
+  >
+    <div
+      class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20"
+      style="left: 100%; top: 0%;"
+    />
+  </div>
+  <div
+    class="flex items-center gap-2"
+  >
+    <div
+      aria-hidden="true"
+      class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      data-testid="Swatch"
+      style="background-image: url("/src/images/transparent-bg.gif");"
+    >
+      <div
+        class="flex items-center justify-center size-full"
+        style="background-color: rgb(255, 0, 68);"
+      />
+    </div>
+    <div
+      class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
+      data-testid="ColorInput"
+    >
+      <input
+        aria-label="Color value"
+        class="w-full bg-transparent text-sm outline-none"
+        value="#ff0044"
+      />
+    </div>
+  </div>
+  <div
+    class="space-y-3"
+    data-testid="ChannelSliders"
+  >
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      H
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0)); touch-action: none;"
+      >
+        <div
+          aria-label="Hue"
+          aria-valuemax="359.9"
+          aria-valuemin="0"
+          aria-valuenow="344"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(95.5821% - 19.1164212281189px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Hue"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="344"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        >
+          °
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      S
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(128, 128, 128), rgb(255, 0, 68)); touch-action: none;"
+      >
+        <div
+          aria-label="Saturation"
+          aria-valuemax="100"
+          aria-valuemin="0"
+          aria-valuenow="100"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(100% - 20px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Saturation"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="100"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        >
+          %
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      L
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(255, 0, 68), rgb(255, 255, 255)); touch-action: none;"
+      >
+        <div
+          aria-label="Lightness"
+          aria-valuemax="100"
+          aria-valuemin="0"
+          aria-valuenow="50"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(50% - 10px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Lightness"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="50"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        >
+          %
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2 justify-between"
+    data-testid="Options"
+  >
+    <div
+      class="flex items-center"
+      data-testid="ModeSelector"
+    >
+      <button
+        aria-label="Switch to OKLCH"
+        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        type="button"
+      >
+        OKLCH
+      </button>
+      <button
+        aria-label="Switch to HSL"
+        class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+        type="button"
+      >
+        HSL
+      </button>
+      <button
+        aria-label="Switch to RGB"
+        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        type="button"
+      >
+        RGB
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
+<div
+  class="relative overflow-hidden flex w-full max-w-xs flex-col gap-4 p-3"
+  data-testid="ColorPicker"
+>
+  <div
+    class="relative h-32 w-full cursor-crosshair overflow-hidden"
+    data-testid="OKLCHPanel"
+    style="touch-action: none;"
+  >
+    <canvas
+      class="absolute inset-0 size-full"
+      height="128"
+      width="256"
+    />
+    <svg
+      class="pointer-events-none absolute inset-0 size-full"
+      preserveAspectRatio="none"
+      viewBox="0 0 100 100"
+    >
+      <path
+        d="M0.01955986022949219,0 L3.626985549926756,0.78125 L7.525968551635742,1.5625 L11.76846504211426,2.34375 L16.42367362976074,3.125 L21.587266921997074,3.90625 L27.398252487182617,4.6875 L34.07269477844238,5.46875 L41.98090553283691,6.25 L51.86589241027833,7.03125 L65.75257301330566,7.8125 L78.25337409973145,8.59375 L78.29232215881349,9.375 L78.33195686340332,10.15625 L78.37229728698732,10.9375 L78.41336250305176,11.71875 L78.45517158508302,12.5 L78.49774360656737,13.28125 L78.54107856750488,14.0625 L78.58523368835448,14.84375 L78.63022804260254,15.625 L78.67606163024902,16.40625 L78.7227725982666,17.1875 L78.7703800201416,17.96875 L78.81892204284668,18.75 L78.86841773986816,19.53125 L78.91888618469238,20.3125 L78.9703845977783,21.09375 L79.02291297912598,21.875 L79.07652854919434,22.65625 L79.13125038146973,23.4375 L79.1871166229248,24.21875 L79.2441463470459,25 L79.30241584777832,25.78125 L79.3619441986084,26.5625 L79.42275047302245,27.34375 L79.48491096496582,28.125 L79.54846382141112,28.90625 L79.61344718933105,29.6875 L79.67989921569824,30.46875 L79.747896194458,31.25 L79.81747627258301,32.03125 L79.88871574401855,32.8125 L79.9616527557373,33.59375 L80.03634452819826,34.375 L80.1128673553467,35.15625 L80.19129753112794,35.9375 L80.27169227600098,36.71875 L80.35412788391113,37.5 L80.43869972229004,38.28125 L80.52546501159668,39.0625 L80.61453819274902,39.84375 L80.70599555969238,40.625 L80.7999324798584,41.40625 L80.89644432067871,42.1875 L80.9956645965576,42.96875 L81.09770774841309,43.75 L81.20266914367676,44.53125 L81.31068229675292,45.3125 L81.42189979553224,46.09375 L81.53645515441895,46.875 L81.65450096130373,47.65625 L81.77620887756346,48.4375 L81.90173149108887,49.21875 L82.03127861022949,50 L82.16502189636229,50.78125 L82.30317115783691,51.5625 L82.44597434997559,52.34375 L82.59364128112794,53.125 L82.74641990661623,53.90625 L82.90461540222168,54.6875 L83.06849479675293,55.46875 L83.23838233947755,56.25 L83.4146022796631,57.03125 L83.59751701354979,57.8125 L83.78752708435059,58.59375 L83.98505210876465,59.375 L84.19053077697754,60.15625 L84.40447807312012,60.9375 L84.62738990783693,61.71875 L84.85989570617676,62.5 L85.1025676727295,63.28125 L85.35613059997559,64.0625 L85.62132835388184,64.84375 L85.89896202087402,65.625 L86.18994712829591,66.40625 L86.49525642395021,67.1875 L86.81595802307129,67.96875 L87.1542263031006,68.75 L87.50861167907716,69.53125 L87.8606128692627,70.3125 L88.21021080017091,71.09375 L88.55740547180176,71.875 L88.90217781066893,72.65625 L89.24454689025877,73.4375 L89.58451271057129,74.21875 L89.92209434509276,75 L90.25729179382324,75.78125 L90.59012413024904,76.5625 L90.92061042785645,77.34375 L91.24882698059082,78.125 L91.57477378845215,78.90625 L91.89852714538573,79.6875 L92.2201633453369,80.46875 L92.5397777557373,81.25 L92.85746574401857,82.03125 L93.17337989807129,82.8125 L93.48771095275879,83.59375 L93.80066871643066,84.375 L94.11253929138185,85.15625 L94.42366600036621,85.9375 L94.73452568054199,86.71875 L95.04569053649902,87.5 L95.3579044342041,88.28125 L95.67215919494629,89.0625 L95.98978996276855,89.84375 L96.31255149841309,90.625 L96.64292335510252,91.40625 L96.98437690734862,92.1875 L97.34196662902832,92.96875 L97.72339820861816,93.75 L98.14074516296388,94.53125 L98.61432075500488,95.3125 L99.17975425720215,96.09375 L99.97359275817873,96.875 L100,97.65625 L100,98.4375 L100,99.21875"
+        fill="none"
+        stroke="rgba(255, 255, 255, 0.5)"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        vector-effect="non-scaling-stroke"
+      />
+    </svg>
+    <span
+      class="pointer-events-none absolute text-sm leading-none text-white/50"
+      style="right: 6%; bottom: 4px; margin-right: 10px;"
+    >
+      sRGB
+    </span>
+    <div
+      class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20"
+      style="left: 78.20231511888886%; top: 8.252964744844437%;"
+    />
+  </div>
+  <div
+    class="flex items-center gap-2"
+  >
+    <div
+      aria-hidden="true"
+      class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      data-testid="Swatch"
+      style="background-image: url("/src/images/transparent-bg.gif");"
+    >
+      <div
+        class="flex items-center justify-center size-full"
+        style="background-color: oklch(0.63269 0.25404 19.902);"
+      />
+    </div>
+    <div
+      class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
+      data-testid="ColorInput"
+    >
+      <input
+        aria-label="Color value"
+        class="w-full bg-transparent text-sm outline-none"
+        value="oklch(63.269% 0.25404 19.902)"
+      />
+    </div>
+  </div>
+  <div
+    class="space-y-3"
+    data-testid="ChannelSliders"
+  >
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      L
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, oklch(0 0.25404 19.902), oklch(0.63269 0.25404 19.902), oklch(1 0.25404 19.902)); touch-action: none;"
+      >
+        <div
+          aria-label="Lightness"
+          aria-valuemax="1"
+          aria-valuemin="0"
+          aria-valuenow="0.63269"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(63.269% - 12.6538px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Lightness"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="63.3"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        >
+          %
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      C
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, oklch(0.63269 0 19.902), oklch(0.63269 0.28643 19.902)); touch-action: none;"
+      >
+        <div
+          aria-label="Chroma"
+          aria-valuemax="0.28643"
+          aria-valuemin="0"
+          aria-valuenow="0.25404"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(88.6918% - 17.7383653946863px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Chroma"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="0.254"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+          style="visibility: hidden;"
+        >
+          °
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      H
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, oklch(0.7 0.4 0), oklch(0.7 0.4 60), oklch(0.7 0.4 120), oklch(0.7 0.4 180), oklch(0.7 0.4 240), oklch(0.7 0.4 300), oklch(0.7 0.4 0)); touch-action: none;"
+      >
+        <div
+          aria-label="Hue"
+          aria-valuemax="360"
+          aria-valuemin="0"
+          aria-valuenow="19.902"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(5.52833% - 1.1056666666667px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Hue"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="19.9"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        >
+          °
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2 justify-between"
+    data-testid="Options"
+  >
+    <div
+      class="flex items-center"
+      data-testid="ModeSelector"
+    >
+      <button
+        aria-label="Switch to OKLCH"
+        class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+        type="button"
+      >
+        OKLCH
+      </button>
+      <button
+        aria-label="Switch to HSL"
+        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        type="button"
+      >
+        HSL
+      </button>
+      <button
+        aria-label="Switch to RGB"
+        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        type="button"
+      >
+        RGB
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] = `
+<div
+  class="relative overflow-hidden flex w-full max-w-xs flex-col gap-4 p-3"
+  data-testid="ColorPicker"
+>
+  <div
+    class="relative h-32 w-full cursor-crosshair overflow-hidden"
+    data-testid="SaturationPanel"
+    style="background: linear-gradient(transparent, rgb(0, 0, 0)), linear-gradient(to right, rgb(255, 255, 255), transparent), rgb(255, 0, 68); touch-action: none;"
+  >
+    <div
+      class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20"
+      style="left: 100%; top: 0%;"
+    />
+  </div>
+  <div
+    class="flex items-center gap-2"
+  >
+    <div
+      aria-hidden="true"
+      class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      data-testid="Swatch"
+      style="background-image: url("/src/images/transparent-bg.gif");"
+    >
+      <div
+        class="flex items-center justify-center size-full"
+        style="background-color: rgb(255, 0, 68);"
+      />
+    </div>
+    <div
+      class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
+      data-testid="ColorInput"
+    >
+      <input
+        aria-label="Color value"
+        class="w-full bg-transparent text-sm outline-none"
+        value="#ff0044"
+      />
+    </div>
+  </div>
+  <div
+    class="space-y-3"
+    data-testid="ChannelSliders"
+  >
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      R
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(255, 0, 0)); touch-action: none;"
+      >
+        <div
+          aria-label="Red"
+          aria-valuemax="255"
+          aria-valuemin="0"
+          aria-valuenow="255"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(100% - 20px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Red"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="255"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+          style="visibility: hidden;"
+        >
+          °
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      G
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 255, 0)); touch-action: none;"
+      >
+        <div
+          aria-label="Green"
+          aria-valuemax="255"
+          aria-valuemin="0"
+          aria-valuenow="0"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(0% - 0px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Green"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="0"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+          style="visibility: hidden;"
+        >
+          °
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+      data-testid="GradientSlider"
+    >
+      B
+      <div
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 0, 255)); touch-action: none;"
+      >
+        <div
+          aria-label="Blue"
+          aria-valuemax="255"
+          aria-valuemin="0"
+          aria-valuenow="68"
+          class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+          role="slider"
+          style="left: calc(26.6667% - 5.3333333333333px);"
+          tabindex="0"
+        />
+      </div>
+      <div
+        class="flex items-center"
+        data-testid="NumericInput"
+      >
+        <input
+          aria-label="Blue"
+          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          type="text"
+          value="68"
+        />
+        <span
+          class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+          style="visibility: hidden;"
+        >
+          °
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2 justify-between"
+    data-testid="Options"
+  >
+    <div
+      class="flex items-center"
+      data-testid="ModeSelector"
+    >
+      <button
+        aria-label="Switch to OKLCH"
+        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        type="button"
+      >
+        OKLCH
+      </button>
+      <button
+        aria-label="Switch to HSL"
+        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        type="button"
+      >
+        HSL
+      </button>
+      <button
+        aria-label="Switch to RGB"
+        class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+        type="button"
+      >
+        RGB
+      </button>
+    </div>
+  </div>
+</div>
+`;

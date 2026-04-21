@@ -35,7 +35,8 @@
   "sideEffects": false,
   "license": "MIT",
   "peerDependencies": {
-    "react": "16.8 - 19"
+    "react": "16.8 - 19",
+    "tailwindcss": "3.4 - 4"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -117,12 +118,12 @@
     {
       "name": "commonjs",
       "path": "./dist/index.cjs",
-      "limit": "30 kB"
+      "limit": "32 kB"
     },
     {
       "name": "esm",
       "path": "./dist/index.js",
-      "limit": "25 kB"
+      "limit": "28 kB"
     }
   ]
 }

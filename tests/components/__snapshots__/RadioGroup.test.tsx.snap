@@ -1,0 +1,50 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RadioGroup > renders the title and one button per option 1`] = `
+<div
+  class="flex flex-col flex-1"
+  data-testid="RadioGroup"
+>
+  <div
+    class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500"
+  >
+    Format
+  </div>
+  <button
+    class="flex items-center justify-between py-1.5 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
+    type="button"
+  >
+    <span>
+      Auto
+    </span>
+    <span
+      aria-hidden="true"
+      class="size-2.5 rounded-full border bg-neutral-900 dark:bg-neutral-50 border-neutral-900 dark:border-neutral-50"
+    />
+  </button>
+  <button
+    class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+    type="button"
+  >
+    <span>
+      Hex
+    </span>
+    <span
+      aria-hidden="true"
+      class="size-2.5 rounded-full border border-neutral-400 dark:border-neutral-500"
+    />
+  </button>
+  <button
+    class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+    type="button"
+  >
+    <span>
+      RGB
+    </span>
+    <span
+      aria-hidden="true"
+      class="size-2.5 rounded-full border border-neutral-400 dark:border-neutral-500"
+    />
+  </button>
+</div>
+`;
