@@ -9,22 +9,25 @@ const meta: Meta<typeof ColorPicker> = {
   component: ColorPicker,
   args: {
     classNames: {
-      root: 'border border-neutral-200 dark:border-neutral-800',
+      root: 'bg-white dark:bg-black',
     },
     defaultMode: 'oklch',
+    displayFormat: 'auto',
+    outputFormat: 'auto',
+    precision: 5,
     showAlpha: false,
     showEyeDropper: true,
-    showHueBar: true,
+    showHueBar: false,
     showInputs: true,
-    showPicker: true,
-    showSettings: true,
-    showSliders: false,
+    showPanel: true,
+    showSettings: false,
+    showSliders: true,
     showSwatch: true,
   },
   argTypes: {
     precision: {
       control: { type: 'number', min: 1, max: 10, step: 1 },
-      description: 'Decimal digits for non-hex output. Unset → colorizr default (5).',
+      description: 'Decimal digits for non-hex output.',
     },
   },
 };
@@ -35,7 +38,7 @@ type Story = StoryObj<typeof ColorPicker>;
 
 function Controlled(props: ComponentProps<typeof ColorPicker>) {
   const { color: defaultColor, onChange } = props;
-  const [color, setColor] = useState(defaultColor ?? 'oklch(0.7 0.15 250)');
+  const [color, setColor] = useState(defaultColor ?? 'oklch(54% 0.194 250)');
 
   return (
     <ColorPicker
@@ -50,46 +53,48 @@ function Controlled(props: ComponentProps<typeof ColorPicker>) {
 }
 
 export const Default: Story = {
+  args: {},
   render: props => <Controlled {...props} />,
 };
 
-export const WithAlpha: Story = {
-  args: { showAlpha: true },
-  render: props => <Controlled {...props} />,
-};
-
-export const WithSliders: Story = {
-  args: { showSliders: true, showInputs: true },
+export const WithToolbar: Story = {
+  name: 'With Toolbar and Inputs',
+  args: {
+    defaultMode: 'hsl',
+    showAlpha: true,
+    showHueBar: true,
+    showEyeDropper: false,
+    showSliders: false,
+  },
   render: props => <Controlled {...props} />,
 };
 
 export const WithSettings: Story = {
-  args: { showSettings: true, showAlpha: true, showEyeDropper: true },
+  name: 'With Alpha and Settings',
+  args: { showSettings: true, showAlpha: true },
   render: props => <Controlled {...props} />,
 };
 
 export const Customized: Story = {
   args: {
-    showAlpha: true,
-    showEyeDropper: true,
-    showInputs: true,
     showSettings: true,
-    showSliders: true,
     classNames: {
-      alphaSlider: { track: 'h-4 rounded-md', thumb: 'size-6 border-pink-500' },
-      channelSlider: { track: 'h-3 rounded-md', thumb: 'border-pink-500' },
+      channelSliders: 'bg-neutral-300 dark:bg-neutral-800 p-3',
+      channelSlider: { track: 'h-4 rounded-lg' },
       colorInput: {
-        root: 'border-pink-400 dark:border-pink-500 rounded-xl',
-        input: 'font-mono tracking-wider',
+        root: 'border-neutral-500 rounded-full h-10',
+        input: 'font-mono tracking-wider px-3',
       },
-      hueSlider: { track: 'h-4 rounded-md', thumb: 'size-6 border-pink-500' },
-      modeSelector: 'rounded-lg',
-      numericInput: { input: 'w-12 text-pink-700 dark:text-pink-400 dark:bg-neutral-700' },
-      panel: { root: 'rounded-xl', thumb: 'size-5 border-4 border-neutral-700' },
-      root: 'bg-neutral-200 dark:bg-neutral-800 rounded-2xl shadow-lg',
-      settingsMenu: { menu: 'border-pink-400 dark:border-pink-500' },
+      colorValue: 'p-3',
+      eyeDropper: 'rounded-full',
+      modeSelector: 'rounded-full ',
+      numericInput: { input: 'w-14' },
+      options: 'bg-neutral-200 bg-neutral-900 p-3',
+      panel: { thumb: 'size-5 border-4 border-neutral-700' },
+      root: 'max-w-sm bg-neutral-200 dark:bg-neutral-700 gap-0 rounded-2xl overflow-hidden shadow-lg p-0',
+      settingsMenu: { trigger: 'rounded-full' },
       swatch: {
-        root: 'rounded-md overflow-hidden size-12',
+        root: 'rounded-md overflow-hidden size-10',
         color: 'rounded-none',
       },
     },

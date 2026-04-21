@@ -41,6 +41,7 @@ export default function AlphaSlider(props: AlphaSliderProps) {
       maxValue={1}
       minValue={0}
       onValueChange={onChange}
+      startContent="A"
       step={0.01}
       value={value}
     />

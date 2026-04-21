@@ -59,12 +59,12 @@ const trackClassName = cn(
 
 const thumbClassName = cn(
   'pointer-events-none absolute top-1/2 size-5 -translate-y-1/2',
-  'rounded-full border-2 border-white bg-black shadow-md',
+  'rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md',
   'transition-transform',
-  'focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2',
+  'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white',
 );
 
-const thumbPressedClassName = 'scale-90 border-[3px]';
+const thumbPressedClassName = 'ring-1 ring-black dark:ring-white';
 
 export default function GradientSlider(props: GradientSliderProps) {
   const {

@@ -1,5 +1,6 @@
 import { cn } from '~/modules/helpers';
 
+import Button from './components/Button';
 import type { ColorMode } from './types';
 
 interface ModeSelectorProps {
@@ -20,22 +21,17 @@ export default function ModeSelector(props: ModeSelectorProps) {
   const { className, mode, modes = ['oklch', 'hsl', 'rgb'], onClick } = props;
 
   return (
-    <div className={cn('flex overflow-hidden rounded-sm', className)}>
+    <div className={cn('flex items-center', className)} data-testid="ModeSelector">
       {modes.map(m => (
-        <button
+        <Button
           key={m}
           aria-label={`Switch to ${m.toLocaleUpperCase()}`}
-          className={cn(
-            'px-3 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-50 text-xs leading-none',
-            {
-              'bg-neutral-200 dark:bg-neutral-700': mode === m,
-            },
-          )}
+          isActive={mode === m}
           onClick={() => onClick(m)}
-          type="button"
+          variant="segmented"
         >
           {m.toLocaleUpperCase()}
-        </button>
+        </Button>
       ))}
     </div>
   );

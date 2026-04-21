@@ -29,7 +29,7 @@ function Controlled(props: ComponentProps<typeof ChannelInputs>) {
   const [color, setColor] = useState(initial);
 
   return (
-    <div style={{ width: 320 }}>
+    <div style={{ width: 240 }}>
       <ChannelInputs
         {...rest}
         color={color}

@@ -1,6 +1,6 @@
 import type { PointerEvent as ReactPointerEvent } from 'react';
 
-import { clamp, quantize, relativePosition } from '~/modules/helpers';
+import { clamp, createId, quantize, relativePosition } from '~/modules/helpers';
 
 describe('helpers', () => {
   describe('clamp', () => {
@@ -50,6 +50,51 @@ describe('helpers', () => {
 
     it('snaps to integer step', () => {
       expect(quantize(179.7, 1)).toBe(180);
+    });
+  });
+
+  describe('createId', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('returns a string starting with the given prefix', () => {
+      expect(createId('gamut')).toMatch(/^gamut-[\dA-Za-z-]+$/);
+    });
+
+    it('generates unique ids across calls', () => {
+      const ids = new Set(Array.from({ length: 20 }, () => createId('gamut')));
+
+      expect(ids.size).toBe(20);
+    });
+
+    it('uses crypto.randomUUID when available', () => {
+      const uuidSpy = vi
+        .spyOn(globalThis.crypto, 'randomUUID')
+        .mockReturnValue('deadbeef-0000-4000-8000-000000000000');
+
+      expect(createId('id')).toBe('id-deadbeef');
+      expect(uuidSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to Math.random when crypto.randomUUID is unavailable', () => {
+      const original = globalThis.crypto.randomUUID;
+
+      Object.defineProperty(globalThis.crypto, 'randomUUID', {
+        configurable: true,
+        value: undefined,
+      });
+
+      try {
+        vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+        expect(createId('id')).toMatch(/^id-[\da-z]+$/);
+      } finally {
+        Object.defineProperty(globalThis.crypto, 'randomUUID', {
+          configurable: true,
+          value: original,
+        });
+      }
     });
   });
 

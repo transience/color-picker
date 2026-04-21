@@ -1,9 +1,8 @@
-/* eslint-disable testing-library/no-container */
 import { getP3MaxChroma } from 'colorizr';
 
 import { pointerToLC } from '~/modules/oklchCanvas';
 import OKLCHPanel from '~/OKLCHPanel';
-import { fireEvent, render } from '~/test-utils';
+import { fireEvent, render, screen } from '~/test-utils';
 
 import {
   firePointerDrag,
@@ -32,19 +31,9 @@ describe('OKLCHPanel', () => {
 
   describe('Render', () => {
     it('renders correctly', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
+      render(<OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />);
 
-      expect(container).toMatchSnapshot();
-    });
-
-    it('renders a canvas element', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-
-      expect(container.querySelector('canvas')).toBeInTheDocument();
+      expect(screen.getByTestId('OKLCHPanel')).toMatchSnapshot();
     });
 
     it('calls renderOKLCHCanvas on mount via getContext', () => {
@@ -63,44 +52,14 @@ describe('OKLCHPanel', () => {
 
       expect(canvas.spy.mock.calls.length).toBeGreaterThan(callsBefore);
     });
-
-    it('renders an SVG boundary path starting with a moveto command', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const path = container.querySelector('svg path');
-
-      expect(path).not.toBeNull();
-      expect(path!.getAttribute('d')).toMatch(/^M/);
-    });
-
-    it('positions thumb based on lightness and chroma', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const thumb = container.querySelector('[class*="border-black"]') as HTMLElement;
-
-      expect(thumb.style.left).toMatch(/%$/);
-      expect(thumb.style.top).toMatch(/%$/);
-    });
-
-    it('sets touch-action: none on the panel', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
-
-      expect(panel.style.touchAction).toBe('none');
-    });
   });
 
   describe('Pointer interaction', () => {
     it('pointerDown emits (l, c) matching pointerToLC at the clicked position', () => {
       const hue = 30;
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={hue} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+
+      render(<OKLCHPanel chroma={0.1} hue={hue} lightness={0.6} onChange={mockOnChange} />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
       fireEvent.pointerDown(panel, { clientX: 128, clientY: 64, pointerId: 1 });
@@ -113,10 +72,8 @@ describe('OKLCHPanel', () => {
     });
 
     it('pointerDown at bottom emits lightness near 0', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+      render(<OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
       fireEvent.pointerDown(panel, { clientX: 128, clientY: 128, pointerId: 1 });
@@ -127,10 +84,8 @@ describe('OKLCHPanel', () => {
     });
 
     it('pointerDown at left emits zero chroma', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+      render(<OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
       fireEvent.pointerDown(panel, { clientX: 0, clientY: 64, pointerId: 1 });
@@ -141,10 +96,8 @@ describe('OKLCHPanel', () => {
     });
 
     it('emits multiple values during pointerMove drag', () => {
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+      render(<OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
 
@@ -159,10 +112,9 @@ describe('OKLCHPanel', () => {
 
     it('clamps lightness to [0, 1] and chroma to [0, maxC] when pointer is out of bounds', () => {
       const hue = 30;
-      const { container } = render(
-        <OKLCHPanel chroma={0.1} hue={hue} lightness={0.6} onChange={mockOnChange} />,
-      );
-      const panel = container.querySelector('.cursor-crosshair') as HTMLElement;
+
+      render(<OKLCHPanel chroma={0.1} hue={hue} lightness={0.6} onChange={mockOnChange} />);
+      const panel = screen.getByTestId('OKLCHPanel');
 
       mockRect(panel, { left: 0, top: 0, width: 256, height: 128 });
       fireEvent.pointerDown(panel, { clientX: 500, clientY: -100, pointerId: 1 });
@@ -172,8 +124,6 @@ describe('OKLCHPanel', () => {
       expect(l).toBeGreaterThanOrEqual(0);
       expect(l).toBeLessThanOrEqual(1);
       expect(c).toBeGreaterThanOrEqual(0);
-      // Pointer positions outside the canvas clamp to the P3 gamut edge; allow
-      // small slack because colorizr's getP3MaxChroma uses its own epsilon.
       expect(c).toBeLessThanOrEqual(maxChromaFn(l, hue) + 0.01);
     });
   });

@@ -22,8 +22,7 @@ describe('RadioGroup', () => {
       />,
     );
 
-    expect(screen.getByText('Format')).toBeInTheDocument();
-    expect(screen.getAllByRole('button')).toHaveLength(3);
+    expect(screen.getByTestId('RadioGroup')).toMatchSnapshot();
   });
 
   it('fires onChange with the selected option value on click', () => {
@@ -95,7 +94,7 @@ describe('RadioGroup', () => {
     const unselected = screen.getByRole('button', { name: 'Auto' });
 
     // Selected gets a darker text color class.
-    expect(selected.className).toMatch(/text-neutral-900|text-neutral-50/);
-    expect(unselected.className).not.toMatch(/text-neutral-900 /);
+    expect(selected).toHaveClass(/text-neutral-900|text-neutral-50/);
+    expect(unselected).not.toHaveClass('text-neutral-900');
   });
 });

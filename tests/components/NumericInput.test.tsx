@@ -90,9 +90,9 @@ describe('NumericInput', () => {
       const root = screen.getByTestId('NumericInput');
       const suffix = root.querySelector('span');
 
-      expect(root.className).toMatch(/slot-root/);
-      expect(input.className).toMatch(/slot-input/);
-      expect(suffix?.className).toMatch(/slot-suffix/);
+      expect(root).toHaveClass('slot-root');
+      expect(input).toHaveClass('slot-input');
+      expect(suffix).toHaveClass('slot-suffix');
     });
   });
 

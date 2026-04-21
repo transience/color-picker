@@ -1,0 +1,230 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
+<div
+  class="flex items-start justify-center gap-3"
+  data-testid="ChannelInputs"
+>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Hue"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="180"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        °
+      </span>
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      H
+    </span>
+  </div>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Saturation"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="50"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        %
+      </span>
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      S
+    </span>
+  </div>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Lightness"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="40"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        %
+      </span>
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      L
+    </span>
+  </div>
+</div>
+`;
+
+exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
+<div
+  class="flex items-start justify-center gap-3"
+  data-testid="ChannelInputs"
+>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Lightness"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="50.0"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        %
+      </span>
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      L
+    </span>
+  </div>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Chroma"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="0.120"
+      />
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      C
+    </span>
+  </div>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Hue"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="120.0"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        °
+      </span>
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      H
+    </span>
+  </div>
+</div>
+`;
+
+exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
+<div
+  class="flex items-start justify-center gap-3"
+  data-testid="ChannelInputs"
+>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Red"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="100"
+      />
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      R
+    </span>
+  </div>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Green"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="150"
+      />
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      G
+    </span>
+  </div>
+  <div
+    class="flex flex-col items-center gap-1"
+  >
+    <div
+      class="flex items-center justify-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Blue"
+        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        type="text"
+        value="200"
+      />
+    </div>
+    <span
+      class="text-xs text-neutral-500 dark:text-neutral-400"
+    >
+      B
+    </span>
+  </div>
+</div>
+`;

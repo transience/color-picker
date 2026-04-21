@@ -1,14 +1,17 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { cn } from '~/modules/helpers';
 
+import GearIcon from '~/components/GearIcon';
+
+import Button from './components/Button';
 import RadioGroup from './components/RadioGroup';
-import ThreeDotsVerticalIcon from './components/ThreeDotsVerticalIcon';
 import type { ColorFormat, SettingsMenuClassNames, SettingsOption } from './types';
 
 interface SettingsMenuProps {
-  /** Per-part className overrides (`trigger` = ⋮ button, `menu` = popover panel). */
+  /** Per-part className overrides (`trigger` = button, `menu` = popover panel). */
   classNames?: SettingsMenuClassNames;
+  containerRef: RefObject<HTMLDivElement | null>;
   /** Current display format selection. */
   displayFormat: ColorFormat;
   /** Fired when the user picks a new display format in the menu. */
@@ -28,47 +31,70 @@ const OPTIONS: SettingsOption[] = [
   { label: 'OkLab', value: 'oklab' },
 ];
 
-type PanelPlacement = { maxHeight: number | null; side: 'top' | 'bottom' };
-
-const DEFAULT_PLACEMENT: PanelPlacement = { maxHeight: null, side: 'bottom' };
 const GAP = 8;
+const ITEM_WIDTH = 144;
+const MIN_HORIZONTAL_WIDTH = ITEM_WIDTH * 2 + GAP * 3;
+// Paired with the `duration-200` class on the panel — keep these in sync.
+const CLOSE_DURATION_MS = 200;
+const CLOSE_UNMOUNT_SLACK_MS = 50;
 
 export default function SettingsMenu(props: SettingsMenuProps) {
-  const { classNames, displayFormat, onChangeDisplayFormat, onChangeOutputFormat, outputFormat } =
-    props;
+  const {
+    classNames,
+    containerRef,
+    displayFormat,
+    onChangeDisplayFormat,
+    onChangeOutputFormat,
+    outputFormat,
+  } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const [placement, setPlacement] = useState<PanelPlacement>(DEFAULT_PLACEMENT);
+  const [isRendered, setIsRendered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [layout, setLayout] = useState('column');
+  const [height, setHeight] = useState<string | number>('auto');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    if (!isOpen) {
-      setPlacement(DEFAULT_PLACEMENT);
+    const el = containerRef.current;
 
-      return;
+    if (!el) {
+      return undefined;
     }
 
-    if (!triggerRef.current || !panelRef.current) {
-      return;
+    const measure = () => {
+      setHeight(el.clientHeight * 0.8);
+      setLayout(el.clientWidth >= MIN_HORIZONTAL_WIDTH ? 'row' : 'column');
+    };
+
+    measure();
+
+    if (typeof ResizeObserver === 'undefined') {
+      return undefined;
     }
 
-    const triggerRect = triggerRef.current.getBoundingClientRect();
-    const panelHeight = panelRef.current.scrollHeight;
-    const viewportHeight = window.innerHeight;
+    const observer = new ResizeObserver(measure);
 
-    const spaceBelow = viewportHeight - triggerRect.bottom - GAP;
-    const spaceAbove = triggerRect.top - GAP;
+    observer.observe(el);
 
-    if (panelHeight <= spaceBelow) {
-      setPlacement({ maxHeight: null, side: 'bottom' });
-    } else if (panelHeight <= spaceAbove) {
-      setPlacement({ maxHeight: null, side: 'top' });
-    } else {
-      const side = spaceAbove > spaceBelow ? 'top' : 'bottom';
-      const maxHeight = Math.max(spaceAbove, spaceBelow);
+    return () => observer.disconnect();
+  }, [containerRef, isOpen]);
 
-      setPlacement({ maxHeight, side });
+  useEffect(() => {
+    if (isOpen) {
+      setIsRendered(true);
+      const frame = requestAnimationFrame(() => setIsVisible(true));
+
+      return () => cancelAnimationFrame(frame);
     }
+
+    setIsVisible(false);
+    const timer = setTimeout(
+      () => setIsRendered(false),
+      CLOSE_DURATION_MS + CLOSE_UNMOUNT_SLACK_MS,
+    );
+
+    return () => clearTimeout(timer);
   }, [isOpen]);
 
   useEffect(() => {
@@ -109,51 +135,70 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   };
 
   return (
-    <div className="relative">
-      <button
+    <div data-testid="SettingsMenuWrapper">
+      <Button
         ref={triggerRef}
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label="Color format settings"
-        className={cn(
-          'flex size-6 shrink-0 items-center justify-center rounded-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60 focus-visible:outline-2 focus-visible:outline-blue-500',
-          classNames?.trigger,
-        )}
+        className={classNames?.trigger}
         data-testid="SettingsTrigger"
         onClick={() => setIsOpen(open => !open)}
-        type="button"
       >
-        <ThreeDotsVerticalIcon />
-      </button>
-      {isOpen && (
-        <div
-          ref={panelRef}
-          className={cn(
-            'absolute z-50 right-0 w-40 flex flex-col gap-3 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-800 p-2 shadow-lg',
-            'text-neutral-700 dark:text-neutral-200',
-            placement.side === 'bottom' ? 'top-full mt-1' : 'bottom-full mb-1',
-            placement.maxHeight !== null && 'overflow-y-auto',
-            classNames?.menu,
-          )}
-          data-testid="SettingsMenu"
-          style={placement.maxHeight !== null ? { maxHeight: placement.maxHeight } : undefined}
-        >
-          <RadioGroup
-            onChange={onChangeDisplayFormat}
-            onInteractionEnd={refocusTrigger}
-            options={OPTIONS}
-            title="Display format"
-            value={displayFormat}
-          />
-          <div className="h-px bg-neutral-300 dark:bg-neutral-600" />
-          <RadioGroup
-            onChange={onChangeOutputFormat}
-            onInteractionEnd={refocusTrigger}
-            options={OPTIONS}
-            title="Output format"
-            value={outputFormat}
-          />
-        </div>
+        <GearIcon />
+      </Button>
+      {isRendered && (
+        <>
+          <div className="absolute inset-0" onClick={() => setIsOpen(false)} role="presentation" />
+          <div
+            ref={panelRef}
+            aria-hidden={!isOpen}
+            className={cn(
+              'absolute z-50 left-0 right-0 bottom-0',
+              'overflow-hidden rounded-t-lg shadow-lg',
+              'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200',
+              'transition-transform duration-200 ease-out',
+              isVisible ? 'translate-y-0' : 'translate-y-full',
+              classNames?.menu,
+            )}
+            data-testid="SettingsMenu"
+          >
+            <div className="flex flex-col overflow-y-auto" style={{ maxHeight: height }}>
+              <div className="sticky top-0 flex items-center justify-between p-3 bg-neutral-100 dark:bg-neutral-800">
+                <p className="text-sm font-semibold">Settings</p>
+                <button
+                  aria-label="Close settings"
+                  className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  onClick={() => setIsOpen(false)}
+                  type="button"
+                >
+                  Done
+                </button>
+              </div>
+              <div
+                className={cn('flex flex-col flex-1 gap-3 pb-3 px-3', {
+                  'flex-row justify-center': layout === 'row',
+                })}
+              >
+                <RadioGroup
+                  onChange={onChangeDisplayFormat}
+                  onInteractionEnd={refocusTrigger}
+                  options={OPTIONS}
+                  title="Display format"
+                  value={displayFormat}
+                />
+                {layout === 'column' && <div className="h-px bg-neutral-300 dark:bg-neutral-600" />}
+                <RadioGroup
+                  onChange={onChangeOutputFormat}
+                  onInteractionEnd={refocusTrigger}
+                  options={OPTIONS}
+                  title="Output format"
+                  value={outputFormat}
+                />
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

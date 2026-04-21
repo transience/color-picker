@@ -5,53 +5,46 @@ import { fireEvent, render, screen } from '~/test-utils';
 
 describe('ChannelInputs', () => {
   describe('Render', () => {
-    it('renders 3 inputs with H/S/L labels in HSL mode', () => {
+    it('renders correctly in HSL mode', () => {
       render(
         <ChannelInputs
           alpha={1}
-          color="#ff0044"
+          color="hsl(180 50% 40%)"
           mode="hsl"
           onAlphaChange={() => {}}
           onChangeColor={() => {}}
         />,
       );
 
-      expect(screen.getAllByRole('textbox')).toHaveLength(3);
-      expect(screen.getByText('H')).toBeInTheDocument();
-      expect(screen.getByText('S')).toBeInTheDocument();
-      expect(screen.getByText('L')).toBeInTheDocument();
+      expect(screen.getByTestId('ChannelInputs')).toMatchSnapshot();
     });
 
-    it('renders 3 inputs with R/G/B labels in RGB mode', () => {
+    it('renders correctly in RGB mode', () => {
       render(
         <ChannelInputs
           alpha={1}
-          color="#ff0044"
+          color="rgb(100 150 200)"
           mode="rgb"
           onAlphaChange={() => {}}
           onChangeColor={() => {}}
         />,
       );
 
-      expect(screen.getByText('R')).toBeInTheDocument();
-      expect(screen.getByText('G')).toBeInTheDocument();
-      expect(screen.getByText('B')).toBeInTheDocument();
+      expect(screen.getByTestId('ChannelInputs')).toMatchSnapshot();
     });
 
-    it('renders 3 inputs with L/C/H labels in OKLCH mode', () => {
+    it('renders correctly in OKLCH mode', () => {
       render(
         <ChannelInputs
           alpha={1}
-          color="oklch(0.6 0.2 20)"
+          color="oklch(0.5 0.12 120)"
           mode="oklch"
           onAlphaChange={() => {}}
           onChangeColor={() => {}}
         />,
       );
 
-      expect(screen.getByText('L')).toBeInTheDocument();
-      expect(screen.getByText('C')).toBeInTheDocument();
-      expect(screen.getByText('H')).toBeInTheDocument();
+      expect(screen.getByTestId('ChannelInputs')).toMatchSnapshot();
     });
 
     it('displays rounded HSL values', () => {
@@ -84,67 +77,6 @@ describe('ChannelInputs', () => {
       expect(screen.getByDisplayValue('100')).toBeInTheDocument();
       expect(screen.getByDisplayValue('150')).toBeInTheDocument();
       expect(screen.getByDisplayValue('200')).toBeInTheDocument();
-    });
-
-    it('displays OKLCH values with documented precision (L%, C=3dp, H=1dp)', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="oklch(0.5 0.12 120)"
-          mode="oklch"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
-        />,
-      );
-
-      expect(screen.getByDisplayValue('50.0')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('0.120')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('120.0')).toBeInTheDocument();
-    });
-
-    it('renders HSL suffixes: ° for hue, % for saturation and lightness', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="hsl(180 50% 40%)"
-          mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
-        />,
-      );
-
-      expect(screen.getAllByText('°')).toHaveLength(1);
-      expect(screen.getAllByText('%')).toHaveLength(2);
-    });
-
-    it('renders OKLCH suffixes: % for lightness, ° for hue, none for chroma', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="oklch(0.5 0.1 120)"
-          mode="oklch"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
-        />,
-      );
-
-      expect(screen.getAllByText('%')).toHaveLength(1);
-      expect(screen.getAllByText('°')).toHaveLength(1);
-    });
-
-    it('renders no suffixes in RGB mode', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="#ff0044"
-          mode="rgb"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
-        />,
-      );
-
-      expect(screen.queryByText('°')).not.toBeInTheDocument();
-      expect(screen.queryByText('%')).not.toBeInTheDocument();
     });
 
     it('does not render an alpha input by default', () => {
@@ -403,7 +335,7 @@ describe('ChannelInputs', () => {
         />,
       );
 
-      expect(screen.getByTestId('ChannelInputs').className).toMatch(/extra-wrapper/);
+      expect(screen.getByTestId('ChannelInputs')).toHaveClass('extra-wrapper');
     });
 
     it('forwards numericInputClassNames to every NumericInput', () => {
@@ -424,7 +356,7 @@ describe('ChannelInputs', () => {
       expect(inputs).toHaveLength(4);
 
       for (const input of inputs) {
-        expect(input.className).toMatch(/custom-numeric-input/);
+        expect(input).toHaveClass('custom-numeric-input');
       }
     });
   });

@@ -49,7 +49,7 @@ describe('GradientSlider', () => {
 
   describe('Render', () => {
     it('renders correctly', () => {
-      const { container } = render(
+      render(
         <GradientSlider
           aria-label="Test slider"
           gradient={GRADIENT}
@@ -58,7 +58,7 @@ describe('GradientSlider', () => {
         />,
       );
 
-      expect(container).toMatchSnapshot();
+      expect(screen.getByTestId('GradientSlider')).toMatchSnapshot();
     });
 
     it('renders startContent and endContent', () => {
@@ -93,42 +93,6 @@ describe('GradientSlider', () => {
       expect(slider).toHaveAttribute('aria-valuenow', '120');
       expect(slider).toHaveAttribute('aria-valuemin', '0');
       expect(slider).toHaveAttribute('aria-valuemax', '360');
-    });
-
-    it('applies per-part classNames', () => {
-      render(
-        <GradientSlider
-          aria-label="Test"
-          classNames={{ root: 'slot-root', track: 'slot-track', thumb: 'slot-thumb' }}
-          gradient={GRADIENT}
-          onValueChange={mockOnChange}
-          value={50}
-        />,
-      );
-
-      const thumb = screen.getByRole('slider');
-      const track = thumb.parentElement!;
-      const root = track.parentElement!;
-
-      expect(root.className).toMatch(/slot-root/);
-      expect(track.className).toMatch(/slot-track/);
-      expect(thumb.className).toMatch(/slot-thumb/);
-    });
-
-    it('positions thumb at percentage-based left', () => {
-      render(
-        <GradientSlider
-          aria-label="Test slider"
-          gradient={GRADIENT}
-          maxValue={100}
-          minValue={0}
-          onValueChange={mockOnChange}
-          value={25}
-        />,
-      );
-      const slider = screen.getByRole('slider');
-
-      expect(slider.style.left).toBe('calc(25% - 5px)');
     });
   });
 

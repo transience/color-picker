@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Button > renders the icon variant 1`] = `
+<button
+  class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 size-8 shrink-0 rounded-sm text-neutral-600 dark:text-neutral-300"
+  type="button"
+>
+  icon
+</button>
+`;
+
+exports[`Button > renders the segmented variant 1`] = `
+<button
+  class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+  type="button"
+>
+  hsl
+</button>
+`;
+
+exports[`Button > renders the segmented variant in the active state 1`] = `
+<button
+  class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+  type="button"
+>
+  active
+</button>
+`;

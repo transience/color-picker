@@ -78,6 +78,14 @@ describe('RGBSliders', () => {
         'true',
       );
     });
+
+    it('omits NumericInputs when showInputs is false', () => {
+      render(
+        <RGBSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} showInputs={false} />,
+      );
+
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
   });
 
   describe('Emission', () => {
@@ -103,6 +111,21 @@ describe('RGBSliders', () => {
       fireEvent.keyDown(screen.getByRole('slider', { name: /blue/i }), { key: 'ArrowRight' });
 
       expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+    });
+
+    it.each([
+      ['Red', '200'],
+      ['Green', '150'],
+      ['Blue', '50'],
+    ] as const)('emits OKLCH when the %s NumericInput changes', (label, typed) => {
+      render(<Controlled />);
+      const input = screen.getByRole('textbox', { name: label });
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: typed } });
+
+      expect(mockOnChangeColor).toHaveBeenCalled();
+      expect(mockOnChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
     });
   });
 

@@ -1,16 +1,14 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ColorInput > Render > renders the controlled value 1`] = `
-<div>
-  <div
-    class="flex items-center gap-2 w-full h-8 min-h-8 border-2 border-neutral-300 dark:border-neutral-600 rounded-lg px-2"
-    data-testid="ColorInput"
-  >
-    <input
-      aria-label="Color value"
-      class="w-full text-sm outline-none"
-      value="#ff0044"
-    />
-  </div>
+<div
+  class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
+  data-testid="ColorInput"
+>
+  <input
+    aria-label="Color value"
+    class="w-full bg-transparent text-sm outline-none"
+    value="#ff0044"
+  />
 </div>
 `;

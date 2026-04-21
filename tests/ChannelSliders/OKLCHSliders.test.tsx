@@ -94,6 +94,14 @@ describe('OKLCHSliders', () => {
         'true',
       );
     });
+
+    it('omits NumericInputs when showInputs is false', () => {
+      render(
+        <OKLCHSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} showInputs={false} />,
+      );
+
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
   });
 
   describe('Emission', () => {
@@ -119,6 +127,21 @@ describe('OKLCHSliders', () => {
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
 
       expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+    });
+
+    it.each([
+      ['Lightness', '75'],
+      ['Chroma', '0.05'],
+      ['Hue', '200'],
+    ] as const)('emits OKLCH when the %s NumericInput changes', (label, typed) => {
+      render(<Controlled />);
+      const input = screen.getByRole('textbox', { name: label });
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: typed } });
+
+      expect(mockOnChangeColor).toHaveBeenCalled();
+      expect(mockOnChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
     });
   });
 

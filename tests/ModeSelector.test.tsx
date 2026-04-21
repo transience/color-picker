@@ -11,17 +11,13 @@ describe('ModeSelector', () => {
   it('renders all modes by default', () => {
     render(<ModeSelector mode="hsl" onClick={mockOnClick} />);
 
-    expect(screen.getByRole('button', { name: 'Switch to OKLCH' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Switch to HSL' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Switch to RGB' })).toBeInTheDocument();
+    expect(screen.getByTestId('ModeSelector')).toMatchSnapshot();
   });
 
   it('renders only the provided modes', () => {
     render(<ModeSelector mode="hsl" modes={['hsl', 'rgb']} onClick={mockOnClick} />);
 
-    expect(screen.getByRole('button', { name: 'Switch to HSL' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Switch to RGB' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Switch to OKLCH' })).not.toBeInTheDocument();
+    expect(screen.getByTestId('ModeSelector')).toMatchSnapshot();
   });
 
   it('invokes onClick with the selected mode', () => {
@@ -38,7 +34,7 @@ describe('ModeSelector', () => {
     const rgb = screen.getByRole('button', { name: 'Switch to RGB' });
     const hsl = screen.getByRole('button', { name: 'Switch to HSL' });
 
-    expect(rgb.className).toMatch(/bg-neutral-200/);
-    expect(hsl.className).not.toMatch(/bg-neutral-200/);
+    expect(rgb).toHaveClass('bg-neutral-200');
+    expect(hsl).not.toHaveClass('bg-neutral-200');
   });
 });

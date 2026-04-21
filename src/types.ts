@@ -71,20 +71,20 @@ export interface ColorPickerClassNames {
   channelSliders?: string;
   /** Color value text input (root frame + inner `<input>`). */
   colorInput?: ColorInputClassNames;
-  /** Layout wrapper around the `colorInput` (padding, margins). */
-  colorInputWrapper?: string;
-  /** Row containing eye-dropper, swatch, hue bar, and alpha bar. */
-  controls?: string;
+  /** Wrapper row for the swatch and the colorInput. */
+  colorValue?: string;
   /** Screen color picker button. */
   eyeDropper?: string;
   /** Gamut warning icon shown inside `colorInput` in narrow formats. */
   gamutWarning?: string;
-  /** Hue GradientSlider in the Controls row. */
+  /** Hue GradientSlider in the toolbar row. */
   hueSlider?: GradientSliderClassNames;
   /** Color mode switcher row (OKLCH/HSL/RGB buttons). */
   modeSelector?: string;
   /** Applied to every NumericInput (inline slider inputs and standalone rows). */
   numericInput?: NumericInputClassNames;
+  /** Wrapper row for the modeSelector and settingsMenu */
+  options?: string;
   /** 2D draggable panel (OKLCH or Saturation/Value). */
   panel?: PanelClassNames;
   /** Outermost ColorPicker root element. */
@@ -93,6 +93,10 @@ export interface ColorPickerClassNames {
   settingsMenu?: SettingsMenuClassNames;
   /** Color preview swatch (outer checkerboard + inner color fill). */
   swatch?: SwatchClassNames;
+  /** Wrapper column containing the hue bar and alpha bar. */
+  toolbar?: string;
+  /** Tooltip popover content (applied wherever ColorPicker renders a tooltip). */
+  tooltip?: string;
 }
 
 export interface GradientSliderClassNames {

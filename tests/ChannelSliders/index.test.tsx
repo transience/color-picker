@@ -1,5 +1,5 @@
-import ChannelSliders from '~/ChannelSliders';
-import { fireEvent, render, screen } from '~/test-utils';
+import ChannelSliders from 'src/ChannelSliders';
+import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
 
 const mockOnChangeColor = vi.fn();
 const originalRAF = globalThis.requestAnimationFrame;
@@ -33,12 +33,10 @@ describe('ChannelSliders', () => {
   });
 
   describe('HSL mode', () => {
-    it('renders H, S, L sliders', () => {
+    it('renders correctly', () => {
       render(<ChannelSliders {...createDefaultProps({ mode: 'hsl' })} />);
 
-      expect(screen.getByRole('slider', { name: /hue/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /saturation/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /lightness/i })).toBeInTheDocument();
+      expect(screen.getByTestId('ChannelSliders')).toMatchSnapshot();
     });
 
     it('disables saturation slider when channels.s.disabled is true', () => {
@@ -70,12 +68,10 @@ describe('ChannelSliders', () => {
   });
 
   describe('RGB mode', () => {
-    it('renders R, G, B sliders', () => {
+    it('renders correctly', () => {
       render(<ChannelSliders {...createDefaultProps({ mode: 'rgb' })} />);
 
-      expect(screen.getByRole('slider', { name: /red/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /green/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /blue/i })).toBeInTheDocument();
+      expect(screen.getByTestId('ChannelSliders')).toMatchSnapshot();
     });
 
     it('ignores channel keys that are not relevant to RGB mode', () => {
@@ -106,12 +102,10 @@ describe('ChannelSliders', () => {
   });
 
   describe('OKLCH mode', () => {
-    it('renders L, C, H sliders', () => {
+    it('renders correctly', () => {
       render(<ChannelSliders {...createDefaultProps({ mode: 'oklch' })} />);
 
-      expect(screen.getByRole('slider', { name: /lightness/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /chroma/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /hue/i })).toBeInTheDocument();
+      expect(screen.getByTestId('ChannelSliders')).toMatchSnapshot();
     });
 
     it('disables chroma slider when channels.c.disabled is true', () => {

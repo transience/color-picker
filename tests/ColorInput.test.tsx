@@ -26,15 +26,9 @@ describe('ColorInput', () => {
 
   describe('Render', () => {
     it('renders the controlled value', () => {
-      const { container } = render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
-
-      expect(container).toMatchSnapshot();
-    });
-
-    it('shows value when not editing', () => {
       render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
 
-      expect(screen.getByDisplayValue('#ff0044')).toBeInTheDocument();
+      expect(screen.getByTestId('ColorInput')).toMatchSnapshot();
     });
   });
 

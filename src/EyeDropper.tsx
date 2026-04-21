@@ -1,5 +1,5 @@
+import Button from './components/Button';
 import EyeDropperIcon from './components/EyeDropperIcon';
-import { cn } from './modules/helpers';
 
 interface EyeDropperProps {
   /** Extra classes appended to the trigger button. */
@@ -39,17 +39,13 @@ export default function EyeDropper(props: EyeDropperProps) {
   };
 
   return (
-    <button
+    <Button
       aria-label="Pick color from screen"
-      className={cn(
-        'flex size-8 shrink-0 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-blue-500',
-        className,
-      )}
+      className={className}
       data-testid="EyeDropper"
       onClick={handleClick}
-      type="button"
     >
       <EyeDropperIcon />
-    </button>
+    </Button>
   );
 }

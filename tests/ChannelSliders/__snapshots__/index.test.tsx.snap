@@ -1,0 +1,362 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
+<div
+  class="space-y-3"
+  data-testid="ChannelSliders"
+>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    H
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0)); touch-action: none;"
+    >
+      <div
+        aria-label="Hue"
+        aria-valuemax="359.9"
+        aria-valuemin="0"
+        aria-valuenow="201"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(55.8488% - 11.1697693803834px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Hue"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="201"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        °
+      </span>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    S
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, rgb(110, 110, 110), rgb(0, 143, 220)); touch-action: none;"
+    >
+      <div
+        aria-label="Saturation"
+        aria-valuemax="100"
+        aria-valuemin="0"
+        aria-valuenow="100"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(100% - 20px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Saturation"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="100"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        %
+      </span>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    L
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 166, 255), rgb(255, 255, 255)); touch-action: none;"
+    >
+      <div
+        aria-label="Lightness"
+        aria-valuemax="100"
+        aria-valuemin="0"
+        aria-valuenow="43.14"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(43.14% - 8.628px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Lightness"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="43"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        %
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
+<div
+  class="space-y-3"
+  data-testid="ChannelSliders"
+>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    L
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, oklch(0 0.16 241), oklch(0.62 0.16 241), oklch(1 0.16 241)); touch-action: none;"
+    >
+      <div
+        aria-label="Lightness"
+        aria-valuemax="1"
+        aria-valuemin="0"
+        aria-valuenow="0.62"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(62% - 12.4px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Lightness"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="62.0"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        %
+      </span>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    C
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, oklch(0.62 0 241), oklch(0.62 0.1886 241)); touch-action: none;"
+    >
+      <div
+        aria-label="Chroma"
+        aria-valuemax="0.1886"
+        aria-valuemin="0"
+        aria-valuenow="0.16"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(84.8356% - 16.9671261930011px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Chroma"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="0.160"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        style="visibility: hidden;"
+      >
+        °
+      </span>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    H
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, oklch(0.7 0.4 0), oklch(0.7 0.4 60), oklch(0.7 0.4 120), oklch(0.7 0.4 180), oklch(0.7 0.4 240), oklch(0.7 0.4 300), oklch(0.7 0.4 0)); touch-action: none;"
+    >
+      <div
+        aria-label="Hue"
+        aria-valuemax="360"
+        aria-valuemin="0"
+        aria-valuenow="241"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(66.9444% - 13.3888888888889px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Hue"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="241.0"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+      >
+        °
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
+<div
+  class="space-y-3"
+  data-testid="ChannelSliders"
+>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    R
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(255, 0, 0)); touch-action: none;"
+    >
+      <div
+        aria-label="Red"
+        aria-valuemax="255"
+        aria-valuemin="0"
+        aria-valuenow="0"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(0% - 0px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Red"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="0"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        style="visibility: hidden;"
+      >
+        °
+      </span>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    G
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 255, 0)); touch-action: none;"
+    >
+      <div
+        aria-label="Green"
+        aria-valuemax="255"
+        aria-valuemin="0"
+        aria-valuenow="143"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(56.0784% - 11.2156862745098px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Green"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="143"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        style="visibility: hidden;"
+      >
+        °
+      </span>
+    </div>
+  </div>
+  <div
+    class="flex items-center gap-2"
+    data-testid="GradientSlider"
+  >
+    B
+    <div
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 0, 255)); touch-action: none;"
+    >
+      <div
+        aria-label="Blue"
+        aria-valuemax="255"
+        aria-valuemin="0"
+        aria-valuenow="220"
+        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
+        role="slider"
+        style="left: calc(86.2745% - 17.2549019607843px);"
+        tabindex="0"
+      />
+    </div>
+    <div
+      class="flex items-center"
+      data-testid="NumericInput"
+    >
+      <input
+        aria-label="Blue"
+        class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+        type="text"
+        value="220"
+      />
+      <span
+        class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
+        style="visibility: hidden;"
+      >
+        °
+      </span>
+    </div>
+  </div>
+</div>
+`;

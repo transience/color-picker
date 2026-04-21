@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-container */
 import { useState } from 'react';
 
 import AlphaSlider from '~/AlphaSlider';
@@ -36,13 +35,11 @@ describe('AlphaSlider', () => {
   });
 
   describe('Render', () => {
-    it('renders a checkerboard-layered gradient using the provided color', () => {
-      const { container } = render(<AlphaSlider color="#ff0044" onChange={() => {}} value={0.5} />);
-      const track = container.querySelector('[role="slider"]')?.parentElement;
+    it('renders correctly', () => {
+      render(<AlphaSlider color="#ff0044" onChange={() => {}} value={0.5} />);
+      const track = screen.getByRole('slider', { name: 'Alpha' }).parentElement!;
 
-      expect(track?.getAttribute('style')).toContain('linear-gradient');
-      expect(track?.getAttribute('style')).toMatch(/rgb\(255,\s*0,\s*68\)|#ff0044/);
-      expect(track?.getAttribute('style')).toMatch(/url\(/);
+      expect(track).toMatchSnapshot();
     });
 
     it('exposes ARIA slider attributes with [0, 1] bounds', () => {

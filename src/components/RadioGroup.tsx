@@ -14,8 +14,8 @@ export default function RadioGroup(props: RadioGroupProps) {
   const { onChange, onInteractionEnd, options, title, value } = props;
 
   return (
-    <div className="flex flex-col" data-testid="RadioGroup">
-      <div className="px-2 py-1 text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500">
+    <div className="flex flex-col flex-1" data-testid="RadioGroup">
+      <div className="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500">
         {title}
       </div>
       {options.map(option => {
@@ -25,9 +25,12 @@ export default function RadioGroup(props: RadioGroupProps) {
           <button
             key={option.value}
             className={cn(
-              'flex items-center justify-between rounded-sm px-2 py-1 text-sm text-left leading-none',
-              'hover:bg-neutral-200/60 dark:hover:bg-neutral-700/60',
-              isSelected && 'text-neutral-900 dark:text-neutral-50',
+              'flex items-center justify-between py-1.5 text-sm text-left leading-none',
+              'text-neutral-700 dark:text-neutral-300',
+              'hover:text-neutral-900 dark:hover:text-neutral-50',
+              {
+                'text-neutral-900 dark:text-neutral-50': isSelected,
+              },
             )}
             onClick={() => {
               onChange(option.value);

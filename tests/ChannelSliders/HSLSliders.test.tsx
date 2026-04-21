@@ -80,6 +80,14 @@ describe('HSLSliders', () => {
 
       expect(screen.getByTestId('custom-s')).toBeInTheDocument();
     });
+
+    it('omits NumericInputs when showInputs is false', () => {
+      render(
+        <HSLSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} showInputs={false} />,
+      );
+
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
   });
 
   describe('Emission', () => {
@@ -109,6 +117,21 @@ describe('HSLSliders', () => {
       fireEvent.keyDown(light, { key: 'ArrowRight' });
 
       expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+    });
+
+    it.each([
+      ['Hue', '200'],
+      ['Saturation', '60'],
+      ['Lightness', '40'],
+    ] as const)('emits OKLCH when the %s NumericInput changes', (label, typed) => {
+      render(<Controlled />);
+      const input = screen.getByRole('textbox', { name: label });
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: typed } });
+
+      expect(mockOnChangeColor).toHaveBeenCalled();
+      expect(mockOnChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
     });
   });
 
