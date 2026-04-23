@@ -7,7 +7,7 @@ import type { ColorInputClassNames } from './types';
 interface ColorInputProps {
   /** Per-part className overrides (`root` = bordered wrapper, `input` = inner `<input>`). */
   classNames?: ColorInputClassNames;
-  /** Content rendered at the right edge of the input (e.g. a gamut warning icon). */
+  /** Content rendered at the right edge of the input. */
   endContent?: ReactNode;
   /**
    * Called with the typed value each time it becomes a valid CSS color.
@@ -15,6 +15,8 @@ interface ColorInputProps {
    * Incomplete hex input is held until valid — no partial emissions.
    */
   onChange: (value: string) => void;
+  /** Content rendered at the left edge of the input. */
+  startContent?: ReactNode;
   /**
    * Displayed color string when the input is not focused. The caller supplies
    * this in its preferred format (hex, `oklch(...)`, etc.).
@@ -23,7 +25,7 @@ interface ColorInputProps {
 }
 
 export default function ColorInput(props: ColorInputProps) {
-  const { classNames, endContent, onChange, value } = props;
+  const { classNames, endContent, onChange, startContent, value } = props;
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
@@ -75,6 +77,7 @@ export default function ColorInput(props: ColorInputProps) {
       )}
       data-testid="ColorInput"
     >
+      {startContent}
       <input
         aria-label="Color value"
         className={cn('w-full bg-transparent text-sm outline-none', classNames?.input)}

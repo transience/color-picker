@@ -25,7 +25,7 @@ Key choices:
 
 ## 2. Package shape
 
-Entry point: `src/index.ts` — named exports: `ColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ModeSelector`, `Swatch`; the `hslHueGradient` / `oklchHueGradient` constants; and every type from `src/types.ts`. `DEFAULT_COLOR` / `DEFAULT_MODES` are internal.
+Entry point: `src/index.ts` — named exports: `ColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ColorInput`, `ModeSelector`, `Swatch`; the `hslHueGradient` / `oklchHueGradient` constants; and every type from `src/types.ts`. `DEFAULT_COLOR` / `DEFAULT_MODES` are internal.
 
 Source layout:
 

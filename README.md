@@ -124,14 +124,15 @@ Every overridable part is exposed via the `ColorPickerClassNames` slot map (see 
 
 Individual parts are also exported as standalone widgets — drop a swatch, alpha slider, or mode switcher anywhere in your UI.
 
-| Export             | Purpose                                         |
-|--------------------|-------------------------------------------------|
-| **ColorPicker**    | The full picker.                                |
-| **AlphaSlider**    | Checkerboard-backed alpha slider.               |
-| **ChannelInputs** | Per-mode input group (L/C/H, H/S/L, or R/G/B).  |
-| **ChannelSliders** | Per-mode slider group (L/C/H, H/S/L, or R/G/B). |
-| **ModeSelector**   | OKLCH / HSL / RGB mode switcher.                |
-| **Swatch**         | Circular color preview over a checkerboard.     |
+| Export              | Purpose                                         |
+|---------------------|-------------------------------------------------|
+| **ColorPicker**     | The full picker.                                |
+| **AlphaSlider**     | Checkerboard-backed alpha slider.               |
+| **ChannelInputs**   | Per-mode input group (L/C/H, H/S/L, or R/G/B).  |
+| **ChannelSliders**  | Per-mode slider group (L/C/H, H/S/L, or R/G/B). |
+| **ColorInput**      | CSS color string input with validation          |
+| **ModeSelector**    | OKLCH / HSL / RGB mode switcher.                |
+| **Swatch**          | Circular color preview over a checkerboard.     |
 
 Constants (`hslHueGradient`, `oklchHueGradient`) and all types (`ColorMode`, `ColorFormat`, `ChannelsConfig`, `ColorPickerClassNames`, etc.) are also exported.
 

@@ -30,6 +30,30 @@ describe('ColorInput', () => {
 
       expect(screen.getByTestId('ColorInput')).toMatchSnapshot();
     });
+
+    it('renders startContent next to the input', () => {
+      render(
+        <ColorInput
+          onChange={mockOnChange}
+          startContent={<span data-testid="color-swatch">C</span>}
+          value="#ff0044"
+        />,
+      );
+
+      expect(screen.getByTestId('ColorInput')).toMatchSnapshot();
+    });
+
+    it('renders endContent next to the input', () => {
+      render(
+        <ColorInput
+          endContent={<span data-testid="gamut-icon">!</span>}
+          onChange={mockOnChange}
+          value="#ff0044"
+        />,
+      );
+
+      expect(screen.getByTestId('ColorInput')).toMatchSnapshot();
+    });
   });
 
   describe('Edit mode', () => {
@@ -199,20 +223,6 @@ describe('ColorInput', () => {
       fireEvent.change(input, { target: { value: '  #ff0044  ' } });
 
       expect(mockOnChange).toHaveBeenCalledWith('#ff0044');
-    });
-  });
-
-  describe('endContent', () => {
-    it('renders endContent next to the input', () => {
-      render(
-        <ColorInput
-          endContent={<span data-testid="gamut-icon">!</span>}
-          onChange={mockOnChange}
-          value="#ff0044"
-        />,
-      );
-
-      expect(screen.getByTestId('gamut-icon')).toBeInTheDocument();
     });
   });
 });

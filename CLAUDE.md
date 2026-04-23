@@ -33,7 +33,7 @@ pnpm validate             # lint + typecheck + test:coverage + build + size + ty
 
 ## Entry point
 
-`src/index.ts` exports `ColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ModeSelector`, `Swatch`, the `hslHueGradient` / `oklchHueGradient` constants, and everything from `src/types.ts`.
+`src/index.ts` exports `ColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ColorInput`, `ModeSelector`, `Swatch`, the `hslHueGradient` / `oklchHueGradient` constants, and everything from `src/types.ts`.
 
 Path alias `~/*` → `src/*`. Prefer it for intra-`src` imports.
 
