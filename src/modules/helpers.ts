@@ -2,8 +2,32 @@ import type { PointerEvent } from 'react';
 import clsx, { type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+/**
+ * An object without excluded types.
+ */
+type RemoveType<TObject, TExclude = undefined> = {
+  [Key in keyof TObject as TObject[Key] extends TExclude ? never : Key]: TObject[Key];
+};
+
+type Simplify<T> = { [K in keyof T]: T[K] } & {};
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Remove properties with undefined value from an object
+ */
+export function cleanUpObject<T extends Record<string, unknown>>(input: T) {
+  const output: Record<string, unknown> = {};
+
+  for (const key in input) {
+    if (input[key] !== undefined) {
+      output[key] = input[key];
+    }
+  }
+
+  return output as RemoveType<T>;
 }
 
 /**
@@ -19,6 +43,21 @@ export function createId(prefix: string): string {
   }
 
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/**
+ * Merges the defaultProps with literal values with the incoming props, removing undefined values from it that would override the defaultProps.
+ * The result is a type-safe object with the defaultProps as required properties.
+ */
+export function mergeProps<
+  TDefaultProps extends Record<string, any>,
+  TProps extends Record<string, any>,
+>(defaultProps: TDefaultProps, props: TProps) {
+  const cleanProps = cleanUpObject(props);
+
+  return { ...defaultProps, ...cleanProps } as unknown as Simplify<
+    TProps & Required<Pick<TProps, keyof TDefaultProps & string>>
+  >;
 }
 
 /**
