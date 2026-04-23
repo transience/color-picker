@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import ColorPicker from '../src/ColorPicker';
+import { defaultProps } from '../src/hooks/useColorPicker';
 
 const meta: Meta<typeof ColorPicker> = {
   title: 'ColorPicker',
@@ -11,18 +12,7 @@ const meta: Meta<typeof ColorPicker> = {
     classNames: {
       root: 'bg-white dark:bg-black',
     },
-    defaultMode: 'oklch',
-    displayFormat: 'auto',
-    outputFormat: 'auto',
-    precision: 5,
-    showAlpha: false,
-    showEyeDropper: true,
-    showHueBar: false,
-    showInputs: true,
-    showPanel: true,
-    showSettings: false,
-    showSliders: true,
-    showSwatch: true,
+    ...defaultProps,
   },
   argTypes: {
     precision: {

@@ -1,12 +1,12 @@
 import { cn } from '~/modules/helpers';
 
+import useInteractionAttribute from '../hooks/useInteractionAttribute';
 import type {
   ChannelsConfig,
   ColorMode,
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
-import useInteractionAttribute from '../useInteractionAttribute';
 
 import HSLSliders from './HSLSliders';
 import OKLCHSliders from './OKLCHSliders';

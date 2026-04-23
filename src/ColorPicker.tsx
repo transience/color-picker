@@ -1,22 +1,15 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { convertCSS, formatCSS, opacity, parseCSS } from 'colorizr';
+import { ReactNode } from 'react';
 
 import AlphaSlider from './AlphaSlider';
 import ChannelInputs from './ChannelInputs';
 import ChannelSliders from './ChannelSliders';
 import ColorInput from './ColorInput';
 import GradientSlider from './components/GradientSlider';
-import { DEFAULT_COLOR, DEFAULT_MODES, hslHueGradient, oklchHueGradient } from './constants';
+import { hslHueGradient, oklchHueGradient } from './constants';
 import EyeDropper from './EyeDropper';
 import GamutWarning from './GamutWarning';
+import useColorPicker from './hooks/useColorPicker';
 import ModeSelector from './ModeSelector';
-import { colorToHsv, type HSV, hsvToHex, isOklchInSRGB } from './modules/colorSpace';
-import {
-  formatColor,
-  isNarrowFormat,
-  resolveDisplayFormat,
-  resolveOutputFormat,
-} from './modules/format';
 import { cn } from './modules/helpers';
 import OKLCHPanel from './OKLCHPanel';
 import SaturationPanel from './SaturationPanel';
@@ -24,13 +17,6 @@ import SettingsMenu from './SettingsMenu';
 import Swatch from './Swatch';
 import Toolbar from './Toolbar';
 import type { ChannelsConfig, ColorFormat, ColorMode, ColorPickerClassNames } from './types';
-import useInteractionAttribute from './useInteractionAttribute';
-
-interface OKLCHState {
-  c: number;
-  h: number;
-  l: number;
-}
 
 export interface ColorPickerProps {
   /**
@@ -152,209 +138,49 @@ export interface ColorPickerProps {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default function ColorPicker(props: ColorPickerProps) {
+  const picker = useColorPicker(props);
+  const {
+    alpha,
+    containerRef,
+    currentHue,
+    displayFormat,
+    displayValue,
+    handleChangeAlpha,
+    handleChangeColorInput,
+    handleChangeDisplayFormat,
+    handleChangeHsvHue,
+    handleChangeOklchHue,
+    handleChangeOklchPanel,
+    handleChangeOutputFormat,
+    handleChangeSaturationPanel,
+    handleClickMode,
+    hsv,
+    isOklch,
+    mode,
+    oklch,
+    outputFormat,
+    rootRef,
+    showGamutWarning,
+    solidColor,
+    swatchColor,
+  } = picker;
   const {
     channels,
     classNames,
-    color,
-    defaultMode = 'oklch',
-    displayFormat: displayFormatProp = 'auto',
-    modes = DEFAULT_MODES,
-    onChange,
-    onChangeMode,
-    outputFormat: outputFormatProp = 'auto',
-    precision,
-    showAlpha = false,
-    showColorInput = true,
-    showEyeDropper = true,
-    showHueBar = false,
-    showInputs = true,
-    showModeSelector = true,
-    showPanel = true,
-    showSettings = false,
-    showSliders = true,
-    showSwatch = true,
-  } = props;
-  const initialColor = color ?? DEFAULT_COLOR;
+    modes,
+    showAlpha,
+    showColorInput,
+    showEyeDropper,
+    showHueBar,
+    showInputs,
+    showModeSelector,
+    showPanel,
+    showSettings,
+    showSliders,
+    showSwatch,
+  } = picker.props;
 
-  const [alpha, setAlpha] = useState<number>(() => (showAlpha ? opacity(initialColor) : 1));
-  const [displayFormat, setDisplayFormat] = useState<ColorFormat>(displayFormatProp);
-  const [hsv, setHsv] = useState<HSV>(() => colorToHsv(initialColor));
-  const [mode, setMode] = useState<ColorMode>(defaultMode);
-  const [oklch, setOklch] = useState<OKLCHState>(() => parseCSS(initialColor, 'oklch'));
-  const [outputFormat, setOutputFormat] = useState<ColorFormat>(outputFormatProp);
-  const interactionRef = useInteractionAttribute();
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const lastEmittedRef = useRef(initialColor);
-
-  const alphaRef = useRef(alpha);
-  const displayFormatRef = useRef(displayFormat);
-  const hsvRef = useRef(hsv);
-  const modeRef = useRef(mode);
-  const oklchRef = useRef(oklch);
-  const onChangeRef = useRef(onChange);
-  const onChangeModeRef = useRef(onChangeMode);
-  const outputFormatRef = useRef(outputFormat);
-  const precisionRef = useRef(precision);
-  const showAlphaRef = useRef(showAlpha);
-
-  alphaRef.current = alpha;
-  displayFormatRef.current = displayFormat;
-  hsvRef.current = hsv;
-  modeRef.current = mode;
-  oklchRef.current = oklch;
-  onChangeRef.current = onChange;
-  onChangeModeRef.current = onChangeMode;
-  outputFormatRef.current = outputFormat;
-  precisionRef.current = precision;
-  showAlphaRef.current = showAlpha;
-
-  const rootRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      containerRef.current = node;
-      interactionRef(node);
-    },
-    [interactionRef],
-  );
-
-  useEffect(() => {
-    if (color !== undefined && color !== lastEmittedRef.current) {
-      setHsv(colorToHsv(color));
-      setOklch(parseCSS(color, 'oklch'));
-
-      if (showAlphaRef.current) {
-        setAlpha(opacity(color));
-      }
-    }
-  }, [color]);
-
-  const emit = useCallback((oklchValue: string) => {
-    const resolved = resolveOutputFormat(
-      outputFormatRef.current,
-      displayFormatRef.current,
-      modeRef.current,
-    );
-    const alphaForOutput =
-      showAlphaRef.current && alphaRef.current < 1 ? alphaRef.current : undefined;
-    const final = formatColor(oklchValue, resolved, alphaForOutput, precisionRef.current);
-
-    lastEmittedRef.current = final;
-    onChangeRef.current?.(final);
-
-    return final;
-  }, []);
-
-  const handleChangeAlpha = useCallback(
-    (next: number) => {
-      setAlpha(next);
-      alphaRef.current = next;
-
-      const base =
-        modeRef.current === 'oklch'
-          ? formatCSS(oklchRef.current, 'oklch')
-          : convertCSS(hsvToHex(hsvRef.current), 'oklch');
-
-      emit(base);
-    },
-    [emit],
-  );
-
-  const handleChangeColorInput = useCallback(
-    (value: string) => {
-      const oklchValue = convertCSS(value, 'oklch');
-
-      setHsv(colorToHsv(value));
-      setOklch(parseCSS(value, 'oklch'));
-
-      if (showAlphaRef.current) {
-        const nextAlpha = opacity(value);
-
-        setAlpha(nextAlpha);
-        alphaRef.current = nextAlpha;
-      }
-
-      emit(oklchValue);
-    },
-    [emit],
-  );
-
-  const handleChangeDisplayFormat = useCallback((format: ColorFormat) => {
-    setDisplayFormat(format);
-    displayFormatRef.current = format;
-  }, []);
-
-  const handleChangeHsvHue = useCallback(
-    (h: number) => {
-      const next = { ...hsvRef.current, h };
-
-      setHsv(next);
-      emit(convertCSS(hsvToHex(next), 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleChangeOklchHue = useCallback(
-    (h: number) => {
-      const next = { ...oklchRef.current, h };
-
-      setOklch(next);
-      emit(formatCSS(next, 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleChangeOklchPanel = useCallback(
-    (l: number, c: number) => {
-      const next = { ...oklchRef.current, c, l };
-
-      setOklch(next);
-      emit(formatCSS(next, 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleChangeOutputFormat = useCallback((format: ColorFormat) => {
-    setOutputFormat(format);
-    outputFormatRef.current = format;
-  }, []);
-
-  const handleChangeSaturationPanel = useCallback(
-    (s: number, v: number) => {
-      const next = { h: hsvRef.current.h, s, v };
-
-      setHsv(next);
-      emit(convertCSS(hsvToHex(next), 'oklch'));
-    },
-    [emit],
-  );
-
-  const handleClickMode = (value: ColorMode) => {
-    if (value === mode) {
-      return;
-    }
-
-    setMode(value);
-    onChangeModeRef.current?.(value);
-  };
-
-  const isOklch = mode === 'oklch';
-  const currentHue = isOklch ? oklch.h : hsv.h;
   const hueConfig = channels?.h;
-
-  const solidColor = isOklch ? formatCSS(oklch, { format: 'oklch' }) : hsvToHex(hsv);
-  const canonicalOklch = isOklch ? solidColor : convertCSS(solidColor, 'oklch');
-  const resolvedDisplayFormat = resolveDisplayFormat(displayFormat, mode);
-  const alphaForDisplay = showAlpha && alpha < 1 ? alpha : undefined;
-  const displayValue = formatColor(
-    canonicalOklch,
-    resolvedDisplayFormat,
-    alphaForDisplay,
-    precision,
-  );
-  const swatchColor = displayValue;
-  const showGamutWarning =
-    isOklch && isNarrowFormat(resolvedDisplayFormat) && !isOklchInSRGB(oklch.l, oklch.c, oklch.h);
-
   const content: Record<string, ReactNode> = {};
 
   if (showPanel) {
