@@ -127,4 +127,39 @@ describe('OKLCHPanel', () => {
       expect(c).toBeLessThanOrEqual(maxChromaFn(l, hue) + 0.01);
     });
   });
+
+  describe('Native attribute forwarding', () => {
+    it('forwards native HTML attrs to the root', () => {
+      render(
+        <OKLCHPanel
+          chroma={0.1}
+          data-foo="bar"
+          hue={30}
+          id="custom-panel"
+          lightness={0.6}
+          onChange={mockOnChange}
+        />,
+      );
+      const root = screen.getByTestId('OKLCHPanel');
+
+      expect(root).toHaveAttribute('data-foo', 'bar');
+      expect(root).toHaveAttribute('id', 'custom-panel');
+    });
+
+    it('merges consumer style and force-sets touchAction', () => {
+      render(
+        <OKLCHPanel
+          chroma={0.1}
+          hue={30}
+          lightness={0.6}
+          onChange={mockOnChange}
+          style={{ marginTop: 8, touchAction: 'auto' }}
+        />,
+      );
+      const root = screen.getByTestId('OKLCHPanel');
+
+      expect(root).toHaveStyle({ marginTop: '8px' });
+      expect(root).toHaveStyle({ touchAction: 'none' });
+    });
+  });
 });

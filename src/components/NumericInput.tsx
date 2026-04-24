@@ -103,7 +103,7 @@ export default function NumericInput(props: NumericInputProps) {
       <input
         aria-label={ariaLabel}
         className={cn(
-          'w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5',
+          'w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5',
           classNames?.input,
         )}
         disabled={isDisabled}

@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo } from 'react';
+import { type HTMLAttributes, type ReactNode, useMemo } from 'react';
 import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } from 'colorizr';
 
 import { cn } from '~/modules/helpers';
@@ -11,7 +11,7 @@ import type {
   NumericInputClassNames,
 } from './types';
 
-interface ChannelInputsProps {
+interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
   /** Current alpha value as a float in `[0, 1]`. Rendered as the 4th input when `showAlpha` is on. */
   alpha: number;
   /**
@@ -57,6 +57,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
   const {
     alpha,
     channels,
+    className,
     classNames,
     color,
     mode,
@@ -64,6 +65,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     onAlphaChange,
     onChangeColor,
     showAlpha,
+    ...rest
   } = props;
 
   const mergedNumericClassNames: NumericInputClassNames = {
@@ -193,8 +195,9 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
   return (
     <div
-      className={cn('flex items-start justify-center gap-3', classNames?.root)}
+      className={cn('flex items-start justify-center gap-3', className, classNames?.root)}
       data-testid="ChannelInputs"
+      {...rest}
     >
       {fields.map(field => (
         <div key={field.key} className="flex flex-col items-center gap-1">

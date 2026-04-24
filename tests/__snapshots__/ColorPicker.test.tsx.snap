@@ -70,7 +70,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
       >
         <input
           aria-label="Hue"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="344"
         />
@@ -107,7 +107,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
       >
         <input
           aria-label="Saturation"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="100"
         />
@@ -144,7 +144,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
       >
         <input
           aria-label="Lightness"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="50"
         />
@@ -166,21 +166,21 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
     >
       <button
         aria-label="Switch to OKLCH"
-        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
         type="button"
       >
         OKLCH
       </button>
       <button
         aria-label="Switch to HSL"
-        class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+        class="flex items-center justify-center outline-none hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-black/20 dark:bg-white/20"
         type="button"
       >
         HSL
       </button>
       <button
         aria-label="Switch to RGB"
-        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
         type="button"
       >
         RGB
@@ -286,7 +286,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
       >
         <input
           aria-label="Lightness"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="63.3"
         />
@@ -323,7 +323,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
       >
         <input
           aria-label="Chroma"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="0.254"
         />
@@ -361,7 +361,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
       >
         <input
           aria-label="Hue"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="19.9"
         />
@@ -383,21 +383,21 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
     >
       <button
         aria-label="Switch to OKLCH"
-        class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+        class="flex items-center justify-center outline-none hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-black/20 dark:bg-white/20"
         type="button"
       >
         OKLCH
       </button>
       <button
         aria-label="Switch to HSL"
-        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
         type="button"
       >
         HSL
       </button>
       <button
         aria-label="Switch to RGB"
-        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
         type="button"
       >
         RGB
@@ -477,7 +477,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
       >
         <input
           aria-label="Red"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="255"
         />
@@ -515,7 +515,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
       >
         <input
           aria-label="Green"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="0"
         />
@@ -553,7 +553,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
       >
         <input
           aria-label="Blue"
-          class="w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5"
+          class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
           type="text"
           value="68"
         />
@@ -576,21 +576,21 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
     >
       <button
         aria-label="Switch to OKLCH"
-        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
         type="button"
       >
         OKLCH
       </button>
       <button
         aria-label="Switch to HSL"
-        class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+        class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
         type="button"
       >
         HSL
       </button>
       <button
         aria-label="Switch to RGB"
-        class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+        class="flex items-center justify-center outline-none hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-black/20 dark:bg-white/20"
         type="button"
       >
         RGB

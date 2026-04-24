@@ -153,6 +153,30 @@ describe('AlphaSlider', () => {
     });
   });
 
+  describe('Native attribute forwarding', () => {
+    it('forwards native HTML attrs to the GradientSlider root', () => {
+      render(
+        <AlphaSlider
+          color="#ff0044"
+          data-foo="bar"
+          id="custom-alpha"
+          onChange={() => {}}
+          value={0.5}
+        />,
+      );
+      const root = screen.getByTestId('GradientSlider');
+
+      expect(root).toHaveAttribute('data-foo', 'bar');
+      expect(root).toHaveAttribute('id', 'custom-alpha');
+    });
+
+    it('honors a consumer-supplied aria-label', () => {
+      render(<AlphaSlider aria-label="Opacity" color="#ff0044" onChange={() => {}} value={0.5} />);
+
+      expect(screen.getByRole('slider', { name: 'Opacity' })).toBeInTheDocument();
+    });
+  });
+
   describe('Disabled state', () => {
     it('sets aria-disabled and tabindex -1', () => {
       render(<AlphaSlider color="#ff0044" isDisabled onChange={() => {}} value={0.5} />);

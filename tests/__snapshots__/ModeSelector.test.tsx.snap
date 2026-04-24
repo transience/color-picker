@@ -7,21 +7,21 @@ exports[`ModeSelector > renders all modes by default 1`] = `
 >
   <button
     aria-label="Switch to OKLCH"
-    class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+    class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
     type="button"
   >
     OKLCH
   </button>
   <button
     aria-label="Switch to HSL"
-    class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+    class="flex items-center justify-center outline-none hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-black/20 dark:bg-white/20"
     type="button"
   >
     HSL
   </button>
   <button
     aria-label="Switch to RGB"
-    class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+    class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
     type="button"
   >
     RGB
@@ -36,14 +36,14 @@ exports[`ModeSelector > renders only the provided modes 1`] = `
 >
   <button
     aria-label="Switch to HSL"
-    class="flex items-center justify-center outline-none hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-neutral-200 dark:bg-neutral-700"
+    class="flex items-center justify-center outline-none hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10 bg-black/20 dark:bg-white/20"
     type="button"
   >
     HSL
   </button>
   <button
     aria-label="Switch to RGB"
-    class="flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
+    class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10"
     type="button"
   >
     RGB

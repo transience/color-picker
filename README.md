@@ -1,6 +1,6 @@
 # Color Picker
 
-![NPM Version](https://img.shields.io/npm/v/%40transience%2Fcolor-picker) [![CI](https://github.com/transience/color-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/transience/color-picker/actions/workflows/ci.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=transience_color-picker) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=coverage)](https://sonarcloud.io/summary/new_code?id=transience_color-picker)
+[![NPM Version](https://img.shields.io/npm/v/%40transience%2Fcolor-picker)](https://www.npmjs.com/package/@transience/color-picker) [![CI](https://github.com/transience/color-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/transience/color-picker/actions/workflows/ci.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=transience_color-picker) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=transience_color-picker&metric=coverage)](https://sonarcloud.io/summary/new_code?id=transience_color-picker)
 
 A modern, OKLCH-first React/Tailwind color picker.
 
@@ -9,16 +9,12 @@ A modern, OKLCH-first React/Tailwind color picker.
 - 🎯 **Slot styling**: Every internal element accepts className overrides via a typed `classNames` map.
 - 🚨 **Gamut-aware**: Warns when an OKLCH color falls outside the sRGB gamut.
 
-<div style="display: flex; justify-content: center; gap: 10px;">
-	<div style="display:flex; flex-direction:column; align-items: center; gap:5px;">
-    <img src="./docs/public/color-picker-default.png" alt="Color Picker" height="350" width="auto" />
-    The default layout
-	</div>
-	<div style="display:flex; flex-direction:column; align-items: center; gap:5px;">
-    <img src="./docs/public/color-picker-customized.png" alt="Color Picker" height="350" width="auto" />
-    Custom layout
-	</div>
-</div>
+<p align="center">
+  <img src="./docs/public/color-picker-default.png" height="350" alt="Default layout" />
+  &nbsp;&nbsp;
+  <img src="./docs/public/color-picker-customized.png" height="350" alt="Custom layout" />
+</p>
+<p align="center"><sub>Default layout &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Custom layout</sub></p>
 
 👉 **[Live demo (Storybook)](https://transience.github.io/color-picker/)**
 
@@ -28,7 +24,7 @@ A modern, OKLCH-first React/Tailwind color picker.
 npm i @transience/color-picker
 ```
 
-Styled with Tailwind CSS utilities — no stylesheet ships.\
+Styled with Tailwind CSS utilities - no stylesheet ships.\
 Your app's Tailwind build must scan the package's compiled source so the utilities are included in the generated CSS.
 
 **Tailwind v4** (CSS-first):
@@ -51,6 +47,14 @@ export default {
   plugins: [],
 };
 ```
+
+If you are using pnpm, you need to add the following line to your .npmrc file to hoist our packages to the root node_modules.
+
+```shell
+public-hoist-pattern[]=*@transience/color-picker/*
+```
+
+After modifying the .npmrc file, you need to run pnpm install again to ensure that the dependencies are installed correctly.
 
 ## Usage
 
@@ -105,7 +109,9 @@ When an OKLCH color doesn't fit inside a narrow format (`hex`, `hsl`, `rgb`), a 
 
 ## Styling
 
-Every overridable part is exposed via the `ColorPickerClassNames` slot map (see `src/types.ts`). Each slot's classes are merged with the component's defaults via `clsx` + `tailwind-merge`, so Tailwind utilities override correctly:
+Every overridable part is exposed via the `ColorPickerClassNames` slot map (see `src/types.ts`). Each slot's classes are merged with the component's defaults via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge), so your overrides win predictably — `classNames={{ swatch: { root: 'rounded-full' } }}` reliably overrides the internal `rounded-md`. Without that merge, both classes would land in the DOM and CSS source order would decide the winner.
+
+Most Tailwind apps already ship `tailwind-merge`, so it dedupes in your bundle. If yours doesn't, it's pulled in automatically with this package.
 
 ```tsx
 <ColorPicker
@@ -115,7 +121,9 @@ Every overridable part is exposed via the `ColorPickerClassNames` slot map (see 
     root: 'border border-neutral-300 rounded-lg',
     swatch: { root: 'ring-2 ring-offset-2' },
     hueSlider: { track: 'h-3' },
-    modeSelector: 'text-xs',
+    modeSelector: {
+      button: 'first:rounded-none last:rounded-none text-sm',
+    },
   }}
 />
 ```
@@ -124,21 +132,52 @@ Every overridable part is exposed via the `ColorPickerClassNames` slot map (see 
 
 Individual parts are also exported as standalone widgets — drop a swatch, alpha slider, or mode switcher anywhere in your UI.
 
-| Export              | Purpose                                         |
-|---------------------|-------------------------------------------------|
-| **ColorPicker**     | The full picker.                                |
-| **AlphaSlider**     | Checkerboard-backed alpha slider.               |
-| **ChannelInputs**   | Per-mode input group (L/C/H, H/S/L, or R/G/B).  |
-| **ChannelSliders**  | Per-mode slider group (L/C/H, H/S/L, or R/G/B). |
-| **ColorInput**      | CSS color string input with validation          |
-| **ModeSelector**    | OKLCH / HSL / RGB mode switcher.                |
-| **Swatch**          | Circular color preview over a checkerboard.     |
+| Export              | Purpose                                                                     |
+|---------------------|-----------------------------------------------------------------------------|
+| **ColorPicker**     | The full picker.                                                            |
+| **useColorPicker**  | State hook powering `ColorPicker`. See [Hook](#hook).                       |
+| **AlphaSlider**     | Checkerboard-backed alpha slider.                                           |
+| **ChannelInputs**   | Per-mode input group (L/C/H, H/S/L, or R/G/B).                              |
+| **ChannelSliders**  | Per-mode slider group (L/C/H, H/S/L, or R/G/B).                             |
+| **ColorInput**      | CSS color string input with validation.                                     |
+| **EyeDropper**      | Screen color picker button (omits when `window.EyeDropper` is unavailable). |
+| **GamutWarning**    | Popover-anchored icon shown when an OKLCH color falls outside sRGB.         |
+| **GradientSlider**  | Low-level 1D slider with a CSS-gradient track.                              |
+| **HueSlider**       | Standalone mode-aware hue slider (OKLCH or HSL gradient).                   |
+| **ModeSelector**    | OKLCH / HSL / RGB mode switcher.                                            |
+| **OKLCHPanel**      | 2D OKLCH chroma/lightness panel with sRGB gamut overlay.                    |
+| **SaturationPanel** | 2D HSV saturation/value panel (used for HSL and RGB modes).                 |
+| **SettingsMenu**    | Display/output format picker popover.                                       |
+| **Swatch**          | Circular color preview over a checkerboard. Accepts `children` for icon overlays. |
 
-Constants (`hslHueGradient`, `oklchHueGradient`) and all types (`ColorMode`, `ColorFormat`, `ChannelsConfig`, `ColorPickerClassNames`, etc.) are also exported.
 
-## Related
+The constants (`hslHueGradient`, `oklchHueGradient`) and all types (`ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `HSV`, `ChannelsConfig`, `ColorPickerClassNames`, etc.) are also exported.
 
-- [colorizr](https://github.com/gilbarbara/colorizr) — the color math and conversions powering this picker.
+## Hook
+
+The useColorPicker hook is the state engine behind the `ColorPicker` component. It accepts the same props but doesn't render any UI — just returns the state and callbacks needed to build your own custom picker layout or embed the controls inside an existing design.
+
+Reach for it when you need a custom layout, a partial picker, or want to embed the controls inside an existing UI shell.
+
+```tsx
+import { useColorPicker } from '@transience/color-picker';
+
+const picker = useColorPicker({ color, onChange: setColor });
+```
+
+See [`docs/HOOK.md`](./docs/HOOK.md) for the full return reference, composition map, and working examples.
+
+## Color engine
+
+Color parsing, conversion, gamut math, and output formatting are powered by [`colorizr`](https://github.com/gilbarbara/colorizr) (same author). Whatever you pass to `color` is parsed by it; whatever `onChange` emits is formatted by it. It ships as a runtime dependency — no install needed.
+
+If you build a custom layout with [`useColorPicker`](#hook) and need color utilities beyond what the hook returns (e.g., `darken`, `lighten`, `contrast`, `extractColors`), install it directly:
+
+```bash
+npm i colorizr
+```
+
+It'll dedupe in your bundle.
 
 ## References
 

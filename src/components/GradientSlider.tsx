@@ -1,4 +1,5 @@
 import {
+  type HTMLAttributes,
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
@@ -10,7 +11,7 @@ import {
 import { clamp, cn, quantize, relativePosition } from '../modules/helpers';
 import type { GradientSliderClassNames } from '../types';
 
-interface GradientSliderProps {
+interface GradientSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'aria-label'> {
   /** Accessible label for the slider thumb (required for screen readers). */
   'aria-label': string;
   /** Per-part className overrides (`root`, `track`, `thumb`). */
@@ -69,6 +70,7 @@ const thumbPressedClassName = 'ring-1 ring-black dark:ring-white';
 export default function GradientSlider(props: GradientSliderProps) {
   const {
     'aria-label': ariaLabel,
+    className,
     classNames,
     endContent,
     gradient,
@@ -78,7 +80,9 @@ export default function GradientSlider(props: GradientSliderProps) {
     onValueChange,
     startContent,
     step = 1,
+    style,
     value,
+    ...rest
   } = props;
 
   const trackRef = useRef<HTMLDivElement>(null);
@@ -189,7 +193,12 @@ export default function GradientSlider(props: GradientSliderProps) {
   const percentage = clamp(((value - minValue) / (maxValue - minValue)) * 100, 0, 100);
 
   return (
-    <div className={cn('flex items-center gap-2', classNames?.root)} data-testid="GradientSlider">
+    <div
+      className={cn('flex items-center gap-2', className, classNames?.root)}
+      data-testid="GradientSlider"
+      style={style}
+      {...rest}
+    >
       {startContent}
       <div
         ref={trackRef}

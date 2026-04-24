@@ -249,6 +249,61 @@ describe('ColorInput', () => {
     });
   });
 
+  describe('Paste sync flag lifecycle', () => {
+    function ExternalValue({ initial }: { initial: string }) {
+      const [value, setValue] = useState(initial);
+
+      return (
+        <>
+          <ColorInput
+            onChange={next => {
+              mockOnChange(next);
+              setValue(next);
+            }}
+            value={value}
+          />
+          <button onClick={() => setValue('#00ff00')} type="button">
+            external
+          </button>
+        </>
+      );
+    }
+
+    it('does not overwrite editValue if paste was invalid and parent value later changes', () => {
+      render(<ExternalValue initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.paste(input);
+      fireEvent.change(input, { target: { value: 'garbage' } });
+      // Invalid paste — no emit, parent value unchanged. User keeps editing:
+      fireEvent.change(input, { target: { value: 'still-typing' } });
+      expect(screen.getByDisplayValue('still-typing')).toBeInTheDocument();
+
+      // Parent value updates from elsewhere (slider, format switch, etc.).
+      fireEvent.click(screen.getByText('external'));
+
+      // editValue must NOT be stomped by the late sync.
+      expect(screen.getByDisplayValue('still-typing')).toBeInTheDocument();
+    });
+
+    it('clears pending sync flag on blur', () => {
+      render(<ExternalValue initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.paste(input);
+      fireEvent.blur(input);
+
+      // Re-focus and edit, then trigger external change — must not stomp.
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'typing' } });
+      fireEvent.click(screen.getByText('external'));
+
+      expect(screen.getByDisplayValue('typing')).toBeInTheDocument();
+    });
+  });
+
   describe('Invalid input', () => {
     it('does not emit for garbage strings', () => {
       render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
@@ -280,6 +335,16 @@ describe('ColorInput', () => {
       fireEvent.change(input, { target: { value: '  #ff0044  ' } });
 
       expect(mockOnChange).toHaveBeenCalledWith('#ff0044');
+    });
+  });
+
+  describe('Native attribute forwarding', () => {
+    it('forwards native HTML attrs to the root', () => {
+      render(<ColorInput data-foo="bar" id="custom-input" onChange={mockOnChange} value="" />);
+      const root = screen.getByTestId('ColorInput');
+
+      expect(root).toHaveAttribute('data-foo', 'bar');
+      expect(root).toHaveAttribute('id', 'custom-input');
     });
   });
 });

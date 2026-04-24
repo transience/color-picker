@@ -17,7 +17,7 @@ type SwatchAnchorProps = SwatchBaseProps & { as: 'a'; href: string } & Omit<
 
 type SwatchButtonProps = SwatchBaseProps & { as: 'button' } & Omit<
     ButtonHTMLAttributes<HTMLButtonElement>,
-    'color' | 'children'
+    'color' | 'children' | 'type'
   >;
 
 type SwatchDivProps = SwatchBaseProps & { as?: 'div' } & Omit<
@@ -39,7 +39,7 @@ interface SwatchBaseProps {
 }
 
 export default function Swatch(props: SwatchProps) {
-  const { as = 'div', children, classNames, color, style, ...rest } = props;
+  const { as = 'div', children, className, classNames, color, style, ...rest } = props;
   const Root = as as ElementType;
   const extraProps = as === 'button' ? { type: 'button' as const } : {};
 
@@ -47,12 +47,13 @@ export default function Swatch(props: SwatchProps) {
     <Root
       className={cn(
         'block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0',
+        className,
         classNames?.root,
       )}
       data-testid="Swatch"
       style={{ ...style, backgroundImage: `url(${transparentBg})` }}
-      {...extraProps}
       {...rest}
+      {...extraProps}
     >
       <span
         className={cn('flex items-center justify-center size-full', classNames?.color)}

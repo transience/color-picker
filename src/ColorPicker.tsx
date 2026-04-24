@@ -57,6 +57,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     showSettings,
     showSliders,
     showSwatch,
+    style,
   } = picker.props;
 
   const hueConfig = channels?.h;
@@ -228,6 +229,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         classNames?.root,
       )}
       data-testid="ColorPicker"
+      style={style}
     >
       {content.panel}
       {content.colorValue}

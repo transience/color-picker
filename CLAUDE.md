@@ -33,16 +33,18 @@ pnpm validate             # lint + typecheck + test:coverage + build + size + ty
 
 ## Entry point
 
-`src/index.ts` exports `ColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ColorInput`, `ModeSelector`, `Swatch`, the `hslHueGradient` / `oklchHueGradient` constants, and everything from `src/types.ts`.
+`src/index.ts` exports `ColorPicker`, `useColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ColorInput`, `EyeDropper`, `GamutWarning`, `GradientSlider` (primitive 1D slider), `HueSlider`, `ModeSelector`, `OKLCHPanel`, `SaturationPanel`, `SettingsMenu`, `Swatch`, the `hslHueGradient` / `oklchHueGradient` constants, and everything from `src/types.ts` (where `HSV` is defined; `modules/colorSpace.ts` imports it from there).
 
 Path alias `~/*` → `src/*`. Prefer it for intra-`src` imports.
 
 ## Where things live
 
-- `src/ColorPicker.tsx` — top-level composition. Owns HSV + OKLCH state, alpha, format resolution, and the `onChange` emit pipeline.
+- `src/ColorPicker.tsx` — thin JSX wrapper around `useColorPicker`. Composes sub-components based on `show*` flags.
+- `src/hooks/useColorPicker.ts` — public state hook. Owns HSV + OKLCH state, alpha, format resolution, and the `onChange` emit pipeline. Returns `UseColorPickerReturn`.
+- `src/hooks/useInteractionAttribute.ts` — sets `data-interacting` on the root during drags/keys.
 - `src/modules/` — pure logic. `colorSpace.ts` (HSV ↔ RGB, OKLCH ↔ P3-HSV, gamut checks), `format.ts` (format resolution + `formatColor`), `oklchCanvas.ts` (OKLCH panel coordinate math), `helpers.ts` (`cn`, `clamp`, `quantize`, `relativePosition`).
 - `src/ChannelSliders/` — per-mode slider group (HSL / OKLCH / RGB), dispatched by `mode`.
-- `src/types.ts` — public types. `ColorMode`, `ColorFormat`, `ChannelsConfig`, `ColorPickerClassNames` slot map.
+- `src/types.ts` — public types. `ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `ChannelsConfig`, `ColorPickerClassNames` slot map.
 - `src/constants.tsx` — `DEFAULT_COLOR` (`oklch(54% 0.194 250)`), `DEFAULT_MODES`, hue gradients.
 
 All other component files are building blocks assembled by `ColorPicker` — open them as needed; they're small.
@@ -70,4 +72,5 @@ Coverage: **90%** across statements, branches, functions, lines. Excluded: `src/
 
 ## Deeper reading
 
-`docs/ARCHITECTURE.md` — full state model, OKLCH panel math, interaction pipeline, slot map, why the sRGB overlay is drawn the way it is.
+- `docs/ARCHITECTURE.md` — full state model, OKLCH panel math, interaction pipeline, slot map, why the sRGB overlay is drawn the way it is.
+- `docs/HOOK.md` — `useColorPicker` return reference, composition map, custom-layout examples.

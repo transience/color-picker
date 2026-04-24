@@ -11,15 +11,16 @@ import {
 } from '~/modules/format';
 import { mergeProps } from '~/modules/helpers';
 
-import type { ColorFormat, ColorMode, ColorPickerProps, HSV } from '~/types';
+import type {
+  ColorFormat,
+  ColorMode,
+  ColorPickerProps,
+  HSV,
+  OklchColor,
+  UseColorPickerReturn,
+} from '~/types';
 
 import useInteractionAttribute from './useInteractionAttribute';
-
-interface OKLCHState {
-  c: number;
-  h: number;
-  l: number;
-}
 
 export const defaultProps = {
   defaultMode: 'oklch',
@@ -38,7 +39,7 @@ export const defaultProps = {
   showSwatch: true,
 } satisfies Partial<ColorPickerProps>;
 
-export default function useColorPicker(props: ColorPickerProps) {
+export default function useColorPicker(props: ColorPickerProps): UseColorPickerReturn {
   // `merged` is a new object every render because React hands the component a
   // fresh `props` ref per render. Wrapping in useMemo with [props] would invalidate
   // every render — fake stability. Derived memos below depend on primitives extracted
@@ -61,7 +62,7 @@ export default function useColorPicker(props: ColorPickerProps) {
   const [displayFormat, setDisplayFormat] = useState<ColorFormat>(displayFormatProp);
   const [hsv, setHsv] = useState<HSV>(() => colorToHsv(initialColor));
   const [mode, setMode] = useState<ColorMode>(defaultMode);
-  const [oklch, setOklch] = useState<OKLCHState>(() => parseCSS(initialColor, 'oklch'));
+  const [oklch, setOklch] = useState<OklchColor>(() => parseCSS(initialColor, 'oklch'));
   const [outputFormat, setOutputFormat] = useState<ColorFormat>(outputFormatProp);
   const interactionRef = useInteractionAttribute();
   const containerRef = useRef<HTMLDivElement | null>(null);

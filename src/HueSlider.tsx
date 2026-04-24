@@ -1,10 +1,14 @@
-import { ReactNode } from 'react';
+import { type HTMLAttributes, ReactNode } from 'react';
 
 import GradientSlider from './components/GradientSlider';
 import { hslHueGradient, oklchHueGradient } from './constants';
 import type { ColorMode, GradientSliderClassNames } from './types';
 
-interface HueSliderProps {
+interface HueSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /** Accessible label for the slider thumb.
+   * @default 'GlobalHue'
+   */
+  'aria-label'?: string;
   /** Per-part className overrides forwarded to the inner `GradientSlider`. */
   classNames?: GradientSliderClassNames;
   /**
@@ -32,7 +36,17 @@ interface HueSliderProps {
 }
 
 export default function HueSlider(props: HueSliderProps) {
-  const { classNames, gradient, isDisabled, label, mode, onChange, value } = props;
+  const {
+    'aria-label': ariaLabel = 'GlobalHue',
+    classNames,
+    gradient,
+    isDisabled,
+    label,
+    mode,
+    onChange,
+    value,
+    ...rest
+  } = props;
 
   let currentGradient = mode === 'oklch' ? oklchHueGradient : hslHueGradient;
 
@@ -42,7 +56,7 @@ export default function HueSlider(props: HueSliderProps) {
 
   return (
     <GradientSlider
-      aria-label="GlobalHue"
+      aria-label={ariaLabel}
       classNames={classNames}
       gradient={currentGradient}
       isDisabled={isDisabled}
@@ -50,6 +64,7 @@ export default function HueSlider(props: HueSliderProps) {
       onValueChange={onChange}
       startContent={label}
       value={value}
+      {...rest}
     />
   );
 }

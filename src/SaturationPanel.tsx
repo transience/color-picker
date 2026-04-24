@@ -1,10 +1,10 @@
-import { type PointerEvent, useRef } from 'react';
+import { type HTMLAttributes, type PointerEvent, useRef } from 'react';
 
 import { panelClasses } from './constants';
 import { cn, relativePosition } from './modules/helpers';
 import type { PanelClassNames } from './types';
 
-interface SaturationPanelProps {
+interface SaturationPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /** Per-part className overrides (`root`, `thumb`). */
   classNames?: PanelClassNames;
   /** HSV hue in degrees `[0, 360)`. Sets the color painted across the panel. */
@@ -21,7 +21,7 @@ interface SaturationPanelProps {
 }
 
 export default function SaturationPanel(props: SaturationPanelProps) {
-  const { classNames, hue, onChange, saturation, value } = props;
+  const { className, classNames, hue, onChange, saturation, style, value, ...rest } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
 
@@ -52,14 +52,16 @@ export default function SaturationPanel(props: SaturationPanelProps) {
   return (
     <div
       ref={containerRef}
-      className={cn(panelClasses.root, classNames?.root)}
+      className={cn(panelClasses.root, className, classNames?.root)}
       data-testid="SaturationPanel"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       style={{
         background: `linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, transparent), hsl(${hue}, 100%, 50%)`,
+        ...style,
         touchAction: 'none',
       }}
+      {...rest}
     >
       <div
         className={cn(panelClasses.thumb, classNames?.thumb)}

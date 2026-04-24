@@ -1,10 +1,14 @@
-import { ReactNode, useMemo } from 'react';
+import { type HTMLAttributes, ReactNode, useMemo } from 'react';
 
 import GradientSlider from './components/GradientSlider';
 import transparentBg from './images/transparent-bg.gif';
 import type { GradientSliderClassNames } from './types';
 
-interface AlphaSliderProps {
+interface AlphaSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'onChange'> {
+  /** Accessible label for the slider thumb.
+   * @default 'Alpha'
+   */
+  'aria-label'?: string;
   /** Per-part className overrides forwarded to the inner `GradientSlider`. */
   classNames?: GradientSliderClassNames;
   /**
@@ -29,7 +33,16 @@ interface AlphaSliderProps {
 }
 
 export default function AlphaSlider(props: AlphaSliderProps) {
-  const { classNames, color, isDisabled, label, onChange, value } = props;
+  const {
+    'aria-label': ariaLabel = 'Alpha',
+    classNames,
+    color,
+    isDisabled,
+    label,
+    onChange,
+    value,
+    ...rest
+  } = props;
 
   const gradient = useMemo(
     () => `linear-gradient(to right, transparent, ${color}), url(${transparentBg})`,
@@ -38,7 +51,7 @@ export default function AlphaSlider(props: AlphaSliderProps) {
 
   return (
     <GradientSlider
-      aria-label="Alpha"
+      aria-label={ariaLabel}
       classNames={classNames}
       gradient={gradient}
       isDisabled={isDisabled}
@@ -48,6 +61,7 @@ export default function AlphaSlider(props: AlphaSliderProps) {
       startContent={label}
       step={0.01}
       value={value}
+      {...rest}
     />
   );
 }

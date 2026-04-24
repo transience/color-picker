@@ -34,7 +34,15 @@ describe('ModeSelector', () => {
     const rgb = screen.getByRole('button', { name: 'Switch to RGB' });
     const hsl = screen.getByRole('button', { name: 'Switch to HSL' });
 
-    expect(rgb).toHaveClass('bg-neutral-200');
-    expect(hsl).not.toHaveClass('bg-neutral-200');
+    expect(rgb).toHaveClass('bg-black/20');
+    expect(hsl).not.toHaveClass('bg-black/20');
+  });
+
+  it('forwards native HTML attrs to the root', () => {
+    render(<ModeSelector data-foo="bar" id="custom-mode" mode="oklch" onClick={mockOnClick} />);
+    const root = screen.getByTestId('ModeSelector');
+
+    expect(root).toHaveAttribute('data-foo', 'bar');
+    expect(root).toHaveAttribute('id', 'custom-mode');
   });
 });
