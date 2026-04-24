@@ -19,6 +19,22 @@ function Controlled({ initial }: { initial: string }) {
   );
 }
 
+// Simulates a parent that reformats the emitted color to a canonical form
+// (e.g. converting any input to OKLCH) — uppercase stands in for reformat.
+function Reformatting({ initial }: { initial: string }) {
+  const [value, setValue] = useState(initial);
+
+  return (
+    <ColorInput
+      onChange={next => {
+        mockOnChange(next);
+        setValue(next.toUpperCase());
+      }}
+      value={value}
+    />
+  );
+}
+
 describe('ColorInput', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -189,6 +205,47 @@ describe('ColorInput', () => {
       fireEvent.change(input, { target: { value: 'red' } });
 
       expect(mockOnChange).toHaveBeenCalledWith('red');
+    });
+  });
+
+  describe('Commit sync', () => {
+    it('syncs display to parent-reformatted value after paste', () => {
+      render(<Reformatting initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.paste(input);
+      fireEvent.change(input, { target: { value: 'oklab(0.75 -0.21 0.18)' } });
+
+      expect(mockOnChange).toHaveBeenCalledWith('oklab(0.75 -0.21 0.18)');
+      expect(screen.getByDisplayValue('OKLAB(0.75 -0.21 0.18)')).toBeInTheDocument();
+    });
+
+    it('syncs display to parent value on Enter', () => {
+      render(<Reformatting initial="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'red' } });
+      // Mid-type emit fired, but editValue still shows the typed text.
+      expect(screen.getByDisplayValue('red')).toBeInTheDocument();
+
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(screen.getByDisplayValue('RED')).toBeInTheDocument();
+    });
+
+    it('does not sync display while typing (no paste/Enter)', () => {
+      render(<Reformatting initial="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'red' } });
+
+      // Parent has the reformatted 'RED', but the input still shows the typed
+      // text — live typing must not be stomped by the sync path.
+      expect(mockOnChange).toHaveBeenCalledWith('red');
+      expect(screen.getByDisplayValue('red')).toBeInTheDocument();
     });
   });
 
