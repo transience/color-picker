@@ -4,7 +4,12 @@ import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } fro
 import { cn } from '~/modules/helpers';
 
 import NumericInput from './components/NumericInput';
-import type { ChannelsConfig, ColorMode, NumericInputClassNames } from './types';
+import type {
+  ChannelInputsClassNames,
+  ChannelsConfig,
+  ColorMode,
+  NumericInputClassNames,
+} from './types';
 
 interface ChannelInputsProps {
   /** Current alpha value as a float in `[0, 1]`. Rendered as the 4th input when `showAlpha` is on. */
@@ -14,8 +19,8 @@ interface ChannelInputsProps {
    * is honored here; `hidden`/`disabled` apply to sliders, not this input row.
    */
   channels?: ChannelsConfig;
-  /** Extra classes appended to the input row wrapper. */
-  className?: string;
+  /** Per-part className overrides. */
+  classNames?: ChannelInputsClassNames;
   /**
    * Current color as a CSS string (any format parseable by `colorizr`). The
    * component derives the per-channel values for the active `mode` from it.
@@ -52,7 +57,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
   const {
     alpha,
     channels,
-    className,
+    classNames,
     color,
     mode,
     numericInputClassNames,
@@ -181,9 +186,14 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     ];
   }, [channels, color, mode, onChangeColor]);
 
+  const labelClassName = cn(
+    'text-xs text-neutral-500 dark:text-neutral-400 leading-none',
+    classNames?.label,
+  );
+
   return (
     <div
-      className={cn('flex items-start justify-center gap-3', className)}
+      className={cn('flex items-start justify-center gap-3', classNames?.root)}
       data-testid="ChannelInputs"
     >
       {fields.map(field => (
@@ -198,7 +208,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
             suffix={field.suffix}
             value={field.value}
           />
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">{field.label}</span>
+          <span className={labelClassName}>{field.label}</span>
         </div>
       ))}
       {showAlpha && (
@@ -212,7 +222,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
             step={0.01}
             value={alpha.toFixed(2)}
           />
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">A</span>
+          <span className={labelClassName}>A</span>
         </div>
       )}
     </div>

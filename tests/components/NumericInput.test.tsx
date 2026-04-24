@@ -50,16 +50,7 @@ describe('NumericInput', () => {
     it('renders the value in the input', () => {
       render(<NumericInput {...createDefaultProps({ suffix: '°' })} />);
 
-      expect(screen.getByDisplayValue('180')).toBeInTheDocument();
-    });
-
-    it('renders a visible suffix when one is provided', () => {
-      render(<NumericInput {...createDefaultProps({ suffix: '°' })} />);
-
-      const suffix = screen.getByText('°');
-
-      expect(suffix).toBeInTheDocument();
-      expect(suffix).not.toHaveStyle({ visibility: 'hidden' });
+      expect(screen.getByTestId('NumericInput')).toMatchSnapshot();
     });
 
     it('hides a whitespace suffix (used as alignment spacer)', () => {

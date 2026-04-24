@@ -281,7 +281,7 @@ export default function ColorPicker(props: ColorPickerProps) {
       <ChannelInputs
         alpha={alpha}
         channels={channels}
-        className={classNames?.channelInputs}
+        classNames={classNames?.channelInputs}
         color={solidColor}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
