@@ -20,11 +20,11 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
   >
     <div
       aria-hidden="true"
-      class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
       data-testid="Swatch"
       style="background-image: url("/src/images/transparent-bg.gif");"
     >
-      <div
+      <span
         class="flex items-center justify-center size-full"
         style="background-color: rgb(255, 0, 68);"
       />
@@ -236,11 +236,11 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
   >
     <div
       aria-hidden="true"
-      class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
       data-testid="Swatch"
       style="background-image: url("/src/images/transparent-bg.gif");"
     >
-      <div
+      <span
         class="flex items-center justify-center size-full"
         style="background-color: oklch(0.63269 0.25404 19.902);"
       />
@@ -427,11 +427,11 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
   >
     <div
       aria-hidden="true"
-      class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
       data-testid="Swatch"
       style="background-image: url("/src/images/transparent-bg.gif");"
     >
-      <div
+      <span
         class="flex items-center justify-center size-full"
         style="background-color: rgb(255, 0, 68);"
       />

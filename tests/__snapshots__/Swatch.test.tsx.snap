@@ -2,12 +2,11 @@
 
 exports[`Swatch > applies classNames to root and color elements 1`] = `
 <div
-  aria-hidden="true"
-  class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0 extra-root"
+  class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0 extra-root"
   data-testid="Swatch"
   style="background-image: url("/src/images/transparent-bg.gif");"
 >
-  <div
+  <span
     class="flex items-center justify-center size-full extra-color"
     style="background-color: rgb(0, 0, 0);"
   />
@@ -16,12 +15,11 @@ exports[`Swatch > applies classNames to root and color elements 1`] = `
 
 exports[`Swatch > renders correctly 1`] = `
 <div
-  aria-hidden="true"
-  class="size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+  class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
   data-testid="Swatch"
   style="background-image: url("/src/images/transparent-bg.gif");"
 >
-  <div
+  <span
     class="flex items-center justify-center size-full"
     style="background-color: rgb(255, 0, 68);"
   />
