@@ -19,23 +19,19 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'typ
   variant?: Variant;
 }
 
+const ACTIVE_CLASSNAME = 'bg-black/20 dark:bg-white/20';
+
 const BASE =
-  'flex items-center justify-center outline-none bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-visible:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600';
+  'flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30';
 
 const VARIANTS: Record<Variant, string> = {
-  icon: 'size-8 shrink-0 rounded-sm text-neutral-600 dark:text-neutral-300 ',
+  icon: 'size-8 shrink-0 rounded-sm text-neutral-800 dark:text-neutral-200 ',
   segmented:
     'h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    activeClassName = 'bg-neutral-200 dark:bg-neutral-700',
-    className,
-    isActive,
-    variant = 'icon',
-    ...rest
-  },
+  { activeClassName = ACTIVE_CLASSNAME, className, isActive, variant = 'icon', ...rest },
   ref,
 ) {
   return (

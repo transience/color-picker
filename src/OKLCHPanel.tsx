@@ -1,4 +1,12 @@
-import { type PointerEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  type HTMLAttributes,
+  type PointerEvent,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { panelClasses } from './constants';
 import { clamp, cn, relativePosition } from './modules/helpers';
@@ -14,7 +22,7 @@ import type { PanelClassNames } from './types';
 const CANVAS_WIDTH = 256;
 const CANVAS_HEIGHT = 128;
 
-interface OKLCHPanelProps {
+interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /** OKLCH chroma as an absolute value (typical sRGB range: `[0, ~0.4]`). */
   chroma: number;
   /** Per-part className overrides (`root`, `thumb`). */
@@ -31,7 +39,7 @@ interface OKLCHPanelProps {
 }
 
 export default function OKLCHPanel(props: OKLCHPanelProps) {
-  const { chroma, classNames, hue, lightness, onChange } = props;
+  const { chroma, className, classNames, hue, lightness, onChange, style, ...rest } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderRef = useRef<OKLCHCanvasResult>({ hsvHue: 0, srgbBoundary: [] });
@@ -123,11 +131,12 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
   return (
     <div
       ref={containerRef}
-      className={cn(panelClasses.root, classNames?.root)}
+      className={cn(panelClasses.root, className, classNames?.root)}
       data-testid="OKLCHPanel"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      style={{ touchAction: 'none' }}
+      style={{ ...style, touchAction: 'none' }}
+      {...rest}
     >
       <canvas
         ref={canvasRef}

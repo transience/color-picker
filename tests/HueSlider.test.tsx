@@ -52,4 +52,20 @@ describe('HueSlider', () => {
     fireEvent.keyDown(slider, { key: 'ArrowRight' });
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('forwards native HTML attrs to the GradientSlider root', () => {
+    render(
+      <HueSlider data-foo="bar" id="custom-hue" mode="oklch" onChange={() => {}} value={180} />,
+    );
+    const root = screen.getByTestId('GradientSlider');
+
+    expect(root).toHaveAttribute('data-foo', 'bar');
+    expect(root).toHaveAttribute('id', 'custom-hue');
+  });
+
+  it('honors a consumer-supplied aria-label', () => {
+    render(<HueSlider aria-label="Hue angle" mode="oklch" onChange={() => {}} value={180} />);
+
+    expect(screen.getByRole('slider', { name: 'Hue angle' })).toBeInTheDocument();
+  });
 });

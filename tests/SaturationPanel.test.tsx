@@ -83,4 +83,39 @@ describe('SaturationPanel', () => {
       expect(calls).toContainEqual([1, 1]);
     });
   });
+
+  describe('Native attribute forwarding', () => {
+    it('forwards native HTML attrs to the root', () => {
+      render(
+        <SaturationPanel
+          data-foo="bar"
+          hue={0}
+          id="custom-sat"
+          onChange={mockOnChange}
+          saturation={0.5}
+          value={0.5}
+        />,
+      );
+      const root = screen.getByTestId('SaturationPanel');
+
+      expect(root).toHaveAttribute('data-foo', 'bar');
+      expect(root).toHaveAttribute('id', 'custom-sat');
+    });
+
+    it('merges consumer style and force-sets touchAction', () => {
+      render(
+        <SaturationPanel
+          hue={0}
+          onChange={mockOnChange}
+          saturation={0.5}
+          style={{ marginTop: 8, touchAction: 'auto' }}
+          value={0.5}
+        />,
+      );
+      const root = screen.getByTestId('SaturationPanel');
+
+      expect(root).toHaveStyle({ marginTop: '8px' });
+      expect(root).toHaveStyle({ touchAction: 'none' });
+    });
+  });
 });

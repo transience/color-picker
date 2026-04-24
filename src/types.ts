@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from 'react';
+import type { CSSProperties, ReactNode, RefObject } from 'react';
 
 /**
  * Identifiers for every color channel the picker can render.
@@ -220,6 +220,7 @@ export interface ColorPickerProps {
    * @default true
    */
   showSwatch?: boolean;
+  style?: CSSProperties;
 }
 
 export interface GradientSliderClassNames {

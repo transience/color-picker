@@ -1,3 +1,5 @@
+import { type HTMLAttributes } from 'react';
+
 import { cn } from '~/modules/helpers';
 
 import useInteractionAttribute from '../hooks/useInteractionAttribute';
@@ -12,7 +14,7 @@ import HSLSliders from './HSLSliders';
 import OKLCHSliders from './OKLCHSliders';
 import RGBSliders from './RGBSliders';
 
-interface ChannelSlidersProps {
+interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
   /**
    * Per-channel overrides (label, hidden, disabled). Only keys matching the
    * active `mode` are used.
@@ -48,11 +50,13 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     numericInputClassNames,
     onChangeColor,
     showInputs = true,
+    ...rest
   } = props;
   const rootRef = useInteractionAttribute();
 
   return (
     <div
+      {...rest}
       ref={rootRef}
       className={cn('flex flex-col gap-3', className)}
       data-testid="ChannelSliders"

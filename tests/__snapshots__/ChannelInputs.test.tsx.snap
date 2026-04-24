@@ -14,7 +14,7 @@ exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
     >
       <input
         aria-label="Hue"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="180"
       />
@@ -39,7 +39,7 @@ exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
     >
       <input
         aria-label="Saturation"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="50"
       />
@@ -64,7 +64,7 @@ exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
     >
       <input
         aria-label="Lightness"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="40"
       />
@@ -97,7 +97,7 @@ exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
     >
       <input
         aria-label="Lightness"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="50.0"
       />
@@ -122,7 +122,7 @@ exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
     >
       <input
         aria-label="Chroma"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="0.120"
       />
@@ -142,7 +142,7 @@ exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
     >
       <input
         aria-label="Hue"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="120.0"
       />
@@ -175,7 +175,7 @@ exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
     >
       <input
         aria-label="Red"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="100"
       />
@@ -195,7 +195,7 @@ exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
     >
       <input
         aria-label="Green"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="150"
       />
@@ -215,7 +215,7 @@ exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
     >
       <input
         aria-label="Blue"
-        class="bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5 w-full text-center"
+        class="bg-black/10 dark:bg-white/10 text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5 w-full text-center"
         type="text"
         value="200"
       />

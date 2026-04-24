@@ -1,10 +1,17 @@
-import { type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from 'react';
+import {
+  type HTMLAttributes,
+  type KeyboardEvent,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { isValidColor } from 'colorizr';
 
 import { cn } from './modules/helpers';
 import type { ColorInputClassNames } from './types';
 
-interface ColorInputProps {
+interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /** Per-part className overrides (`root` = bordered wrapper, `input` = inner `<input>`). */
   classNames?: ColorInputClassNames;
   /** Content rendered at the right edge of the input. */
@@ -25,7 +32,7 @@ interface ColorInputProps {
 }
 
 export default function ColorInput(props: ColorInputProps) {
-  const { classNames, endContent, onChange, startContent, value } = props;
+  const { className, classNames, endContent, onChange, startContent, value, ...rest } = props;
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const pendingSyncRef = useRef(false);
@@ -48,6 +55,7 @@ export default function ColorInput(props: ColorInputProps) {
 
   const handleBlur = () => {
     setIsEditing(false);
+    pendingSyncRef.current = false;
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -85,6 +93,8 @@ export default function ColorInput(props: ColorInputProps) {
 
     if (isValidColor(trimmed)) {
       onChange(trimmed);
+    } else {
+      pendingSyncRef.current = false;
     }
   };
 
@@ -95,9 +105,11 @@ export default function ColorInput(props: ColorInputProps) {
         {
           'ring-1 ring-neutral-300 dark:ring-neutral-600': isEditing,
         },
+        className,
         classNames?.root,
       )}
       data-testid="ColorInput"
+      {...rest}
     >
       {startContent}
       <input

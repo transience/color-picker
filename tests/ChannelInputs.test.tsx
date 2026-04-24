@@ -360,4 +360,24 @@ describe('ChannelInputs', () => {
       }
     });
   });
+
+  describe('Native attribute forwarding', () => {
+    it('forwards native HTML attrs to the root', () => {
+      render(
+        <ChannelInputs
+          alpha={1}
+          color="oklch(54% 0.194 250)"
+          data-foo="bar"
+          id="custom-channels"
+          mode="oklch"
+          onAlphaChange={() => {}}
+          onChangeColor={() => {}}
+        />,
+      );
+      const root = screen.getByTestId('ChannelInputs');
+
+      expect(root).toHaveAttribute('data-foo', 'bar');
+      expect(root).toHaveAttribute('id', 'custom-channels');
+    });
+  });
 });

@@ -230,4 +230,14 @@ describe('SettingsMenu', () => {
       expect(groups.querySelector('.h-px')).not.toBeInTheDocument();
     });
   });
+
+  describe('triggerProps', () => {
+    it('forwards native HTML attrs to the trigger button', () => {
+      renderMenu({ triggerProps: { id: 'custom-trigger', title: 'Settings' } });
+      const trigger = screen.getByTestId('SettingsTrigger');
+
+      expect(trigger).toHaveAttribute('id', 'custom-trigger');
+      expect(trigger).toHaveAttribute('title', 'Settings');
+    });
+  });
 });

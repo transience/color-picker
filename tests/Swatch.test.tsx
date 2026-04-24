@@ -64,4 +64,10 @@ describe('Swatch', () => {
 
     expect(root.firstElementChild?.tagName).toBe('SPAN');
   });
+
+  it('appends top-level className to the root', () => {
+    render(<Swatch className="extra-class" color="#ff0044" />);
+
+    expect(screen.getByTestId('Swatch')).toHaveClass('extra-class');
+  });
 });

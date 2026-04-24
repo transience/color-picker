@@ -1,4 +1,11 @@
-import { RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  type ButtonHTMLAttributes,
+  RefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { cn } from '~/modules/helpers';
 
@@ -20,6 +27,11 @@ interface SettingsMenuProps {
   onChangeOutputFormat: (format: ColorFormat) => void;
   /** Current output format selection. */
   outputFormat: ColorFormat;
+  /** Native HTML attributes forwarded to the trigger `<button>`. Internal a11y/handler attrs win. */
+  triggerProps?: Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    'aria-expanded' | 'aria-haspopup' | 'onClick' | 'type' | 'children'
+  >;
 }
 
 const OPTIONS: SettingsOption[] = [
@@ -46,6 +58,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
     onChangeDisplayFormat,
     onChangeOutputFormat,
     outputFormat,
+    triggerProps,
   } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [isRendered, setIsRendered] = useState(false);
@@ -137,11 +150,12 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   return (
     <div data-testid="SettingsMenuWrapper">
       <Button
+        aria-label="Color format settings"
+        {...triggerProps}
         ref={triggerRef}
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        aria-label="Color format settings"
-        className={classNames?.trigger}
+        className={cn(triggerProps?.className, classNames?.trigger)}
         data-testid="SettingsTrigger"
         onClick={() => setIsOpen(open => !open)}
       >

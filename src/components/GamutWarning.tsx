@@ -1,16 +1,16 @@
-import { useRef } from 'react';
+import { type ButtonHTMLAttributes, useRef } from 'react';
 
 import { cn, createId } from '../modules/helpers';
 
 import WarningIcon from './WarningIcon';
 
-interface GamutWarningProps {
-  /** Extra classes appended to the icon wrapper. */
-  className?: string;
-}
+type GamutWarningProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'popoverTarget' | 'aria-describedby' | 'type' | 'children'
+>;
 
 export default function GamutWarning(props: GamutWarningProps) {
-  const { className } = props;
+  const { className, style, ...rest } = props;
   const idRef = useRef<string | null>(null);
 
   idRef.current ??= createId('gamut');
@@ -24,8 +24,9 @@ export default function GamutWarning(props: GamutWarningProps) {
         aria-describedby={id}
         className={cn('inline-flex shrink-0 text-orange-400 cursor-pointer', className)}
         data-testid="GamutWarning"
+        {...rest}
         popoverTarget={id}
-        style={{ anchorName }}
+        style={{ ...style, anchorName }}
         type="button"
       >
         <WarningIcon />

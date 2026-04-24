@@ -77,4 +77,14 @@ describe('EyeDropper', () => {
 
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('forwards native HTML attrs to the trigger button', () => {
+    setEyeDropper(makeResolving('#000000'));
+
+    render(<EyeDropper data-foo="bar" id="custom-eyedropper" onChange={() => {}} />);
+    const button = screen.getByTestId('EyeDropper');
+
+    expect(button).toHaveAttribute('data-foo', 'bar');
+    expect(button).toHaveAttribute('id', 'custom-eyedropper');
+  });
 });

@@ -1,9 +1,11 @@
+import { type HTMLAttributes } from 'react';
+
 import { cn } from '~/modules/helpers';
 
 import Button from './components/Button';
 import type { ColorMode, ModeSelectorClassNames } from './types';
 
-interface ModeSelectorProps {
+interface ModeSelectorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onClick'> {
   /** Per-part className overrides. */
   classNames?: ModeSelectorClassNames;
   /** Currently selected mode; its button gets the active background class. */
@@ -18,10 +20,14 @@ interface ModeSelectorProps {
 }
 
 export default function ModeSelector(props: ModeSelectorProps) {
-  const { classNames, mode, modes = ['oklch', 'hsl', 'rgb'], onClick } = props;
+  const { className, classNames, mode, modes = ['oklch', 'hsl', 'rgb'], onClick, ...rest } = props;
 
   return (
-    <div className={cn('flex items-center', classNames?.root)} data-testid="ModeSelector">
+    <div
+      className={cn('flex items-center', className, classNames?.root)}
+      data-testid="ModeSelector"
+      {...rest}
+    >
       {modes.map(m => (
         <Button
           key={m}

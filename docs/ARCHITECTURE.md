@@ -25,7 +25,7 @@ Key choices:
 
 ## 2. Package shape
 
-Entry point: `src/index.ts` — named exports: `ColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ColorInput`, `ModeSelector`, `Swatch`; the `hslHueGradient` / `oklchHueGradient` constants; and every type from `src/types.ts`. `DEFAULT_COLOR` / `DEFAULT_MODES` are internal.
+Entry point: `src/index.ts` — named exports: `ColorPicker`, `useColorPicker`, `AlphaSlider`, `ChannelInputs`, `ChannelSliders`, `ColorInput`, `EyeDropper`, `GamutWarning`, `HueSlider`, `ModeSelector`, `OKLCHPanel`, `SaturationPanel`, `SettingsMenu`, `Swatch`, `GradientSlider` (the 1D slider primitive behind `AlphaSlider` / `HueSlider` / channel sliders, exported so consumers can build custom gradient-backed sliders); the `hslHueGradient` / `oklchHueGradient` constants; and every type from `src/types.ts` (including `ColorPickerProps`, `UseColorPickerReturn`, `OklchColor`, and `HSV`). `DEFAULT_COLOR` / `DEFAULT_MODES` are internal.
 
 Source layout:
 
@@ -34,18 +34,19 @@ src/
   ColorPicker.tsx          Top-level composition + state
   SaturationPanel.tsx      HSV 2D panel (HSL / RGB modes)
   OKLCHPanel.tsx           P3-HSV 2D panel + sRGB boundary (OKLCH mode)
-  Toolbar.tsx              Hue bar + alpha bar stack
   AlphaSlider.tsx          Checkerboard-backed alpha slider
+  HueSlider.tsx            Mode-aware standalone hue slider
   ColorInput.tsx           Free-form CSS color text input
   Swatch.tsx               Circular preview
   ModeSelector.tsx         OKLCH / HSL / RGB switcher
   SettingsMenu.tsx         Display/output format menu (gear trigger)
   EyeDropper.tsx           window.EyeDropper trigger
-  GamutWarning.tsx         Popover-anchored icon
   ChannelInputs.tsx        Standalone numeric input row
-  useInteractionAttribute.ts  Hook that sets data-interacting on the root during drags/keys
   constants.tsx            DEFAULT_COLOR, DEFAULT_MODES, hue gradients
   types.ts                 Public types and slot maps
+  hooks/
+    useColorPicker.ts      Public state hook — the engine behind ColorPicker
+    useInteractionAttribute.ts  Sets data-interacting on the root during drags/keys
   ChannelSliders/
     index.tsx              Dispatches by mode
     HSLSliders.tsx
@@ -55,6 +56,7 @@ src/
     GradientSlider.tsx       1D slider (hue, alpha, every channel)
     NumericInput.tsx         Clamped numeric field with arrow/shift stepping
     Button.tsx               Shared icon / segmented button shell
+    GamutWarning.tsx         Popover-anchored gamut warning icon
     RadioGroup.tsx           Settings-menu format picker
     EyeDropperIcon.tsx, GearIcon.tsx, WarningIcon.tsx   Inline SVGs
   modules/                 Pure logic
@@ -80,12 +82,12 @@ Path alias: `~/*` → `src/*`. Prefer it for intra-`src` imports.
 │   ├── Swatch                     showSwatch
 │   └── ColorInput                 showColorInput
 │       └── GamutWarning           (auto, when narrow format + out-of-gamut OKLCH)
-├── toolbar       showHueBar || showAlpha
-│   ├── hueBar                     showHueBar       → GradientSlider
-│   └── alphaBar                   showAlpha        → AlphaSlider → GradientSlider
+├── toolbar       showGlobalHue || showAlpha
+│   ├── hueSlider                  showGlobalHue    → HueSlider → GradientSlider
+│   └── alphaSlider                showAlpha        → AlphaSlider → GradientSlider
 ├── sliders       showSliders                       → ChannelSliders
-│       └── HSL / OKLCH / RGB triad of GradientSliders
-│           └── optional NumericInput endContent    showInputs
+│   └── HSL / OKLCH / RGB triad of GradientSliders
+│       └── optional NumericInput endContent        showInputs
 ├── inputs        (!showSliders) && showInputs      → ChannelInputs
 └── options       showEyeDropper || showModeSelector || showSettings
     ├── EyeDropper                 showEyeDropper
@@ -99,7 +101,7 @@ Assembly in `src/ColorPicker.tsx`: sections are collected into the `content` rec
 
 ## 4. State model
 
-Anchor file: `src/ColorPicker.tsx`.
+Anchor file: `src/hooks/useColorPicker.ts`.
 
 Two parallel color states live side by side:
 
@@ -135,7 +137,11 @@ Every interaction (panel drag, channel slider, alpha slider, color input, eyedro
 
 ### Props
 
-Full table lives in `README.md` (`## Props`). The types flow through `ColorPickerProps` in `src/ColorPicker.tsx`.
+Full table lives in `README.md` (`## Props`). The `ColorPickerProps` interface is defined in `src/types.ts` and consumed by both `ColorPicker` and `useColorPicker`.
+
+### Hook
+
+`useColorPicker(props: ColorPickerProps): UseColorPickerReturn` (`src/hooks/useColorPicker.ts`) is the same state engine `ColorPicker` uses internally — the component is a thin JSX wrapper. The `UseColorPickerReturn` interface in `src/types.ts` is the stable public contract (refs, state, handlers, derived values). See [`docs/HOOK.md`](./HOOK.md) for the full return reference and composition examples.
 
 ### Slot-based classNames
 
@@ -235,7 +241,7 @@ The 2D panel thumbs are pointer-only — no role, no ARIA, no key handling. Keyb
 
 ### `useInteractionAttribute`
 
-`src/useInteractionAttribute.ts` — sets `data-interacting="true"` on the root element while the user is actively interacting. Pointer and keyboard are tracked independently:
+`src/hooks/useInteractionAttribute.ts` — sets `data-interacting="true"` on the root element while the user is actively interacting. Pointer and keyboard are tracked independently:
 
 - Pointer: explicit `pointerdown` → begin, `pointerup`/`pointercancel` → end.
 - Keyboard: matches `[role="slider"], input` targets; `keydown` begins, `keyup` schedules a 200 ms idle timer; `focusout` (out of the picker) cancels immediately.
@@ -288,6 +294,7 @@ Coverage thresholds: **90%** across statements, branches, functions, and lines. 
 ## 12. Further reading
 
 - `README.md` — consumer-facing API, props, and styling guide.
+- `docs/HOOK.md` — `useColorPicker` reference and custom-layout examples.
 - `CLAUDE.md` — orientation for Claude Code (project intro, commands, where things live).
 - [`colorizr`](https://github.com/gilbarbara/colorizr) — the color-math library this package delegates to.
 - Chrome DevTools [`Spectrum.ts`](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/ui/legacy/components/color_picker/Spectrum.ts) and [`SrgbOverlay.ts`](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/ui/components/srgb_overlay/SrgbOverlay.ts) — the reference implementations the OKLCH panel matches.
