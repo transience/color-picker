@@ -70,6 +70,7 @@ const preview: Preview = {
           'AlphaSlider',
           'ChannelInputs',
           'ChannelSliders',
+          'ColorInput',
           'ModeSelector',
           'Swatch',
           '*',

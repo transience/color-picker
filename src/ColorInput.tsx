@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from 'react';
 import { isValidColor } from 'colorizr';
 
 import { cn } from './modules/helpers';
@@ -28,8 +28,18 @@ export default function ColorInput(props: ColorInputProps) {
   const { classNames, endContent, onChange, startContent, value } = props;
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const pendingSyncRef = useRef(false);
 
   const displayValue = isEditing ? editValue : value;
+
+  // Sync editValue ← value after an explicit commit event (paste, Enter)
+  // so the input reflects the parent's canonical/reformatted color.
+  useEffect(() => {
+    if (pendingSyncRef.current) {
+      setEditValue(value);
+      pendingSyncRef.current = false;
+    }
+  }, [value]);
 
   const handleFocus = () => {
     setIsEditing(true);
@@ -38,6 +48,18 @@ export default function ColorInput(props: ColorInputProps) {
 
   const handleBlur = () => {
     setIsEditing(false);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    // Enter commits: sync display to the parent's canonical value. The current
+    // editValue was already emitted during typing, so no onChange needed.
+    if (event.key === 'Enter') {
+      setEditValue(value);
+    }
+  };
+
+  const handlePaste = () => {
+    pendingSyncRef.current = true;
   };
 
   const handleChange = (text: string) => {
@@ -84,6 +106,8 @@ export default function ColorInput(props: ColorInputProps) {
         onBlur={handleBlur}
         onChange={event => handleChange(event.target.value)}
         onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         value={displayValue}
       />
       {endContent}
