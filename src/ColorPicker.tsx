@@ -215,7 +215,7 @@ export default function ColorPicker(props: ColorPickerProps) {
   }
 
   if (showSwatch) {
-    content.swatch = <Swatch classNames={classNames?.swatch} color={swatchColor} />;
+    content.swatch = <Swatch aria-hidden classNames={classNames?.swatch} color={swatchColor} />;
   }
 
   if (showColorInput || showSwatch) {
