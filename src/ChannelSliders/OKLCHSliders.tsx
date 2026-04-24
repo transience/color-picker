@@ -89,6 +89,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
               <NumericInput
                 aria-label="Lightness"
                 classNames={numericInputClassNames}
+                isDisabled={lightnessConfig?.disabled}
                 max={100}
                 min={0}
                 onChange={v => handleChangeLightness(v / 100)}
@@ -116,6 +117,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
               <NumericInput
                 aria-label="Chroma"
                 classNames={numericInputClassNames}
+                isDisabled={chromaConfig?.disabled}
                 max={maxChroma}
                 min={0}
                 onChange={handleChangeChroma}
@@ -143,6 +145,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
               <NumericInput
                 aria-label="Hue"
                 classNames={numericInputClassNames}
+                isDisabled={hueConfig?.disabled}
                 max={360}
                 min={0}
                 onChange={handleChangeHue}
