@@ -1,11 +1,11 @@
 import { cn } from '~/modules/helpers';
 
 import Button from './components/Button';
-import type { ColorMode } from './types';
+import type { ColorMode, ModeSelectorClassNames } from './types';
 
 interface ModeSelectorProps {
-  /** Extra classes appended to the button row wrapper. */
-  className?: string;
+  /** Per-part className overrides. */
+  classNames?: ModeSelectorClassNames;
   /** Currently selected mode; its button gets the active background class. */
   mode: ColorMode;
   /**
@@ -18,14 +18,16 @@ interface ModeSelectorProps {
 }
 
 export default function ModeSelector(props: ModeSelectorProps) {
-  const { className, mode, modes = ['oklch', 'hsl', 'rgb'], onClick } = props;
+  const { classNames, mode, modes = ['oklch', 'hsl', 'rgb'], onClick } = props;
 
   return (
-    <div className={cn('flex items-center', className)} data-testid="ModeSelector">
+    <div className={cn('flex items-center', classNames?.root)} data-testid="ModeSelector">
       {modes.map(m => (
         <Button
           key={m}
+          activeClassName={classNames?.activeButton}
           aria-label={`Switch to ${m.toLocaleUpperCase()}`}
+          className={classNames?.button}
           isActive={mode === m}
           onClick={() => onClick(m)}
           variant="segmented"

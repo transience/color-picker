@@ -43,3 +43,13 @@ function Controlled(props: ComponentProps<typeof ModeSelector>) {
 export const Default: Story = {
   render: props => <Controlled {...props} />,
 };
+
+export const Customized: Story = {
+  args: {
+    classNames: {
+      root: 'gap-2',
+      button: 'h-12 rounded-full! text-lg px-6',
+    },
+  },
+  render: props => <Controlled {...props} />,
+};

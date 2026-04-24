@@ -80,7 +80,7 @@ export interface ColorPickerClassNames {
   /** Hue GradientSlider in the toolbar row. */
   hueSlider?: GradientSliderClassNames;
   /** Color mode switcher row (OKLCH/HSL/RGB buttons). */
-  modeSelector?: string;
+  modeSelector?: ModeSelectorClassNames;
   /** Applied to every NumericInput (inline slider inputs and standalone rows). */
   numericInput?: NumericInputClassNames;
   /** Wrapper row for the modeSelector and settingsMenu */
@@ -103,6 +103,12 @@ export interface GradientSliderClassNames {
   root?: string;
   thumb?: string;
   track?: string;
+}
+
+export interface ModeSelectorClassNames {
+  activeButton?: string;
+  button?: string;
+  root?: string;
 }
 
 export interface NumericInputClassNames {
