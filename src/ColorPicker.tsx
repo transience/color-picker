@@ -306,7 +306,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     content.modeSelector = (
       <ModeSelector
         key="modeSelector"
-        className={classNames?.modeSelector}
+        classNames={classNames?.modeSelector}
         mode={mode}
         modes={modes}
         onClick={handleClickMode}

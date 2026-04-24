@@ -77,7 +77,9 @@ export const Customized: Story = {
       },
       colorValue: 'p-3',
       eyeDropper: 'rounded-full',
-      modeSelector: 'rounded-full ',
+      modeSelector: {
+        root: 'rounded-full',
+      },
       numericInput: { input: 'w-14' },
       options: 'bg-neutral-200 bg-neutral-900 p-3',
       panel: { thumb: 'size-5 border-4 border-neutral-700' },

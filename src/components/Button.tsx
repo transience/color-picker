@@ -5,6 +5,10 @@ import { cn } from '~/modules/helpers';
 type Variant = 'icon' | 'segmented';
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+  /**
+   * Class name applied to the active button.
+   */
+  activeClassName?: string;
   /** Applies the selected background. */
   isActive?: boolean;
   /**
@@ -25,20 +29,19 @@ const VARIANTS: Record<Variant, string> = {
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, isActive, variant = 'icon', ...rest },
+  {
+    activeClassName = 'bg-neutral-200 dark:bg-neutral-700',
+    className,
+    isActive,
+    variant = 'icon',
+    ...rest
+  },
   ref,
 ) {
   return (
     <button
       ref={ref}
-      className={cn(
-        BASE,
-        VARIANTS[variant],
-        {
-          'bg-neutral-200 dark:bg-neutral-700': isActive,
-        },
-        className,
-      )}
+      className={cn(BASE, VARIANTS[variant], className, isActive && activeClassName)}
       type="button"
       {...rest}
     />
