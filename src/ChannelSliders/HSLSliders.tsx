@@ -80,6 +80,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
               <NumericInput
                 aria-label="Hue"
                 classNames={numericInputClassNames}
+                isDisabled={hueConfig?.disabled}
                 max={360}
                 min={0}
                 onChange={v => update({ h: v, s, l })}
@@ -106,6 +107,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
               <NumericInput
                 aria-label="Saturation"
                 classNames={numericInputClassNames}
+                isDisabled={saturationConfig?.disabled}
                 max={100}
                 min={0}
                 onChange={v => update({ h, s: v, l })}
@@ -132,6 +134,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
               <NumericInput
                 aria-label="Lightness"
                 classNames={numericInputClassNames}
+                isDisabled={lightnessConfig?.disabled}
                 max={100}
                 min={0}
                 onChange={v => update({ h, s, l: v })}

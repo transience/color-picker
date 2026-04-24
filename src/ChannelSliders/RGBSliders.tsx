@@ -68,6 +68,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
               <NumericInput
                 aria-label="Red"
                 classNames={numericInputClassNames}
+                isDisabled={redConfig?.disabled}
                 max={255}
                 min={0}
                 onChange={v => update({ r: v, g, b })}
@@ -94,6 +95,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
               <NumericInput
                 aria-label="Green"
                 classNames={numericInputClassNames}
+                isDisabled={greenConfig?.disabled}
                 max={255}
                 min={0}
                 onChange={v => update({ r, g: v, b })}
@@ -120,6 +122,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
               <NumericInput
                 aria-label="Blue"
                 classNames={numericInputClassNames}
+                isDisabled={blueConfig?.disabled}
                 max={255}
                 min={0}
                 onChange={v => update({ r, g, b: v })}
