@@ -327,7 +327,7 @@ describe('ChannelInputs', () => {
       render(
         <ChannelInputs
           alpha={1}
-          className="extra-wrapper"
+          classNames={{ root: 'extra-wrapper' }}
           color="#ff0044"
           mode="hsl"
           onAlphaChange={() => {}}

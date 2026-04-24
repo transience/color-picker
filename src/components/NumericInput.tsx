@@ -8,6 +8,10 @@ interface NumericInputProps {
   'aria-label'?: string;
   /** Per-part className overrides (`root`, `input`, `suffix`). */
   classNames?: NumericInputClassNames;
+  /**
+   * Disables the input and prevents `onChange` from being called.
+   */
+  isDisabled?: boolean;
   /** Maximum allowed value. Typed and blurred values are clamped to this. */
   max: number;
   /** Minimum allowed value. Typed and blurred values are clamped to this. */
@@ -33,6 +37,7 @@ export default function NumericInput(props: NumericInputProps) {
   const {
     'aria-label': ariaLabel,
     classNames,
+    isDisabled,
     max,
     min,
     onChange,
@@ -101,6 +106,7 @@ export default function NumericInput(props: NumericInputProps) {
           'w-11 bg-neutral-100 dark:bg-neutral-800 text-right text-sm text-neutral-600 dark:text-neutral-300 outline-none focus:ring-1 focus:ring-neutral-300 dark:focus:ring-neutral-600 rounded px-0.5',
           classNames?.input,
         )}
+        disabled={isDisabled}
         onBlur={handleBlur}
         onChange={event => handleChange(event.target.value)}
         onFocus={handleFocus}

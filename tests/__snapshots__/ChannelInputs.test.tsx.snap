@@ -25,7 +25,7 @@ exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
       </span>
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       H
     </span>
@@ -50,7 +50,7 @@ exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
       </span>
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       S
     </span>
@@ -75,7 +75,7 @@ exports[`ChannelInputs > Render > renders correctly in HSL mode 1`] = `
       </span>
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       L
     </span>
@@ -108,7 +108,7 @@ exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
       </span>
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       L
     </span>
@@ -128,7 +128,7 @@ exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
       />
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       C
     </span>
@@ -153,7 +153,7 @@ exports[`ChannelInputs > Render > renders correctly in OKLCH mode 1`] = `
       </span>
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       H
     </span>
@@ -181,7 +181,7 @@ exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
       />
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       R
     </span>
@@ -201,7 +201,7 @@ exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
       />
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       G
     </span>
@@ -221,7 +221,7 @@ exports[`ChannelInputs > Render > renders correctly in RGB mode 1`] = `
       />
     </div>
     <span
-      class="text-xs text-neutral-500 dark:text-neutral-400"
+      class="text-xs text-neutral-500 dark:text-neutral-400 leading-none"
     >
       B
     </span>

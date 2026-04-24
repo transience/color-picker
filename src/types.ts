@@ -50,6 +50,11 @@ export interface ChannelConfig {
   label?: ReactNode;
 }
 
+export interface ChannelInputsClassNames {
+  label?: string;
+  root?: string;
+}
+
 export interface ColorInputClassNames {
   input?: string;
   root?: string;
@@ -64,7 +69,7 @@ export interface ColorPickerClassNames {
   /** AlphaSlider (delegates to GradientSlider sub-parts). */
   alphaSlider?: GradientSliderClassNames;
   /** Wrapper row for the ChannelInputs layout (shown when `showInputs` is on and `showSliders` is off). */
-  channelInputs?: string;
+  channelInputs?: ChannelInputsClassNames;
   /** Applied to each channel slider's sub-parts (L/C/H, H/S/L, or R/G/B). */
   channelSlider?: GradientSliderClassNames;
   /** Wrapper stacking the channel sliders (shown when `showSliders` is on). */
