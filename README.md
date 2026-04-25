@@ -86,7 +86,7 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 | **showAlpha**<br />Renders an alpha slider and appends alpha to emitted values when `< 1`.                                   | `boolean` | `false` |
 | **showColorInput**<br />Shows the text color input with the current value formatted per `displayFormat`.                     | `boolean` | `true` |
 | **showEyeDropper**<br />Adds a screen color picker button. Silently omitted in browsers without `window.EyeDropper` (currently Chromium-only). | `boolean` | `true` |
-| **showHueBar**<br />Shows the rainbow hue bar in the toolbar.                                                                | `boolean` | `false` |
+| **showGlobalHue**<br />Shows the global (mode-independent) hue slider in the toolbar.                                        | `boolean` | `false` |
 | **showInputs**<br />Shows numeric input fields per channel. Inline when `showSliders` is on, standalone row otherwise.       | `boolean` | `true` |
 | **showModeSelector**<br />Shows the OKLCH/HSL/RGB mode switcher.                                                             | `boolean` | `true` |
 | **showPanel**<br />Shows the 2D color panel (saturation/value for HSL/RGB, chroma/lightness for OKLCH).                     | `boolean` | `true` |

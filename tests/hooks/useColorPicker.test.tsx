@@ -13,7 +13,7 @@ describe('useColorPicker', () => {
         showAlpha: false,
         showColorInput: true,
         showEyeDropper: true,
-        showHueBar: false,
+        showGlobalHue: false,
         showInputs: true,
         showModeSelector: true,
         showPanel: true,

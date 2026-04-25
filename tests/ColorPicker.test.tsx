@@ -75,10 +75,10 @@ describe('ColorPicker', () => {
       expect(screen.queryByTestId('Swatch')).not.toBeInTheDocument();
     });
 
-    it('render the hue bar when showHueBar is true', () => {
-      render(<ColorPicker color="#ff0044" showHueBar />);
+    it('renders the global hue slider when showGlobalHue is true', () => {
+      render(<ColorPicker color="#ff0044" showGlobalHue />);
 
-      expect(screen.getByRole('slider', { name: 'HueBar' })).toBeInTheDocument();
+      expect(screen.getByRole('slider', { name: 'GlobalHue' })).toBeInTheDocument();
     });
 
     it('hides the 2D panel when showPanel is false', () => {
@@ -94,24 +94,6 @@ describe('ColorPicker', () => {
       expect(screen.queryByRole('button', { name: 'Switch to OKLCH' })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Switch to HSL' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Switch to RGB' })).toBeInTheDocument();
-    });
-
-    it('omits the toolbar when all elements are hidden', () => {
-      render(<ColorPicker color="#ff0044" />);
-
-      expect(screen.queryByTestId('Toolbar')).not.toBeInTheDocument();
-    });
-
-    it('renders the toolbar when showAlpha is true', () => {
-      render(<ColorPicker color="#ff0044" showAlpha />);
-
-      expect(screen.getByTestId('Toolbar')).toBeInTheDocument();
-    });
-
-    it('renders the toolbar when showHueBar is true', () => {
-      render(<ColorPicker color="#ff0044" showHueBar />);
-
-      expect(screen.getByTestId('Toolbar')).toBeInTheDocument();
     });
 
     it('renders the alpha slider when showAlpha is true', () => {
@@ -262,25 +244,29 @@ describe('ColorPicker', () => {
             hueSlider: { thumb: 'slot-hue-thumb' },
             swatch: { root: 'slot-swatch-root', color: 'slot-swatch-color' },
             eyeDropper: 'slot-eyedropper',
-            modeSelector: 'slot-mode-selector',
+            modeSelector: {
+              root: 'slot-mode-selector',
+            },
           }}
           color="oklch(0.5 0.1 120)"
           showAlpha
-          showHueBar
+          showGlobalHue
         />,
       );
 
       expect(screen.getByTestId('ColorPicker')).toHaveClass('slot-root');
-      expect(screen.getByTestId('OKLCHPanel')).toHaveClass('slot-panel-root');
-      expect(
-        screen.getByTestId('OKLCHPanel').querySelector('.slot-panel-thumb'),
-      ).toBeInTheDocument();
       expect(screen.getByTestId('ColorInput')).toHaveClass('slot-colorinput-root');
       expect(screen.getByTestId('ColorInput').querySelector('input')).toHaveClass(
         'slot-colorinput-input',
       );
-      expect(screen.getByTestId('Toolbar')).toHaveClass('slot-toolbar');
-      expect(screen.getByRole('slider', { name: 'HueBar' })).toHaveClass('slot-hue-thumb');
+      expect(screen.getByRole('slider', { name: 'GlobalHue' })).toHaveClass('slot-hue-thumb');
+      expect(screen.getByTestId('ModeSelector')).toHaveClass('slot-mode-selector');
+
+      expect(screen.getByTestId('OKLCHPanel')).toHaveClass('slot-panel-root');
+      expect(
+        screen.getByTestId('OKLCHPanel').querySelector('.slot-panel-thumb'),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('ColorPicker').querySelector('.slot-toolbar')).toBeInTheDocument();
       expect(screen.getByTestId('Swatch')).toHaveClass('slot-swatch-root');
       expect(screen.getByTestId('Swatch').firstChild as HTMLElement).toHaveClass(
         'slot-swatch-color',
@@ -504,12 +490,12 @@ describe('ColorPicker', () => {
           color="#ff0044"
           defaultMode="hsl"
           onChange={mockOnChange}
-          showHueBar
+          showGlobalHue
           showSliders={false}
         />,
       );
 
-      fireEvent.keyDown(screen.getByRole('slider', { name: 'HueBar' }), { key: 'ArrowRight' });
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'GlobalHue' }), { key: 'ArrowRight' });
 
       expect(mockOnChange.mock.calls[0][0]).toMatch(/^#[\da-f]{6}$/i);
     });
@@ -519,12 +505,12 @@ describe('ColorPicker', () => {
         <ColorPicker
           color="oklch(0.5 0.1 120)"
           onChange={mockOnChange}
-          showHueBar
+          showGlobalHue
           showSliders={false}
         />,
       );
 
-      fireEvent.keyDown(screen.getByRole('slider', { name: 'HueBar' }), { key: 'ArrowRight' });
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'GlobalHue' }), { key: 'ArrowRight' });
 
       expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
