@@ -85,8 +85,36 @@ export default function GradientSlider(props: GradientSliderProps) {
   const thumbRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
+  // Width of the thumb in pixels, divided by 100. Drives the inset-thumb math
+  // in the `left` style below so the thumb stays inside the track at both ends
+  // regardless of the consumer's size override.
+  const [thumbOffset, setThumbOffset] = useState(0.2);
 
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  useEffect(() => {
+    const thumb = thumbRef.current;
+
+    if (!thumb) return undefined;
+
+    const update = () => {
+      const width = thumb.offsetWidth;
+
+      if (width > 0) setThumbOffset(width / 100);
+    };
+
+    update();
+
+    if (typeof ResizeObserver === 'undefined') {
+      return undefined;
+    }
+
+    const observer = new ResizeObserver(update);
+
+    observer.observe(thumb);
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleMove = (event: PointerEvent<HTMLDivElement>) => {
     if (!trackRef.current || isDisabled) return;
@@ -182,7 +210,7 @@ export default function GradientSlider(props: GradientSliderProps) {
           className={cn(thumbClassName, isDragging && thumbPressedClassName, classNames?.thumb)}
           onKeyDown={handleKeyDown}
           role="slider"
-          style={{ left: `calc(${percentage}% - ${percentage * 0.2}px)` }}
+          style={{ left: `calc(${percentage}% - ${percentage * thumbOffset}px)` }}
           tabIndex={isDisabled ? -1 : 0}
         />
       </div>
