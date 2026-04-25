@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 import GradientSlider from './components/GradientSlider';
 import transparentBg from './images/transparent-bg.gif';
@@ -18,6 +18,10 @@ interface AlphaSliderProps {
    * @default false
    */
   isDisabled?: boolean;
+  /**
+   * Optional label rendered to the left of the track (e.g. "A").
+   */
+  label?: ReactNode;
   /** Called on every drag/keyboard change with the new alpha in `[0, 1]`. */
   onChange: (alpha: number) => void;
   /** Current alpha value as a float in `[0, 1]`. */
@@ -25,7 +29,7 @@ interface AlphaSliderProps {
 }
 
 export default function AlphaSlider(props: AlphaSliderProps) {
-  const { classNames, color, isDisabled, onChange, value } = props;
+  const { classNames, color, isDisabled, label, onChange, value } = props;
 
   const gradient = useMemo(
     () => `linear-gradient(to right, transparent, ${color}), url(${transparentBg})`,
@@ -41,7 +45,7 @@ export default function AlphaSlider(props: AlphaSliderProps) {
       maxValue={1}
       minValue={0}
       onValueChange={onChange}
-      startContent="A"
+      startContent={label}
       step={0.01}
       value={value}
     />

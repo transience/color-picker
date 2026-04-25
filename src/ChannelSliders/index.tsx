@@ -52,7 +52,11 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
   const rootRef = useInteractionAttribute();
 
   return (
-    <div ref={rootRef} className={cn('space-y-3', className)} data-testid="ChannelSliders">
+    <div
+      ref={rootRef}
+      className={cn('flex flex-col gap-3', className)}
+      data-testid="ChannelSliders"
+    >
       {mode === 'hsl' && (
         <HSLSliders
           channelSliderClassNames={channelSliderClassNames}

@@ -2,7 +2,7 @@
 
 exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
 <div
-  class="space-y-3"
+  class="flex flex-col gap-3"
   data-testid="ChannelSliders"
 >
   <div
@@ -121,7 +121,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
 
 exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
 <div
-  class="space-y-3"
+  class="flex flex-col gap-3"
   data-testid="ChannelSliders"
 >
   <div
@@ -241,7 +241,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
 
 exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
 <div
-  class="space-y-3"
+  class="flex flex-col gap-3"
   data-testid="ChannelSliders"
 >
   <div
