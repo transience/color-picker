@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 
-import WarningIcon from './components/WarningIcon';
-import { cn, createId } from './modules/helpers';
+import { cn, createId } from '../modules/helpers';
+
+import WarningIcon from './WarningIcon';
 
 interface GamutWarningProps {
   /** Extra classes appended to the icon wrapper. */
