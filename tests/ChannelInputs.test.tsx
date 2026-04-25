@@ -125,16 +125,16 @@ describe('ChannelInputs', () => {
       expect(screen.getByDisplayValue('0.50')).toBeInTheDocument();
     });
 
-    it('renders custom channel labels from the channels prop', () => {
+    it('renders custom channel labels from the labels prop', () => {
       render(
         <ChannelInputs
           alpha={1}
-          channels={{
+          color="#ff0044"
+          labels={{
             h: { label: 'Hue' },
             s: { label: 'Sat' },
             l: { label: 'Lum' },
           }}
-          color="#ff0044"
           mode="hsl"
           onAlphaChange={() => {}}
           onChangeColor={() => {}}

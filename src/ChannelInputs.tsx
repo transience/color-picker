@@ -1,24 +1,22 @@
-import { type HTMLAttributes, type ReactNode, useMemo } from 'react';
+import { type HTMLAttributes, type ReactNode, useCallback, useMemo } from 'react';
 import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } from 'colorizr';
 
-import { cn } from '~/modules/helpers';
+import { cn, resolveLabel } from '~/modules/helpers';
 
 import NumericInput from './components/NumericInput';
+import { DEFAULT_LABELS } from './constants';
 import type {
   ChannelInputsClassNames,
-  ChannelsConfig,
   ColorMode,
+  ColorPickerLabels,
   NumericInputClassNames,
 } from './types';
+
+type ChannelInputKey = 'a' | 'b' | 'c' | 'g' | 'h' | 'l' | 'r' | 's';
 
 interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
   /** Current alpha value as a float in `[0, 1]`. Rendered as the 4th input when `showAlpha` is on. */
   alpha: number;
-  /**
-   * Per-channel overrides (label, hidden, disabled). Only the `label` field
-   * is honored here; `hidden`/`disabled` apply to sliders, not this input row.
-   */
-  channels?: ChannelsConfig;
   /** Per-part className overrides. */
   classNames?: ChannelInputsClassNames;
   /**
@@ -26,6 +24,13 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
    * component derives the per-channel values for the active `mode` from it.
    */
   color: string;
+  /**
+   * Per-channel label/aria overrides for this input row.
+   *
+   * Keys: `r`, `g`, `b`, `h`, `s`, `l`, `c`, `a` (alpha). Each falls back
+   * to the corresponding `DEFAULT_LABELS.channelInputs` entry.
+   */
+  labels?: ColorPickerLabels['channelInputs'];
   /** Active color mode; selects which three channels are rendered (RGB / HSL / OKLCH). */
   mode: ColorMode;
   /** Per-part className overrides forwarded to each `NumericInput`. */
@@ -56,10 +61,10 @@ interface FieldDefinition {
 export default function ChannelInputs(props: ChannelInputsProps) {
   const {
     alpha,
-    channels,
     className,
     classNames,
     color,
+    labels,
     mode,
     numericInputClassNames,
     onAlphaChange,
@@ -74,6 +79,18 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     suffix: numericInputClassNames?.suffix,
   };
 
+  const slot = useCallback(
+    (key: ChannelInputKey) => {
+      const fallback = DEFAULT_LABELS.channelInputs[key];
+
+      return {
+        label: resolveLabel(fallback.label, labels?.[key]?.label),
+        ariaLabel: labels?.[key]?.ariaLabel ?? fallback.ariaLabel,
+      };
+    },
+    [labels],
+  );
+
   const fields = useMemo<FieldDefinition[]>(() => {
     if (mode === 'rgb') {
       const rgb = parseCSS(color, 'rgb');
@@ -81,27 +98,24 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
       return [
         {
-          ariaLabel: 'Red',
+          ...slot('r'),
           key: 'r',
-          label: channels?.r?.label ?? 'R',
           max: 255,
           min: 0,
           onChange: v => emit({ ...rgb, r: v }),
           value: `${Math.round(rgb.r)}`,
         },
         {
-          ariaLabel: 'Green',
+          ...slot('g'),
           key: 'g',
-          label: channels?.g?.label ?? 'G',
           max: 255,
           min: 0,
           onChange: v => emit({ ...rgb, g: v }),
           value: `${Math.round(rgb.g)}`,
         },
         {
-          ariaLabel: 'Blue',
+          ...slot('b'),
           key: 'b',
-          label: channels?.b?.label ?? 'B',
           max: 255,
           min: 0,
           onChange: v => emit({ ...rgb, b: v }),
@@ -117,9 +131,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
       return [
         {
-          ariaLabel: 'Lightness',
+          ...slot('l'),
           key: 'l',
-          label: channels?.l?.label ?? 'L',
           max: 100,
           min: 0,
           onChange: v => emit({ ...lch, l: v / 100 }),
@@ -128,9 +141,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
           value: (lch.l * 100).toFixed(1),
         },
         {
-          ariaLabel: 'Chroma',
+          ...slot('c'),
           key: 'c',
-          label: channels?.c?.label ?? 'C',
           max: maxC,
           min: 0,
           onChange: v => emit({ ...lch, c: v }),
@@ -138,9 +150,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
           value: lch.c.toFixed(3),
         },
         {
-          ariaLabel: 'Hue',
+          ...slot('h'),
           key: 'h',
-          label: channels?.h?.label ?? 'H',
           max: 360,
           min: 0,
           onChange: v => emit({ ...lch, h: v }),
@@ -156,9 +167,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
     return [
       {
-        ariaLabel: 'Hue',
+        ...slot('h'),
         key: 'h',
-        label: channels?.h?.label ?? 'H',
         max: 360,
         min: 0,
         onChange: v => emit({ ...hsl, h: v }),
@@ -166,9 +176,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.h)}`,
       },
       {
-        ariaLabel: 'Saturation',
+        ...slot('s'),
         key: 's',
-        label: channels?.s?.label ?? 'S',
         max: 100,
         min: 0,
         onChange: v => emit({ ...hsl, s: v }),
@@ -176,9 +185,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.s)}`,
       },
       {
-        ariaLabel: 'Lightness',
+        ...slot('l'),
         key: 'l',
-        label: channels?.l?.label ?? 'L',
         max: 100,
         min: 0,
         onChange: v => emit({ ...hsl, l: v }),
@@ -186,7 +194,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.l)}`,
       },
     ];
-  }, [channels, color, mode, onChangeColor]);
+  }, [color, mode, slot, onChangeColor]);
 
   const labelClassName = cn(
     'text-xs text-neutral-500 dark:text-neutral-400 leading-none',
@@ -217,7 +225,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
       {showAlpha && (
         <div className="flex flex-col items-center gap-1">
           <NumericInput
-            aria-label="Alpha"
+            aria-label={slot('a').ariaLabel}
             classNames={mergedNumericClassNames}
             max={1}
             min={0}
@@ -225,7 +233,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
             step={0.01}
             value={alpha.toFixed(2)}
           />
-          <span className={labelClassName}>A</span>
+          <span className={labelClassName}>{slot('a').label}</span>
         </div>
       )}
     </div>

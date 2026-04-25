@@ -8,10 +8,16 @@ import {
 } from 'react';
 import { isValidColor } from 'colorizr';
 
+import { DEFAULT_LABELS } from './constants';
 import { cn } from './modules/helpers';
 import type { ColorInputClassNames } from './types';
 
 interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /**
+   * Accessible label for the underlying `<input>`.
+   * @default 'Color value'
+   */
+  'aria-label'?: string;
   /** Per-part className overrides (`root` = bordered wrapper, `input` = inner `<input>`). */
   classNames?: ColorInputClassNames;
   /** Content rendered at the right edge of the input. */
@@ -32,7 +38,16 @@ interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
 }
 
 export default function ColorInput(props: ColorInputProps) {
-  const { className, classNames, endContent, onChange, startContent, value, ...rest } = props;
+  const {
+    'aria-label': ariaLabel = DEFAULT_LABELS.colorInput,
+    className,
+    classNames,
+    endContent,
+    onChange,
+    startContent,
+    value,
+    ...rest
+  } = props;
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const pendingSyncRef = useRef(false);
@@ -113,7 +128,7 @@ export default function ColorInput(props: ColorInputProps) {
     >
       {startContent}
       <input
-        aria-label="Color value"
+        aria-label={ariaLabel}
         className={cn('w-full bg-transparent text-sm outline-none', classNames?.input)}
         onBlur={handleBlur}
         onChange={event => handleChange(event.target.value)}

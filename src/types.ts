@@ -29,7 +29,10 @@ export type ColorFormat = 'auto' | 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb';
 export type ColorMode = 'hsl' | 'oklch' | 'rgb';
 
 /**
- * Per-channel customization. Omitted fields fall back to component defaults.
+ * Per-channel toggles. Omitted fields fall back to component defaults.
+ *
+ * Visible labels and screen-reader text are configured through the top-level
+ * `labels` prop on `ColorPicker` — see `ColorPickerLabels`.
  */
 export interface ChannelConfig {
   /**
@@ -42,12 +45,6 @@ export interface ChannelConfig {
    * @default false
    */
   hidden?: boolean;
-  /**
-   * Override the default one-letter label rendered at the slider's start
-   * (e.g. "H", "S", "L"). Useful for wrapping the label in a tooltip, icon,
-   * or any consumer-specific decoration.
-   */
-  label?: ReactNode;
 }
 
 export interface ChannelInputsClassNames {
@@ -104,11 +101,61 @@ export interface ColorPickerClassNames {
   tooltip?: string;
 }
 
+/**
+ * Slot-based text overrides for every internal element of `ColorPicker`.
+ * Each rendered component reads only its own slot — no shared fallback chain.
+ *
+ * Per-key fields fall back to built-in English defaults when omitted.
+ */
+export interface ColorPickerLabels {
+  /** Toolbar alpha slider. */
+  alphaSlider?: LabelSlot;
+  /**
+   * Standalone numeric-input rows (rendered when `showSliders` is off).
+   * Use the `'a'` key to label the alpha row when `showAlpha` is on.
+   */
+  channelInputs?: Partial<Record<ChannelKey | 'a', LabelSlot>>;
+  /** ColorInput aria-label. @default 'Color value' */
+  colorInput?: string;
+  /** EyeDropper button aria-label. @default 'Pick color from screen' */
+  eyeDropper?: string;
+  /** Inline HSL sliders. */
+  hslSliders?: Partial<Record<'h' | 's' | 'l', LabelSlot>>;
+  /** Toolbar global hue slider (independent from the per-mode hue inside `hslSliders`/`oklchSliders`). */
+  hueSlider?: LabelSlot;
+  /**
+   * Mode-switcher buttons. Each entry sets the visible label + aria-label for
+   * one mode button. Omitted modes fall back to the uppercased mode value
+   * (visible) and `Switch to {MODE}` (aria).
+   */
+  modeSelector?: Partial<Record<ColorMode, LabelSlot>>;
+  /** Inline OKLCH sliders. */
+  oklchSliders?: Partial<Record<'l' | 'c' | 'h', LabelSlot>>;
+  /** Inline RGB sliders (slider + numeric input share the slot). */
+  rgbSliders?: Partial<Record<'r' | 'g' | 'b', LabelSlot>>;
+  /** SettingsMenu chrome strings. */
+  settingsMenu?: {
+    /** Close-button aria-label. @default 'Close settings' */
+    close?: string;
+    /** Display-format radio-group title. @default 'Display format' */
+    displayFormat?: string;
+    /** Visible Done-button text. @default 'Done' */
+    done?: string;
+    /** Output-format radio-group title. @default 'Output format' */
+    outputFormat?: string;
+    /** Visible heading. @default 'Settings' */
+    title?: string;
+    /** Trigger aria-label. @default 'Color format settings' */
+    trigger?: string;
+  };
+}
+
 export interface ColorPickerProps {
   /**
-   * Per-channel overrides for label, hidden, and disabled state.
+   * Per-channel toggles (`hidden`, `disabled`).
    *
-   * Keys not relevant to the active mode are ignored.
+   * Keys not relevant to the active mode are ignored. Visible labels and
+   * screen-reader text are configured through the `labels` prop.
    */
   channels?: ChannelsConfig;
   /**
@@ -136,6 +183,13 @@ export interface ColorPickerProps {
    * @default 'auto'
    */
   displayFormat?: ColorFormat;
+  /**
+   * Slot-based text overrides for aria-labels and visible chrome strings.
+   *
+   * See `ColorPickerLabels` for the full slot map. Each rendered component
+   * reads only its own slot — no shared fallback chain.
+   */
+  labels?: ColorPickerLabels;
   /**
    * Modes available in the mode switcher.
    * @default ['oklch', 'hsl', 'rgb']
@@ -233,6 +287,22 @@ export interface HSV {
   h: number; // 0-360
   s: number; // 0-1
   v: number; // 0-1
+}
+
+/**
+ * Visible content + screen-reader text for a single label-bearing element.
+ * Both fields are optional; each falls back to a component-level default.
+ */
+export interface LabelSlot {
+  /**
+   * Screen-reader text for the underlying input/slider/button.
+   */
+  ariaLabel?: string;
+  /**
+   * Visible content rendered at the slot's leading edge — e.g. a one-letter
+   * glyph for a channel slider, or an icon node.
+   */
+  label?: ReactNode;
 }
 
 export interface ModeSelectorClassNames {

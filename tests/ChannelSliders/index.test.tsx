@@ -222,11 +222,11 @@ describe('ChannelSliders', () => {
       expect(screen.getByRole('slider', { name: /saturation/i })).toBeInTheDocument();
     });
 
-    it('replaces the default label with a custom node', () => {
+    it('replaces the default label with a custom node via labels prop', () => {
       render(
         <ChannelSliders
           {...createDefaultProps({
-            channels: { h: { label: <span data-testid="custom-h">X</span> } },
+            labels: { hslSliders: { h: { label: <span data-testid="custom-h">X</span> } } },
             mode: 'hsl',
           })}
         />,

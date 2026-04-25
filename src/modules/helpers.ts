@@ -1,4 +1,4 @@
-import type { PointerEvent } from 'react';
+import type { PointerEvent, ReactNode } from 'react';
 import clsx, { type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -77,4 +77,12 @@ export function relativePosition(event: PointerEvent, rect: DOMRect): { x: numbe
     x: clamp((event.clientX - rect.left) / rect.width, 0, 1),
     y: clamp((event.clientY - rect.top) / rect.height, 0, 1),
   };
+}
+
+export function resolveLabel(fallback: string, value?: ReactNode): ReactNode {
+  if (value !== undefined) {
+    return value;
+  }
+
+  return fallback;
 }
