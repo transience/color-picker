@@ -41,7 +41,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
     </div>
   </div>
   <div
-    class="space-y-3"
+    class="flex flex-col gap-3"
     data-testid="ChannelSliders"
   >
     <div
@@ -257,7 +257,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
     </div>
   </div>
   <div
-    class="space-y-3"
+    class="flex flex-col gap-3"
     data-testid="ChannelSliders"
   >
     <div
@@ -448,7 +448,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
     </div>
   </div>
   <div
-    class="space-y-3"
+    class="flex flex-col gap-3"
     data-testid="ChannelSliders"
   >
     <div
