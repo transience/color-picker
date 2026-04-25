@@ -1,14 +1,21 @@
 import { useMemo } from 'react';
 import { formatCSS, getP3MaxChroma, type LCH, parseCSS } from 'colorizr';
 
+import { resolveLabel } from '~/modules/helpers';
+
 import GradientSlider from '../components/GradientSlider';
 import NumericInput from '../components/NumericInput';
-import { oklchHueGradient } from '../constants';
-import type { ChannelsConfig, GradientSliderClassNames, NumericInputClassNames } from '../types';
+import { DEFAULT_LABELS, oklchHueGradient } from '../constants';
+import type {
+  ChannelsConfig,
+  ColorPickerLabels,
+  GradientSliderClassNames,
+  NumericInputClassNames,
+} from '../types';
 
 interface OKLCHSlidersProps {
   /**
-   * Per-channel overrides for `l`, `c`, and `h` (label, hidden, disabled).
+   * Per-channel toggles for `l`, `c`, and `h` (`disabled`, `hidden`).
    * The chroma slider's max range updates dynamically with the current
    * lightness/hue via `getP3MaxChroma`.
    */
@@ -17,6 +24,8 @@ interface OKLCHSlidersProps {
   channelSliderClassNames?: GradientSliderClassNames;
   /** Current color as any CSS string parseable by `colorizr`. */
   color: string;
+  /** Per-channel label/aria overrides. Falls back to `DEFAULT_LABELS.oklchSliders`. */
+  labels?: ColorPickerLabels['oklchSliders'];
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of L/C/H changes. */
@@ -33,6 +42,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     channels,
     channelSliderClassNames,
     color,
+    labels,
     numericInputClassNames,
     onChangeColor,
     showInputs = true,
@@ -42,6 +52,19 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   const lightnessConfig = channels?.l;
   const chromaConfig = channels?.c;
   const hueConfig = channels?.h;
+
+  const slot = (key: 'c' | 'h' | 'l') => {
+    const fallback = DEFAULT_LABELS.oklchSliders[key];
+
+    return {
+      label: resolveLabel(fallback.label, labels?.[key]?.label),
+      ariaLabel: labels?.[key]?.ariaLabel ?? fallback.ariaLabel,
+    };
+  };
+
+  const lightnessSlot = slot('l');
+  const chromaSlot = slot('c');
+  const hueSlot = slot('h');
 
   const maxChroma = useMemo(() => getP3MaxChroma({ l, c: 0, h }), [l, h]);
 
@@ -82,12 +105,12 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     <>
       {!lightnessConfig?.hidden && (
         <GradientSlider
-          aria-label="Lightness"
+          aria-label={lightnessSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Lightness"
+                aria-label={lightnessSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={lightnessConfig?.disabled}
                 max={100}
@@ -103,19 +126,19 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={lightnessConfig?.disabled}
           maxValue={1}
           onValueChange={handleChangeLightness}
-          startContent={lightnessConfig?.label ?? 'L'}
+          startContent={lightnessSlot.label}
           step={0.001}
           value={l}
         />
       )}
       {!chromaConfig?.hidden && (
         <GradientSlider
-          aria-label="Chroma"
+          aria-label={chromaSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Chroma"
+                aria-label={chromaSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={chromaConfig?.disabled}
                 max={maxChroma}
@@ -131,19 +154,19 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={chromaConfig?.disabled}
           maxValue={maxChroma}
           onValueChange={handleChangeChroma}
-          startContent={chromaConfig?.label ?? 'C'}
+          startContent={chromaSlot.label}
           step={0.001}
           value={c}
         />
       )}
       {!hueConfig?.hidden && (
         <GradientSlider
-          aria-label="Hue"
+          aria-label={hueSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Hue"
+                aria-label={hueSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={hueConfig?.disabled}
                 max={360}
@@ -159,7 +182,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={hueConfig?.disabled}
           maxValue={360}
           onValueChange={handleChangeHue}
-          startContent={hueConfig?.label ?? 'H'}
+          startContent={hueSlot.label}
           step={0.01}
           value={h}
         />

@@ -7,13 +7,19 @@ import {
   useState,
 } from 'react';
 
-import { cn } from '~/modules/helpers';
+import { cn, resolveLabel } from '~/modules/helpers';
 
 import GearIcon from '~/components/GearIcon';
 
 import Button from './components/Button';
 import RadioGroup from './components/RadioGroup';
-import type { ColorFormat, SettingsMenuClassNames, SettingsOption } from './types';
+import { DEFAULT_LABELS } from './constants';
+import type {
+  ColorFormat,
+  ColorPickerLabels,
+  SettingsMenuClassNames,
+  SettingsOption,
+} from './types';
 
 interface SettingsMenuProps {
   /** Per-part className overrides (`trigger` = button, `menu` = popover panel). */
@@ -21,6 +27,8 @@ interface SettingsMenuProps {
   containerRef: RefObject<HTMLDivElement | null>;
   /** Current display format selection. */
   displayFormat: ColorFormat;
+  /** Label/aria overrides. */
+  labels?: ColorPickerLabels['settingsMenu'];
   /** Fired when the user picks a new display format in the menu. */
   onChangeDisplayFormat: (format: ColorFormat) => void;
   /** Fired when the user picks a new output format in the menu. */
@@ -55,6 +63,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
     classNames,
     containerRef,
     displayFormat,
+    labels,
     onChangeDisplayFormat,
     onChangeOutputFormat,
     outputFormat,
@@ -67,6 +76,19 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   const [height, setHeight] = useState<string | number>('auto');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  const triggerLabel = labels?.trigger ?? DEFAULT_LABELS.settingsMenu.trigger;
+  const titleLabel = resolveLabel(DEFAULT_LABELS.settingsMenu.title, labels?.title);
+  const closeLabel = labels?.close ?? DEFAULT_LABELS.settingsMenu.close;
+  const doneLabel = resolveLabel(DEFAULT_LABELS.settingsMenu.done, labels?.done);
+  const displayFormatLabel = resolveLabel(
+    DEFAULT_LABELS.settingsMenu.displayFormat,
+    labels?.displayFormat,
+  );
+  const outputFormatLabel = resolveLabel(
+    DEFAULT_LABELS.settingsMenu.outputFormat,
+    labels?.outputFormat,
+  );
 
   useLayoutEffect(() => {
     const el = containerRef.current;
@@ -150,7 +172,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   return (
     <div data-testid="SettingsMenuWrapper">
       <Button
-        aria-label="Color format settings"
+        aria-label={triggerLabel}
         {...triggerProps}
         ref={triggerRef}
         aria-expanded={isOpen}
@@ -179,14 +201,14 @@ export default function SettingsMenu(props: SettingsMenuProps) {
           >
             <div className="flex flex-col overflow-y-auto" style={{ maxHeight: height }}>
               <div className="sticky top-0 flex items-center justify-between p-3 bg-neutral-100 dark:bg-neutral-800">
-                <p className="text-sm font-semibold">Settings</p>
+                <p className="text-sm font-semibold">{titleLabel}</p>
                 <button
-                  aria-label="Close settings"
+                  aria-label={closeLabel}
                   className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
                   onClick={() => setIsOpen(false)}
                   type="button"
                 >
-                  Done
+                  {doneLabel}
                 </button>
               </div>
               <div
@@ -198,7 +220,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
                   onChange={onChangeDisplayFormat}
                   onInteractionEnd={refocusTrigger}
                   options={OPTIONS}
-                  title="Display format"
+                  title={displayFormatLabel}
                   value={displayFormat}
                 />
                 {layout === 'column' && <div className="h-px bg-neutral-300 dark:bg-neutral-600" />}
@@ -206,7 +228,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
                   onChange={onChangeOutputFormat}
                   onInteractionEnd={refocusTrigger}
                   options={OPTIONS}
-                  title="Output format"
+                  title={outputFormatLabel}
                   value={outputFormat}
                 />
               </div>

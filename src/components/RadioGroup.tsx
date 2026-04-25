@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 import { cn } from '~/modules/helpers';
 
 import type { ColorFormat, SettingsOption } from '~/types';
@@ -6,7 +8,7 @@ interface RadioGroupProps {
   onChange: (format: ColorFormat) => void;
   onInteractionEnd: () => void;
   options: SettingsOption[];
-  title: string;
+  title: ReactNode;
   value: ColorFormat;
 }
 

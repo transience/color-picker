@@ -1,17 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatCSS, parseCSS, type RGB } from 'colorizr';
 
+import { resolveLabel } from '~/modules/helpers';
+
 import GradientSlider from '../components/GradientSlider';
 import NumericInput from '../components/NumericInput';
-import type { ChannelsConfig, GradientSliderClassNames, NumericInputClassNames } from '../types';
+import { DEFAULT_LABELS } from '../constants';
+import type {
+  ChannelsConfig,
+  ColorPickerLabels,
+  GradientSliderClassNames,
+  NumericInputClassNames,
+} from '../types';
 
 interface RGBSlidersProps {
-  /** Per-channel overrides for `r`, `g`, and `b` (label, hidden, disabled). */
+  /** Per-channel toggles for `r`, `g`, and `b` (`disabled`, `hidden`). */
   channels?: ChannelsConfig;
   /** Per-part className overrides forwarded to each channel's `GradientSlider`. */
   channelSliderClassNames?: GradientSliderClassNames;
   /** Current color as any CSS string parseable by `colorizr`. */
   color: string;
+  /** Per-channel label/aria overrides. Falls back to `DEFAULT_LABELS.rgbSliders`. */
+  labels?: ColorPickerLabels['rgbSliders'];
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of R/G/B changes. */
@@ -28,6 +38,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
     channels,
     channelSliderClassNames,
     color,
+    labels,
     numericInputClassNames,
     onChangeColor,
     showInputs = true,
@@ -48,6 +59,19 @@ export default function RGBSliders(props: RGBSlidersProps) {
   const greenConfig = channels?.g;
   const blueConfig = channels?.b;
 
+  const slot = (key: 'b' | 'g' | 'r') => {
+    const fallback = DEFAULT_LABELS.rgbSliders[key];
+
+    return {
+      label: resolveLabel(fallback.label, labels?.[key]?.label),
+      ariaLabel: labels?.[key]?.ariaLabel ?? fallback.ariaLabel,
+    };
+  };
+
+  const redSlot = slot('r');
+  const greenSlot = slot('g');
+  const blueSlot = slot('b');
+
   const update = (newRgb: RGB) => {
     setRgb(newRgb);
 
@@ -61,12 +85,12 @@ export default function RGBSliders(props: RGBSlidersProps) {
     <>
       {!redConfig?.hidden && (
         <GradientSlider
-          aria-label="Red"
+          aria-label={redSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Red"
+                aria-label={redSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={redConfig?.disabled}
                 max={255}
@@ -81,19 +105,19 @@ export default function RGBSliders(props: RGBSlidersProps) {
           isDisabled={redConfig?.disabled}
           maxValue={255}
           onValueChange={v => update({ r: v, g, b })}
-          startContent={redConfig?.label ?? 'R'}
+          startContent={redSlot.label}
           step={1}
           value={r}
         />
       )}
       {!greenConfig?.hidden && (
         <GradientSlider
-          aria-label="Green"
+          aria-label={greenSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Green"
+                aria-label={greenSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={greenConfig?.disabled}
                 max={255}
@@ -108,19 +132,19 @@ export default function RGBSliders(props: RGBSlidersProps) {
           isDisabled={greenConfig?.disabled}
           maxValue={255}
           onValueChange={v => update({ r, g: v, b })}
-          startContent={greenConfig?.label ?? 'G'}
+          startContent={greenSlot.label}
           step={1}
           value={g}
         />
       )}
       {!blueConfig?.hidden && (
         <GradientSlider
-          aria-label="Blue"
+          aria-label={blueSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Blue"
+                aria-label={blueSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={blueConfig?.disabled}
                 max={255}
@@ -135,7 +159,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
           isDisabled={blueConfig?.disabled}
           maxValue={255}
           onValueChange={v => update({ r, g, b: v })}
-          startContent={blueConfig?.label ?? 'B'}
+          startContent={blueSlot.label}
           step={1}
           value={b}
         />

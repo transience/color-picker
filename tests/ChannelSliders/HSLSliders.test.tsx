@@ -8,14 +8,18 @@ const mockOnChangeColor = vi.fn();
 
 const DEFAULT_COLOR = formatCSS(parseCSS('#ff0044', 'hsl'), { format: 'oklch' });
 
-function Controlled(props: { channels?: Parameters<typeof HSLSliders>[0]['channels'] }) {
-  const { channels } = props;
+function Controlled(props: {
+  channels?: Parameters<typeof HSLSliders>[0]['channels'];
+  labels?: Parameters<typeof HSLSliders>[0]['labels'];
+}) {
+  const { channels, labels } = props;
   const [color, setColor] = useState(DEFAULT_COLOR);
 
   return (
     <HSLSliders
       channels={channels}
       color={color}
+      labels={labels}
       onChangeColor={next => {
         mockOnChangeColor(next);
         setColor(next);
@@ -76,7 +80,7 @@ describe('HSLSliders', () => {
     });
 
     it('uses custom label when provided', () => {
-      render(<Controlled channels={{ s: { label: <span data-testid="custom-s">Sat</span> } }} />);
+      render(<Controlled labels={{ s: { label: <span data-testid="custom-s">Sat</span> } }} />);
 
       expect(screen.getByTestId('custom-s')).toBeInTheDocument();
     });

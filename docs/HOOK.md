@@ -1,6 +1,6 @@
 # useColorPicker
 
-`useColorPicker` is the state engine behind `<ColorPicker>`. It owns the HSV/OKLCH color state, the emit pipeline, format resolution, and the callbacks wired to every interactive sub-component. Consumers reach for it when the default layout doesn't fit — to build a horizontal picker, embed controls inside an existing toolbar, render only a subset of the parts, or wrap the picker in a different shell without losing the state semantics.
+`useColorPicker` is the state engine behind `<ColorPicker>`. It owns the HSV/OKLCH color state, the emit pipeline, format resolution, and the callbacks wired to every interactive sub-component. Consumers reach for it when the default `<ColorPicker>` structure (and `classNames` slots) don't fit — to embed controls inside an existing toolbar, render only a subset of the parts, swap a primitive for a custom equivalent, or wrap the picker in a different shell without losing the state semantics.
 
 `<ColorPicker>` is a thin JSX wrapper around this hook. Everything the component does, the hook exposes.
 
@@ -8,6 +8,7 @@ Pairs with:
 
 - [`README.md`](../README.md) — installation, `<ColorPicker>` props, styling.
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — how the hook is organized (emit pipeline, ref-shadow state, OKLCH panel math).
+- [Storybook](https://transience.github.io/color-picker/) — live demos. The `useColorPicker` story group has the custom-layout examples; the `ColorPicker → Toolbar` story shows how far `classNames` alone can take you before reaching for the hook.
 
 ---
 
@@ -65,7 +66,7 @@ Computed from state on every render. Most sub-components expect these shapes dir
 - **`displayValue`** (`string`) — current color formatted per `displayFormat`. Feeds `<ColorInput value>`.
 - **`swatchColor`** (`string`) — alias of `displayValue`. Feeds `<Swatch color>`.
 - **`showGamutWarning`** (`boolean`) — true when the OKLCH color falls outside sRGB and a narrow format is active. Use to render `<GamutWarning>` inside `<ColorInput endContent>`.
-- **`props`** (`ColorPickerProps`) — input props merged with defaults. Useful when forwarding flags (`channels`, `classNames`, `showAlpha`, etc.) to sub-components.
+- **`props`** (`ColorPickerProps`) — input props merged with defaults. Useful when forwarding configuration (`channels`, `classNames`, `labels`, `showAlpha`, etc.) to sub-components.
 
 ---
 
@@ -91,9 +92,11 @@ Each return field maps directly onto the props of a built-in sub-component. The 
 
 ## Examples
 
-### Custom layout
+> 👉 More live examples in [Storybook → useColorPicker](https://transience.github.io/color-picker/?path=/story/usecolorpicker--custom-layout). Source: [`stories/CustomPicker.stories.tsx`](../stories/CustomPicker.stories.tsx).
 
-Horizontal picker: panel on the left, swatch + input + mode selector stacked on the right.
+### Composing primitives
+
+Compose primitives directly with `useColorPicker`. The hook owns the state, and the emit pipeline; layout, ordering, and which primitives to render are up to the caller.
 
 ```tsx
 import {
@@ -106,7 +109,7 @@ import {
 } from '@transience/color-picker';
 import { useState } from 'react';
 
-export function HorizontalPicker() {
+export function CustomPicker() {
   const [color, setColor] = useState('oklch(0.7 0.15 250)');
   const picker = useColorPicker({ color, onChange: setColor });
 
@@ -140,37 +143,6 @@ export function HorizontalPicker() {
 }
 ```
 
-### Partial picker — OKLCH panel + alpha only
-
-No mode selector, no channel sliders, no color input. A minimal swatch-and-slider surface for apps that want to commit fully to OKLCH.
-
-```tsx
-import { useColorPicker, AlphaSlider, OKLCHPanel, Swatch } from '@transience/color-picker';
-import { useState } from 'react';
-
-export function OklchOnly() {
-  const [color, setColor] = useState('oklch(0.65 0.2 15 / 0.8)');
-  const picker = useColorPicker({ color, onChange: setColor, showAlpha: true });
-
-  return (
-    <div ref={picker.rootRef} className="flex flex-col gap-3 p-3">
-      <OKLCHPanel
-        chroma={picker.oklch.c}
-        hue={picker.oklch.h}
-        lightness={picker.oklch.l}
-        onChange={picker.handleChangeOklchPanel}
-      />
-      <AlphaSlider
-        color={picker.solidColor}
-        onChange={picker.handleChangeAlpha}
-        value={picker.alpha}
-      />
-      <Swatch color={picker.swatchColor} />
-    </div>
-  );
-}
-```
-
 ---
 
 ## Types
@@ -183,7 +155,7 @@ All exported from the package root:
 - `ColorFormat` — `'auto' | 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb'`.
 - `HSV` — `{ h, s, v }`.
 - `OklchColor` — `{ l, c, h }`.
-- `ChannelsConfig`, `ColorPickerClassNames`, and the per-slot `*ClassNames` interfaces — re-exported from `src/types.ts`.
+- `ChannelsConfig`, `ColorPickerClassNames`, `ColorPickerLabels`, `LabelSlot`, and the per-slot `*ClassNames` interfaces — re-exported from `src/types.ts`.
 
 ## Related primitives
 

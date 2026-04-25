@@ -6,6 +6,7 @@ import useInteractionAttribute from '../hooks/useInteractionAttribute';
 import type {
   ChannelsConfig,
   ColorMode,
+  ColorPickerLabels,
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
@@ -16,7 +17,7 @@ import RGBSliders from './RGBSliders';
 
 interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
   /**
-   * Per-channel overrides (label, hidden, disabled). Only keys matching the
+   * Per-channel toggles (`disabled`, `hidden`). Only keys matching the
    * active `mode` are used.
    */
   channels?: ChannelsConfig;
@@ -26,6 +27,11 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
   className?: string;
   /** Current color as any CSS string parseable by `colorizr`. */
   color: string;
+  /**
+   * Per-mode label/aria overrides. Only the slot matching the active `mode`
+   * is forwarded (`rgbSliders` / `hslSliders` / `oklchSliders`).
+   */
+  labels?: Pick<ColorPickerLabels, 'hslSliders' | 'oklchSliders' | 'rgbSliders'>;
   /** Active color mode; selects which slider set renders (RGB / HSL / OKLCH). */
   mode: ColorMode;
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
@@ -46,6 +52,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     channelSliderClassNames,
     className,
     color,
+    labels,
     mode,
     numericInputClassNames,
     onChangeColor,
@@ -66,6 +73,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           channelSliderClassNames={channelSliderClassNames}
           channels={channels}
           color={color}
+          labels={labels?.hslSliders}
           numericInputClassNames={numericInputClassNames}
           onChangeColor={onChangeColor}
           showInputs={showInputs}
@@ -76,6 +84,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           channelSliderClassNames={channelSliderClassNames}
           channels={channels}
           color={color}
+          labels={labels?.rgbSliders}
           numericInputClassNames={numericInputClassNames}
           onChangeColor={onChangeColor}
           showInputs={showInputs}
@@ -86,6 +95,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           channelSliderClassNames={channelSliderClassNames}
           channels={channels}
           color={color}
+          labels={labels?.oklchSliders}
           numericInputClassNames={numericInputClassNames}
           onChangeColor={onChangeColor}
           showInputs={showInputs}

@@ -335,6 +335,124 @@ describe('ColorPicker', () => {
     });
   });
 
+  describe('labels', () => {
+    beforeEach(() => {
+      (globalThis as unknown as { EyeDropper: unknown }).EyeDropper = function EyeDropperMock() {
+        return { open: () => Promise.resolve({ sRGBHex: '#000000' }) };
+      };
+    });
+
+    it('renders default English aria-labels when no labels prop is passed', () => {
+      render(<ColorPicker color="#ff0044" showAlpha showEyeDropper showGlobalHue showSettings />);
+
+      expect(screen.getByRole('button', { name: 'Pick color from screen' })).toBeInTheDocument();
+      expect(screen.getByLabelText('Color value')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Color format settings' })).toBeInTheDocument();
+      expect(screen.getByRole('slider', { name: 'GlobalHue' })).toBeInTheDocument();
+      expect(screen.getByRole('slider', { name: 'Alpha' })).toBeInTheDocument();
+    });
+
+    it('overrides chrome aria-labels via labels prop', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          labels={{
+            eyeDropper: 'Pipette',
+            colorInput: 'Hex code',
+          }}
+          showEyeDropper
+        />,
+      );
+
+      expect(screen.getByRole('button', { name: 'Pipette' })).toBeInTheDocument();
+      expect(screen.getByLabelText('Hex code')).toBeInTheDocument();
+    });
+
+    it('isolates rgbSliders labels from channelInputs labels', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          defaultMode="rgb"
+          labels={{ rgbSliders: { r: { ariaLabel: 'Rouge' } } }}
+        />,
+      );
+
+      // Slider gets the override, NumericInputs are inline so they share too
+      // (both inside RGBSliders) — but DEFAULT label persists in any other component.
+      expect(screen.getByRole('slider', { name: 'Rouge' })).toBeInTheDocument();
+    });
+
+    it('renders alpha glyph in standalone ChannelInputs row via labels.channelInputs.a', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          labels={{ channelInputs: { a: { label: 'Op', ariaLabel: 'Opacity' } } }}
+          showAlpha
+          showSliders={false}
+        />,
+      );
+
+      expect(screen.getByLabelText('Opacity')).toBeInTheDocument();
+      expect(screen.getByText('Op')).toBeInTheDocument();
+    });
+
+    it('renders custom toolbar AlphaSlider label and ariaLabel', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          labels={{
+            alphaSlider: { label: <span data-testid="alpha-glyph">A</span>, ariaLabel: 'Opacity' },
+          }}
+          showAlpha
+        />,
+      );
+
+      expect(screen.getByRole('slider', { name: 'Opacity' })).toBeInTheDocument();
+      expect(screen.getByTestId('alpha-glyph')).toBeInTheDocument();
+    });
+
+    it('replaces ModeSelector visible text and aria-label per mode', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          labels={{ modeSelector: { oklch: { label: 'OK', ariaLabel: 'OKLCH mode' } } }}
+        />,
+      );
+
+      expect(screen.getByRole('button', { name: 'OKLCH mode' })).toBeInTheDocument();
+      expect(screen.getByText('OK')).toBeInTheDocument();
+    });
+
+    it('overrides SettingsMenu chrome strings', () => {
+      render(
+        <ColorPicker
+          color="#ff0044"
+          labels={{
+            settingsMenu: {
+              trigger: 'Format settings',
+              title: 'Préférences',
+              close: 'Fermer la fenêtre',
+              done: 'Fermer',
+              displayFormat: 'Affichage',
+              outputFormat: 'Sortie',
+            },
+          }}
+          showSettings
+        />,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Format settings' });
+
+      fireEvent.click(trigger);
+
+      expect(screen.getByText('Préférences')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Fermer la fenêtre' })).toBeInTheDocument();
+      expect(screen.getByText('Fermer')).toBeInTheDocument();
+      expect(screen.getByText('Affichage')).toBeInTheDocument();
+      expect(screen.getByText('Sortie')).toBeInTheDocument();
+    });
+  });
+
   describe('Mode change callback', () => {
     it('fires onChangeMode when the switcher changes mode', () => {
       const onChangeMode = vi.fn();

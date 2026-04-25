@@ -1,18 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatCSS, type HSL, parseCSS } from 'colorizr';
 
+import { resolveLabel } from '~/modules/helpers';
+
 import GradientSlider from '../components/GradientSlider';
 import NumericInput from '../components/NumericInput';
-import { hslHueGradient } from '../constants';
-import type { ChannelsConfig, GradientSliderClassNames, NumericInputClassNames } from '../types';
+import { DEFAULT_LABELS, hslHueGradient } from '../constants';
+import type {
+  ChannelsConfig,
+  ColorPickerLabels,
+  GradientSliderClassNames,
+  NumericInputClassNames,
+} from '../types';
 
 interface HSLSlidersProps {
-  /** Per-channel overrides for `h`, `s`, and `l` (label, hidden, disabled). */
+  /** Per-channel toggles for `h`, `s`, and `l` (`disabled`, `hidden`). */
   channels?: ChannelsConfig;
   /** Per-part className overrides forwarded to each channel's `GradientSlider`. */
   channelSliderClassNames?: GradientSliderClassNames;
   /** Current color as any CSS string parseable by `colorizr`. */
   color: string;
+  /** Per-channel label/aria overrides. Falls back to `DEFAULT_LABELS.hslSliders`. */
+  labels?: ColorPickerLabels['hslSliders'];
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of H/S/L changes. */
@@ -29,6 +38,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
     channels,
     channelSliderClassNames,
     color,
+    labels,
     numericInputClassNames,
     onChangeColor,
     showInputs = true,
@@ -48,6 +58,19 @@ export default function HSLSliders(props: HSLSlidersProps) {
   const hueConfig = channels?.h;
   const saturationConfig = channels?.s;
   const lightnessConfig = channels?.l;
+
+  const slot = (key: 'h' | 'l' | 's') => {
+    const fallback = DEFAULT_LABELS.hslSliders[key];
+
+    return {
+      label: resolveLabel(fallback.label, labels?.[key]?.label),
+      ariaLabel: labels?.[key]?.ariaLabel ?? fallback.ariaLabel,
+    };
+  };
+
+  const hueSlot = slot('h');
+  const saturationSlot = slot('s');
+  const lightnessSlot = slot('l');
 
   const saturationGradient = useMemo(
     () => `linear-gradient(to right, hsl(${h} 0% ${l}%), hsl(${h} 100% ${l}%))`,
@@ -73,12 +96,12 @@ export default function HSLSliders(props: HSLSlidersProps) {
     <>
       {!hueConfig?.hidden && (
         <GradientSlider
-          aria-label="Hue"
+          aria-label={hueSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Hue"
+                aria-label={hueSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={hueConfig?.disabled}
                 max={360}
@@ -93,19 +116,19 @@ export default function HSLSliders(props: HSLSlidersProps) {
           isDisabled={hueConfig?.disabled}
           maxValue={359.9}
           onValueChange={v => update({ h: v, s, l })}
-          startContent={hueConfig?.label ?? 'H'}
+          startContent={hueSlot.label}
           step={1}
           value={h}
         />
       )}
       {!saturationConfig?.hidden && (
         <GradientSlider
-          aria-label="Saturation"
+          aria-label={saturationSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Saturation"
+                aria-label={saturationSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={saturationConfig?.disabled}
                 max={100}
@@ -120,19 +143,19 @@ export default function HSLSliders(props: HSLSlidersProps) {
           isDisabled={saturationConfig?.disabled}
           maxValue={100}
           onValueChange={v => update({ h, s: v, l })}
-          startContent={saturationConfig?.label ?? 'S'}
+          startContent={saturationSlot.label}
           step={1}
           value={s}
         />
       )}
       {!lightnessConfig?.hidden && (
         <GradientSlider
-          aria-label="Lightness"
+          aria-label={lightnessSlot.ariaLabel}
           classNames={channelSliderClassNames}
           endContent={
             showInputs ? (
               <NumericInput
-                aria-label="Lightness"
+                aria-label={lightnessSlot.ariaLabel}
                 classNames={numericInputClassNames}
                 isDisabled={lightnessConfig?.disabled}
                 max={100}
@@ -147,7 +170,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
           isDisabled={lightnessConfig?.disabled}
           maxValue={100}
           onValueChange={v => update({ h, s, l: v })}
-          startContent={lightnessConfig?.label ?? 'L'}
+          startContent={lightnessSlot.label}
           step={1}
           value={l}
         />

@@ -75,28 +75,29 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 
 ## Props
 
-| Prop                                                                                                                         | Type | Default |
-|------------------------------------------------------------------------------------------------------------------------------| --- | --- |
-| **channels**<br />Per-channel overrides: `label`, `hidden`, `disabled`.<br />Keys irrelevant to the active mode are ignored. | `ChannelsConfig` | — |
-| **classNames**<br />Slot-based className overrides for every internal part. See [Styling](#styling).                         | `ColorPickerClassNames` | — |
-| **color**<br />Controlled color value. Any CSS color string.<br />Falls back to the internal default when `undefined`.       | `string` | `'oklch(54% 0.194 250)'` |
-| **defaultMode**<br />Initial mode for the 2D panel and channel controls.                                                     | `'oklch' \| 'hsl' \| 'rgb'` | `'oklch'` |
-| **displayFormat**<br />Initial text format for the `ColorInput`. `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.           | `ColorFormat` | `'auto'` |
-| **modes**<br />Modes shown in the mode switcher.                                                                             | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
-| **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`.                                  | `(value: string) => void` | — |
-| **onChangeMode**<br />Called when the user flips the mode via the switcher.                                                  | `(mode: ColorMode) => void` | — |
-| **outputFormat**<br />Initial format `onChange` emits. `'auto'` follows the resolved `displayFormat`.                        | `ColorFormat` | `'auto'` |
-| **precision**<br />Decimal digits for non-hex output. Ignored for `hex`.                                                     | `number` | `5` |
-| **showAlpha**<br />Renders an alpha slider and appends alpha to emitted values when `< 1`.                                   | `boolean` | `false` |
-| **showColorInput**<br />Shows the text color input with the current value formatted per `displayFormat`.                     | `boolean` | `true` |
+| Prop                                                                                                                                           | Type | Default |
+|------------------------------------------------------------------------------------------------------------------------------------------------| --- | --- |
+| **channels**<br />Per-channel toggles: `hidden`, `disabled`.<br />Keys irrelevant to the active mode are ignored.                              | `ChannelsConfig` | — |
+| **classNames**<br />Slot-based className overrides for every internal part. See [Styling](#styling).                                           | `ColorPickerClassNames` | — |
+| **labels**<br />Slot-based text/aria overrides per component. Each rendered component reads only its own slot.                                 | `ColorPickerLabels` | — |
+| **color**<br />Controlled color value. Any CSS color string.<br />Falls back to the internal default when `undefined`.                         | `string` | `'oklch(54% 0.194 250)'` |
+| **defaultMode**<br />Initial mode for the 2D panel and channel controls.                                                                       | `'oklch' \| 'hsl' \| 'rgb'` | `'oklch'` |
+| **displayFormat**<br />Initial text format for the `ColorInput`. `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.                             | `ColorFormat` | `'auto'` |
+| **modes**<br />Modes shown in the mode switcher.                                                                                               | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
+| **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`.                                                    | `(value: string) => void` | — |
+| **onChangeMode**<br />Called when the user flips the mode via the switcher.                                                                    | `(mode: ColorMode) => void` | — |
+| **outputFormat**<br />Initial format `onChange` emits. `'auto'` follows the resolved `displayFormat`.                                          | `ColorFormat` | `'auto'` |
+| **precision**<br />Decimal digits for non-hex output. Ignored for `hex`.                                                                       | `number` | `5` |
+| **showAlpha**<br />Renders an alpha slider and appends alpha to emitted values when `< 1`.                                                     | `boolean` | `false` |
+| **showColorInput**<br />Shows the text color input with the current value formatted per `displayFormat`.                                       | `boolean` | `true` |
 | **showEyeDropper**<br />Adds a screen color picker button. Silently omitted in browsers without `window.EyeDropper` (currently Chromium-only). | `boolean` | `true` |
-| **showGlobalHue**<br />Shows the global (mode-independent) hue slider in the toolbar.                                        | `boolean` | `false` |
-| **showInputs**<br />Shows numeric input fields per channel. Inline when `showSliders` is on, standalone row otherwise.       | `boolean` | `true` |
-| **showModeSelector**<br />Shows the OKLCH/HSL/RGB mode switcher.                                                             | `boolean` | `true` |
-| **showPanel**<br />Shows the 2D color panel (saturation/value for HSL/RGB, chroma/lightness for OKLCH).                     | `boolean` | `true` |
-| **showSettings**<br />Adds a ⋮ menu to expose display and output format choices to end users.                                | `boolean` | `false` |
-| **showSliders**<br />Shows the per-channel sliders matching the active mode (L/C/H, H/S/L, or R/G/B).                        | `boolean` | `true` |
-| **showSwatch**<br />Shows the circular color preview next to the color input.                                                | `boolean` | `true` |
+| **showGlobalHue**<br />Shows the global (mode-independent) hue slider in the toolbar.                                                          | `boolean` | `false` |
+| **showInputs**<br />Shows numeric input fields per channel. Inline when `showSliders` is on, standalone row otherwise.                         | `boolean` | `true` |
+| **showModeSelector**<br />Shows the OKLCH/HSL/RGB mode switcher.                                                                               | `boolean` | `true` |
+| **showPanel**<br />Shows the 2D color panel (saturation/value for HSL/RGB, chroma/lightness for OKLCH).                                        | `boolean` | `true` |
+| **showSettings**<br />Adds a ⋮ menu to expose display and output format choices to end users.                                                  | `boolean` | `false` |
+| **showSliders**<br />Shows the per-channel sliders matching the active mode (L/C/H, H/S/L, or R/G/B).                                          | `boolean` | `true` |
+| **showSwatch**<br />Shows the circular color preview next to the color input.                                                                  | `boolean` | `true` |
 
 ## Color modes and formats
 

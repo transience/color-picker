@@ -46,6 +46,7 @@ export default function ColorPicker(props: ColorPickerProps) {
   const {
     channels,
     classNames,
+    labels,
     modes,
     showAlpha,
     showColorInput,
@@ -86,6 +87,7 @@ export default function ColorPicker(props: ColorPickerProps) {
   if (showColorInput) {
     content.colorInput = (
       <ColorInput
+        aria-label={labels?.colorInput}
         classNames={classNames?.colorInput}
         endContent={showGamutWarning ? <GamutWarning className={classNames?.gamutWarning} /> : null}
         onChange={handleChangeColorInput}
@@ -110,8 +112,10 @@ export default function ColorPicker(props: ColorPickerProps) {
   if (showAlpha) {
     content.alphaSlider = (
       <AlphaSlider
+        aria-label={labels?.alphaSlider?.ariaLabel}
         classNames={classNames?.alphaSlider}
         color={solidColor}
+        label={labels?.alphaSlider?.label}
         onChange={handleChangeAlpha}
         value={alpha}
       />
@@ -121,8 +125,10 @@ export default function ColorPicker(props: ColorPickerProps) {
   if (showGlobalHue) {
     content.globalHue = (
       <HueSlider
+        aria-label={labels?.hueSlider?.ariaLabel}
         classNames={classNames?.hueSlider}
         isDisabled={hueConfig?.disabled}
+        label={labels?.hueSlider?.label}
         mode={mode}
         onChange={isOklch ? handleChangeOklchHue : handleChangeHsvHue}
         value={currentHue}
@@ -146,6 +152,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         channels={channels}
         className={classNames?.channelSliders}
         color={solidColor}
+        labels={labels}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
         onChangeColor={handleChangeColorInput}
@@ -156,9 +163,9 @@ export default function ColorPicker(props: ColorPickerProps) {
     content.inputs = (
       <ChannelInputs
         alpha={alpha}
-        channels={channels}
         classNames={classNames?.channelInputs}
         color={solidColor}
+        labels={labels?.channelInputs}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
         onAlphaChange={handleChangeAlpha}
@@ -172,6 +179,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     content.eyeDropper = (
       <EyeDropper
         key="eyeDropper"
+        aria-label={labels?.eyeDropper}
         className={classNames?.eyeDropper}
         onChange={handleChangeColorInput}
       />
@@ -183,6 +191,7 @@ export default function ColorPicker(props: ColorPickerProps) {
       <ModeSelector
         key="modeSelector"
         classNames={classNames?.modeSelector}
+        labels={labels?.modeSelector}
         mode={mode}
         modes={modes}
         onClick={handleClickMode}
@@ -197,6 +206,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         classNames={classNames?.settingsMenu}
         containerRef={containerRef}
         displayFormat={displayFormat}
+        labels={labels?.settingsMenu}
         onChangeDisplayFormat={handleChangeDisplayFormat}
         onChangeOutputFormat={handleChangeOutputFormat}
         outputFormat={outputFormat}

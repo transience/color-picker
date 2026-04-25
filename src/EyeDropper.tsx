@@ -2,11 +2,17 @@ import type { ButtonHTMLAttributes, MouseEvent } from 'react';
 
 import Button from './components/Button';
 import EyeDropperIcon from './components/EyeDropperIcon';
+import { DEFAULT_LABELS } from './constants';
 
 interface EyeDropperProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'onChange' | 'children' | 'type'
 > {
+  /**
+   * Accessible label for the trigger button.
+   * @default 'Pick color from screen'
+   */
+  'aria-label'?: string;
   /**
    * Called with the picked color as an `sRGB` hex string (e.g. `#aabbcc`) when
    * the user selects a color. Not called if the user dismisses the picker.
@@ -23,7 +29,7 @@ function isSupported(): boolean {
 }
 
 export default function EyeDropper(props: EyeDropperProps) {
-  const { onChange, onClick, ...rest } = props;
+  const { 'aria-label': ariaLabel = DEFAULT_LABELS.eyeDropper, onChange, onClick, ...rest } = props;
 
   if (!isSupported()) {
     return null;
@@ -44,12 +50,7 @@ export default function EyeDropper(props: EyeDropperProps) {
   };
 
   return (
-    <Button
-      aria-label="Pick color from screen"
-      data-testid="EyeDropper"
-      onClick={handleClick}
-      {...rest}
-    >
+    <Button aria-label={ariaLabel} data-testid="EyeDropper" onClick={handleClick} {...rest}>
       <EyeDropperIcon />
     </Button>
   );
