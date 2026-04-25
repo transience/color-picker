@@ -5,14 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 const srcPath = fileURLToPath(new URL('../src', import.meta.url));
 
-const includeInternal = process.env.STORYBOOK_PUBLISHED !== 'true';
-
 const config: StorybookConfig = {
-  stories: [
-    '../stories/*.stories.@(ts|tsx|mdx)',
-    ...(includeInternal ? ['../stories/internal/**/*.stories.@(ts|tsx|mdx)'] : []),
-  ],
-  addons: ['@storybook/addon-a11y', '@storybook/addon-vitest'],
+  stories: ['../stories/*.stories.@(ts|tsx|mdx)'],
+  addons: ['@storybook/addon-docs', '@storybook/addon-a11y', '@storybook/addon-vitest'],
   framework: {
     name: '@storybook/react-vite',
     options: {},

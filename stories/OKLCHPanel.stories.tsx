@@ -1,51 +1,63 @@
-import { useState } from 'react';
+import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { getP3MaxChroma } from 'colorizr';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import OKLCHPanel from '../../src/OKLCHPanel';
+import OKLCHPanel from '../src/OKLCHPanel';
 
-const meta: Meta<typeof OKLCHPanel> = {
+type Story = StoryObj<OKLCHPanelWrapperProps>;
+
+interface OKLCHPanelWrapperProps extends ComponentProps<typeof OKLCHPanel> {
+  width?: string | number;
+}
+
+export default {
   title: 'OKLCHPanel',
   component: OKLCHPanel,
   args: {
     onChange: fn(),
   },
-};
+} satisfies Meta<typeof OKLCHPanel>;
 
-export default meta;
-
-type Story = StoryObj<typeof OKLCHPanel>;
-
-function Controlled(props: {
-  hue: number;
-  initialChroma: number;
-  initialLightness: number;
-  onChange: (l: number, c: number) => void;
-}) {
-  const { hue, initialChroma, initialLightness, onChange } = props;
-  const [state, setState] = useState({ l: initialLightness, c: initialChroma });
+function OKLCHPanelWrapper(props: OKLCHPanelWrapperProps) {
+  const { chroma, lightness, onChange, width = 320, ...rest } = props;
+  const [state, setState] = useState({ l: lightness, c: chroma });
 
   return (
-    <div style={{ width: 320, height: 180 }}>
+    <div style={{ width }}>
       <OKLCHPanel
         chroma={state.c}
-        hue={hue}
         lightness={state.l}
         onChange={(l, c) => {
           setState({ l, c });
           onChange(l, c);
         }}
+        {...rest}
       />
     </div>
   );
 }
 
 export const Default: Story = {
-  args: { hue: 30, chroma: 0.1, lightness: 0.6 },
-  render: ({ chroma, hue, lightness, onChange }) => (
-    <Controlled hue={hue} initialChroma={chroma} initialLightness={lightness} onChange={onChange} />
-  ),
+  args: { hue: 250, chroma: 0.194, lightness: 0.54 },
+  render: props => <OKLCHPanelWrapper {...props} />,
+};
+
+export const Customized: Story = {
+  args: {
+    classNames: {
+      root: 'h-dvh',
+      thumb: 'size-6 ring-6',
+    },
+    hue: 19.9,
+    chroma: 0.28,
+    lightness: 0.63,
+    width: '100vw',
+  },
+  parameters: {
+    className: 'p-0',
+  },
+  render: props => <OKLCHPanelWrapper {...props} />,
 };
 
 /**
@@ -57,9 +69,8 @@ export const Default: Story = {
  */
 export const ClickStaysInGamut: Story = {
   args: { hue: 30, chroma: 0.1, lightness: 0.6 },
-  render: ({ chroma, hue, lightness, onChange }) => (
-    <Controlled hue={hue} initialChroma={chroma} initialLightness={lightness} onChange={onChange} />
-  ),
+  tags: ['!dev'],
+  render: props => <OKLCHPanelWrapper {...props} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     const panel = await canvas.findByTestId('OKLCHPanel');

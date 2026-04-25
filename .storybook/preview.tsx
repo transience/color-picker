@@ -1,20 +1,41 @@
 import './preview.css';
 
-import type { Decorator, Preview } from '@storybook/react-vite';
+import { FC, useEffect } from 'react';
+import type { Preview } from '@storybook/react-vite';
 
-type Theme = 'light' | 'dark' | 'side';
+import { cn } from '../src/modules/helpers';
 
-const withTheme: Decorator = (Story, context) => {
-  const theme = (context.globals.theme ?? 'light') as Theme;
+const prefersDark =
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+const defaultTheme = prefersDark ? 'dark' : 'light';
+
+// eslint-disable-next-line react-refresh/only-export-components
+function PreviewDecorator(StoryFn: FC, context: Record<any, any>) {
+  const {
+    globals: { theme = defaultTheme },
+    parameters: { className },
+  } = context;
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const baseClassName = 'flex items-center justify-center p-6';
+  const lightClassNames = 'bg-neutral-100 text-neutral-900';
+  const darkClassNames = 'dark bg-neutral-900 text-neutral-50';
 
   if (theme === 'side') {
     return (
       <div className="grid flex-1 grid-cols-2">
-        <div className="flex items-center justify-center bg-neutral-100 p-6 text-neutral-900">
-          <Story />
+        <div className={cn(baseClassName, lightClassNames, className)}>
+          <StoryFn />
         </div>
-        <div className="dark flex items-center justify-center bg-neutral-800 p-6 text-neutral-50">
-          <Story />
+        <div className={cn(baseClassName, darkClassNames, className)}>
+          <StoryFn />
         </div>
       </div>
     );
@@ -22,22 +43,22 @@ const withTheme: Decorator = (Story, context) => {
 
   const wrapper =
     theme === 'dark'
-      ? 'dark flex flex-1 items-center justify-center bg-neutral-900 p-6 text-neutral-50'
-      : 'flex flex-1 items-center justify-center bg-neutral-100 p-6 text-neutral-900';
+      ? cn('flex-1', baseClassName, darkClassNames, className)
+      : cn('flex-1', baseClassName, lightClassNames, className);
 
   return (
     <div className={wrapper}>
-      <Story />
+      <StoryFn />
     </div>
   );
-};
+}
 
 const preview: Preview = {
-  decorators: [withTheme],
+  decorators: [PreviewDecorator],
   globalTypes: {
     theme: {
       description: 'Theme',
-      defaultValue: 'light',
+      defaultValue: defaultTheme,
       toolbar: {
         title: 'Theme',
         icon: 'paintbrush',
@@ -51,30 +72,24 @@ const preview: Preview = {
     },
   },
   parameters: {
-    layout: 'fullscreen',
+    a11y: { test: 'error' },
+    backgrounds: { disable: true },
     controls: {
-      expanded: true,
       disableSaveFromUI: true,
+      expanded: true,
       matchers: {
         color: /^(background|color)$/i,
         date: /^date$/i,
       },
       sort: 'alpha',
     },
-    backgrounds: { disable: true },
-    a11y: { test: 'error' },
+    docs: {
+      codePanel: true,
+    },
+    layout: 'fullscreen',
     options: {
       storySort: {
-        order: [
-          'ColorPicker',
-          'AlphaSlider',
-          'ChannelInputs',
-          'ChannelSliders',
-          'ColorInput',
-          'ModeSelector',
-          'Swatch',
-          '*',
-        ],
+        order: ['ColorPicker', 'useColorPicker', '*'],
       },
     },
   },
