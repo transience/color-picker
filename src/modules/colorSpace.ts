@@ -17,13 +17,9 @@ import {
   XYZ_TO_SRGB,
 } from 'colorizr';
 
-import { clamp } from './helpers';
+import type { HSV } from '~/types';
 
-export interface HSV {
-  h: number; // 0-360
-  s: number; // 0-1
-  v: number; // 0-1
-}
+import { clamp } from './helpers';
 
 const GAMUT_EPSILON = 0.0001;
 

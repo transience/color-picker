@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convertCSS, formatCSS, opacity, parseCSS } from 'colorizr';
 
-import type { ColorPickerProps } from '~/ColorPicker';
 import { DEFAULT_COLOR, DEFAULT_MODES } from '~/constants';
-import { colorToHsv, type HSV, hsvToHex, isOklchInSRGB } from '~/modules/colorSpace';
+import { colorToHsv, hsvToHex, isOklchInSRGB } from '~/modules/colorSpace';
 import {
   formatColor,
   isNarrowFormat,
@@ -12,7 +11,7 @@ import {
 } from '~/modules/format';
 import { mergeProps } from '~/modules/helpers';
 
-import type { ColorFormat, ColorMode } from '~/types';
+import type { ColorFormat, ColorMode, ColorPickerProps, HSV } from '~/types';
 
 import useInteractionAttribute from './useInteractionAttribute';
 
@@ -30,7 +29,7 @@ export const defaultProps = {
   showAlpha: false,
   showColorInput: true,
   showEyeDropper: true,
-  showHueBar: false,
+  showGlobalHue: false,
   showInputs: true,
   showModeSelector: true,
   showPanel: true,
