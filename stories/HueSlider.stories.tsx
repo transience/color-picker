@@ -4,9 +4,9 @@ import { fn } from 'storybook/test';
 
 import HueSlider from '../src/HueSlider';
 
-type Story = StoryObj<ControlledProps>;
+type Story = StoryObj<HueSliderWrapperProps>;
 
-interface ControlledProps extends ComponentProps<typeof HueSlider> {
+interface HueSliderWrapperProps extends ComponentProps<typeof HueSlider> {
   width?: string | number;
 }
 
@@ -29,7 +29,7 @@ export default {
   },
 } satisfies Meta<typeof HueSlider>;
 
-function Controlled(props: ControlledProps) {
+function HueSliderWrapper(props: HueSliderWrapperProps) {
   const { onChange, value: initial, width = 240, ...rest } = props;
   const [value, setValue] = useState(initial);
 
@@ -48,18 +48,18 @@ function Controlled(props: ControlledProps) {
 }
 
 export const Default: Story = {
-  render: props => <Controlled {...props} />,
+  render: props => <HueSliderWrapper {...props} />,
 };
 
 export const Customized: Story = {
   args: {
     classNames: {
       track: 'h-12',
-      thumb: 'size-12 bg-transparent!',
+      thumb: 'size-12 border-8 bg-transparent!',
     },
     gradient:
       'linear-gradient(to right, oklch(0.9 0.4 0), oklch(0.9 0.4 60), oklch(0.9 0.4 120), oklch(0.9 0.4 180), oklch(0.9 0.4 240), oklch(0.9 0.4 300), oklch(0.9 0.4 360))',
     width: 480,
   },
-  render: props => <Controlled {...props} />,
+  render: props => <HueSliderWrapper {...props} />,
 };

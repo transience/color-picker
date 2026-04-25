@@ -3,18 +3,22 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 import ChannelInputs from '../src/ChannelInputs';
+import { DEFAULT_COLOR } from '../src/constants';
 
-type Story = StoryObj<ControlledProps>;
+type Story = StoryObj<ChannelInputsWrapperProps>;
 
-interface ControlledProps extends ComponentProps<typeof ChannelInputs> {
-  width?: number;
+interface ChannelInputsWrapperProps extends ComponentProps<typeof ChannelInputs> {
+  width?: string | number;
 }
 
-const meta: Meta<typeof ChannelInputs> = {
+export default {
   title: 'ChannelInputs',
   component: ChannelInputs,
+  parameters: {
+    className: 'bg-white dark:bg-black',
+  },
   args: {
-    color: '#ff0044',
+    color: DEFAULT_COLOR,
     mode: 'oklch',
     onChangeColor: fn(),
   },
@@ -24,11 +28,9 @@ const meta: Meta<typeof ChannelInputs> = {
       options: ['oklch', 'hsl', 'rgb'],
     },
   },
-};
+} satisfies Meta<typeof ChannelInputs>;
 
-export default meta;
-
-function Controlled(props: ControlledProps) {
+function ChannelInputsWrapper(props: ChannelInputsWrapperProps) {
   const { color: initial, onChangeColor, width = 240, ...rest } = props;
   const [color, setColor] = useState(initial);
 
@@ -47,13 +49,13 @@ function Controlled(props: ControlledProps) {
 }
 
 export const Default: Story = {
-  render: props => <Controlled {...props} />,
+  render: props => <ChannelInputsWrapper {...props} />,
 };
 
 export const Customized: Story = {
   args: {
     classNames: {
-      root: 'bg-red-200 dark:bg-red-800 p-3 rounded-lg',
+      root: 'bg-red-100 dark:bg-red-900 p-3 rounded-lg',
       label: 'text-base text-red-500! leading-none',
     },
     numericInputClassNames: {
@@ -63,5 +65,5 @@ export const Customized: Story = {
     showAlpha: true,
     width: 320,
   },
-  render: props => <Controlled {...props} />,
+  render: props => <ChannelInputsWrapper {...props} />,
 };

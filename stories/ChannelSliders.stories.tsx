@@ -4,13 +4,13 @@ import { fn } from 'storybook/test';
 
 import ChannelSliders from '../src/ChannelSliders';
 
-type Story = StoryObj<ControlledProps>;
+type Story = StoryObj<ChannelSlidersWrapperProps>;
 
-interface ControlledProps extends ComponentProps<typeof ChannelSliders> {
-  width?: number;
+interface ChannelSlidersWrapperProps extends ComponentProps<typeof ChannelSliders> {
+  width?: string | number;
 }
 
-const meta: Meta<typeof ChannelSliders> = {
+export default {
   title: 'ChannelSliders',
   component: ChannelSliders,
   args: {
@@ -25,11 +25,9 @@ const meta: Meta<typeof ChannelSliders> = {
       options: ['oklch', 'hsl', 'rgb'],
     },
   },
-};
+} satisfies Meta<typeof ChannelSliders>;
 
-export default meta;
-
-function Controlled(props: ControlledProps) {
+function ChannelSlidersWrapper(props: ChannelSlidersWrapperProps) {
   const { color: initial, onChangeColor, width = 320, ...rest } = props;
   const [color, setColor] = useState(initial);
 
@@ -48,24 +46,22 @@ function Controlled(props: ControlledProps) {
 }
 
 export const Default: Story = {
-  render: props => <Controlled {...props} />,
+  render: props => <ChannelSlidersWrapper {...props} />,
 };
 
 export const Customized: Story = {
   args: {
     channels: {
-      l: {
-        label: <span className="w-28 text-right font-semibold">Lightness</span>,
-      },
-      c: {
-        label: <span className="w-28 text-right font-semibold">Chroma</span>,
-      },
-      h: {
-        disabled: true,
-        label: <span className="w-28 text-right opacity-70 font-semibold">Hue</span>,
+      h: { disabled: true },
+    },
+    labels: {
+      oklchSliders: {
+        l: { label: <span className="w-28 text-right font-semibold">Lightness</span> },
+        c: { label: <span className="w-28 text-right font-semibold">Chroma</span> },
+        h: { label: <span className="w-28 text-right opacity-70 font-semibold">Hue</span> },
       },
     },
-    className: 'bg-white p-3 rounded-lg',
+    className: 'bg-white dark:bg-black p-3 rounded-lg',
     channelSliderClassNames: {
       track: 'h-6 rounded-lg',
       thumb: 'size-6 rounded-lg',
@@ -75,5 +71,5 @@ export const Customized: Story = {
     },
     width: 480,
   },
-  render: props => <Controlled {...props} />,
+  render: props => <ChannelSlidersWrapper {...props} />,
 };

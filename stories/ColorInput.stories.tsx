@@ -7,38 +7,36 @@ import { Swatch } from '../src';
 import ColorInput from '../src/ColorInput';
 import { DEFAULT_COLOR } from '../src/constants';
 
-type Story = StoryObj<ControlledProps>;
+type Story = StoryObj<ColorInputWrapperProps>;
 
-interface ControlledProps extends ComponentProps<typeof ColorInput> {
-  autoFormat?: boolean;
+interface ColorInputWrapperProps extends ComponentProps<typeof ColorInput> {
+  onChangeFormat?: (value: string) => string;
   showSwatch?: boolean;
-  width?: number;
+  width?: string | number;
 }
 
-const meta: Meta<typeof ColorInput> = {
+export default {
   title: 'ColorInput',
   component: ColorInput,
   args: {
     onChange: fn(),
     value: DEFAULT_COLOR,
   },
-};
+} satisfies Meta<typeof ColorInput>;
 
-export default meta;
-
-function Controlled(props: ControlledProps) {
-  const { autoFormat, onChange, showSwatch, value: initial, width = 240, ...rest } = props;
+function ColorInputWrapper(props: ColorInputWrapperProps) {
+  const { onChange, onChangeFormat, showSwatch, value: initial, width = 240, ...rest } = props;
   const [value, setValue] = useState(initial);
 
   return (
     <div style={{ width }}>
       <ColorInput
         onChange={changedValue => {
-          const next = autoFormat ? convertCSS(changedValue, 'oklch') : changedValue;
+          const next = onChangeFormat ? onChangeFormat(changedValue) : changedValue;
 
           setValue(next);
 
-          if (autoFormat) {
+          if (onChangeFormat) {
             onChange(`${changedValue} -> ${next}`);
           } else {
             onChange(next);
@@ -53,21 +51,21 @@ function Controlled(props: ControlledProps) {
 }
 
 export const Default: Story = {
-  render: props => <Controlled {...props} />,
+  render: props => <ColorInputWrapper {...props} />,
 };
 
 export const Customized: Story = {
-  name: 'Customized with autoFormat',
+  name: 'Customized with format',
   args: {
     classNames: {
       root: 'h-12 bg-transparent! border-2 border-neutral-200 dark:border-neutral-700',
       input: 'text-lg',
     },
-    autoFormat: true,
+    onChangeFormat: (value: string) => convertCSS(value, 'oklch'),
     showSwatch: true,
     width: 320,
   },
-  render: props => <Controlled {...props} />,
+  render: props => <ColorInputWrapper {...props} />,
 };
 
 /**
@@ -78,7 +76,7 @@ export const Customized: Story = {
 export const PasteBareHexAndBlur: Story = {
   args: { value: '' },
   tags: ['!dev'],
-  render: props => <Controlled {...props} />,
+  render: props => <ColorInputWrapper {...props} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     const input = await canvas.findByLabelText('Color value');

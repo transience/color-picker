@@ -97,8 +97,6 @@ jobs:
       - run: pnpm install
 
       - run: pnpm build-storybook
-        env:
-          STORYBOOK_PUBLISHED: 'true'
 
       - run: touch storybook-static/.nojekyll
 

@@ -5,7 +5,11 @@ import { fn } from 'storybook/test';
 import ModeSelector from '../src/ModeSelector';
 import type { ColorMode } from '../src/types';
 
-const meta: Meta<typeof ModeSelector> = {
+type Story = StoryObj<ModeSelectorWrapperProps>;
+
+interface ModeSelectorWrapperProps extends ComponentProps<typeof ModeSelector> {}
+
+export default {
   title: 'ModeSelector',
   component: ModeSelector,
   args: {
@@ -18,13 +22,9 @@ const meta: Meta<typeof ModeSelector> = {
       options: ['oklch', 'hsl', 'rgb'],
     },
   },
-};
+} satisfies Meta<typeof ModeSelector>;
 
-export default meta;
-
-type Story = StoryObj<typeof ModeSelector>;
-
-function Controlled(props: ComponentProps<typeof ModeSelector>) {
+function ModeSelectorWrapper(props: ModeSelectorWrapperProps) {
   const { mode: initial, onClick, ...rest } = props;
   const [mode, setMode] = useState<ColorMode>(initial);
 
@@ -41,7 +41,7 @@ function Controlled(props: ComponentProps<typeof ModeSelector>) {
 }
 
 export const Default: Story = {
-  render: props => <Controlled {...props} />,
+  render: props => <ModeSelectorWrapper {...props} />,
 };
 
 export const Customized: Story = {
@@ -51,5 +51,5 @@ export const Customized: Story = {
       button: 'h-12 rounded-full! text-lg px-6',
     },
   },
-  render: props => <Controlled {...props} />,
+  render: props => <ModeSelectorWrapper {...props} />,
 };

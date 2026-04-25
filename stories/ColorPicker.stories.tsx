@@ -5,7 +5,15 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import ColorPicker from '../src/ColorPicker';
 import { defaultProps } from '../src/hooks/useColorPicker';
 
-const meta: Meta<typeof ColorPicker> = {
+import Preview from './components/Preview';
+
+type Story = StoryObj<ColorPickerWrapperProps>;
+
+interface ColorPickerWrapperProps extends ComponentProps<typeof ColorPicker> {
+  showPreview?: boolean;
+}
+
+export default {
   title: 'ColorPicker',
   component: ColorPicker,
   args: {
@@ -20,59 +28,51 @@ const meta: Meta<typeof ColorPicker> = {
       description: 'Decimal digits for non-hex output.',
     },
   },
-};
+} satisfies Meta<typeof ColorPicker>;
 
-export default meta;
-
-type Story = StoryObj<typeof ColorPicker>;
-
-function Controlled(props: ComponentProps<typeof ColorPicker>) {
-  const { color: defaultColor, onChange } = props;
+function ColorPickerWrapper(props: ColorPickerWrapperProps) {
+  const { color: defaultColor, onChange, showPreview } = props;
   const [color, setColor] = useState(defaultColor ?? 'oklch(54% 0.194 250)');
 
   return (
-    <ColorPicker
-      {...props}
-      color={color}
-      onChange={next => {
-        setColor(next);
-        onChange?.(next);
-      }}
-    />
+    <>
+      <ColorPicker
+        {...props}
+        color={color}
+        onChange={next => {
+          setColor(next);
+          onChange?.(next);
+        }}
+      />
+      {showPreview && <Preview color={color} />}
+    </>
   );
 }
 
 export const Default: Story = {
   args: {},
-  render: props => <Controlled {...props} />,
+  render: props => <ColorPickerWrapper {...props} />,
 };
 
-export const WithToolbar: Story = {
-  name: 'With Toolbar and Inputs',
+export const withHueAndInputs: Story = {
+  name: 'With Hue, Alpha and Inputs',
   args: {
     defaultMode: 'hsl',
     showAlpha: true,
-    showHueBar: true,
-    showEyeDropper: false,
+    showGlobalHue: true,
     showSliders: false,
+    showSettings: true,
   },
-  render: props => <Controlled {...props} />,
-};
-
-export const WithSettings: Story = {
-  name: 'With Alpha and Settings',
-  args: { showSettings: true, showAlpha: true },
-  render: props => <Controlled {...props} />,
+  render: props => <ColorPickerWrapper {...props} />,
 };
 
 export const Customized: Story = {
   args: {
-    showSettings: true,
     classNames: {
-      channelSliders: 'bg-neutral-300 dark:bg-neutral-800 p-3',
+      channelSliders: 'bg-zinc-300 dark:bg-zinc-700 p-3',
       channelSlider: { track: 'h-4 rounded-lg' },
       colorInput: {
-        root: 'border-neutral-500 rounded-full h-10',
+        root: 'border-zinc-500 rounded-full h-10',
         input: 'font-mono tracking-wider px-3',
       },
       colorValue: 'p-3',
@@ -81,17 +81,68 @@ export const Customized: Story = {
         root: 'rounded-full',
       },
       numericInput: { input: 'w-14' },
-      options: 'bg-neutral-200 bg-neutral-900 p-3',
-      panel: { thumb: 'size-5 border-4 border-neutral-700' },
-      root: 'max-w-sm bg-neutral-200 dark:bg-neutral-700 gap-0 rounded-2xl overflow-hidden shadow-lg p-0',
+      options: 'p-3',
+      panel: { thumb: 'size-5 border-4 border-zinc-700' },
+      root: 'max-w-sm bg-zinc-200 dark:bg-zinc-800 gap-0 rounded-2xl overflow-hidden shadow-lg p-0',
       settingsMenu: { trigger: 'rounded-full' },
       swatch: {
         root: 'rounded-md overflow-hidden size-10',
         color: 'rounded-none',
       },
     },
+    showSettings: true,
   },
-  render: props => <Controlled {...props} />,
+  render: props => <ColorPickerWrapper {...props} />,
+};
+
+export const Toolbar: Story = {
+  args: {
+    channels: {
+      l: {
+        hidden: true,
+      },
+    },
+    classNames: {
+      channelSlider: {
+        root: 'w-full',
+      },
+      channelSliders: 'flex-row w-full max-w-xl',
+      colorInput: {
+        root: 'dark:bg-neutral-700',
+      },
+      colorValue: 'shrink-0 min-w-64',
+      eyeDropper: 'dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600',
+      root: 'flex-row max-w-5xl mx-auto bg-neutral-200 dark:bg-neutral-800 rounded-b-lg',
+      settingsMenu: {
+        menu: 'dark:bg-neutral-700',
+        trigger: 'dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600',
+      },
+      swatch: {
+        root: 'rounded-lg',
+      },
+    },
+    labels: {
+      hslSliders: {
+        h: { label: null },
+        s: { label: null },
+        l: { label: null },
+      },
+      oklchSliders: {
+        l: { label: null },
+        c: { label: null },
+        h: { label: null },
+      },
+    },
+    modes: ['oklch', 'hsl'],
+    showInputs: false,
+    showPanel: false,
+    showPreview: true,
+    showSettings: true,
+  },
+  parameters: {
+    className: 'flex-col justify-start p-0',
+  },
+  render: props => <ColorPickerWrapper {...props} />,
 };
 
 export const KeyboardE2E: Story = {
@@ -102,10 +153,10 @@ export const KeyboardE2E: Story = {
     onChange: fn(),
   },
   tags: ['!dev'],
-  render: props => <Controlled {...props} />,
+  render: props => <ColorPickerWrapper {...props} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    // With showHueBar=false and mode=hsl, there's exactly one Hue slider
+    // With showGlobalHue=false and mode=hsl, there's exactly one Hue slider
     // (the HSL ChannelSliders' hue track).
     const hueSlider = await canvas.findByRole('slider', { name: 'Hue' });
 

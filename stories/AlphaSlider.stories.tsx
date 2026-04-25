@@ -3,27 +3,30 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 import AlphaSlider from '../src/AlphaSlider';
+import { DEFAULT_COLOR } from '../src/constants';
 
-const meta: Meta<typeof AlphaSlider> = {
+type Story = StoryObj<AlphaSliderWrapperProps>;
+
+interface AlphaSliderWrapperProps extends ComponentProps<typeof AlphaSlider> {
+  width?: string | number;
+}
+
+export default {
   title: 'AlphaSlider',
   component: AlphaSlider,
   args: {
-    color: '#ff0044',
+    color: DEFAULT_COLOR,
     onChange: fn(),
     value: 0.5,
   },
-};
+} satisfies Meta<typeof AlphaSlider>;
 
-export default meta;
-
-type Story = StoryObj<typeof AlphaSlider>;
-
-function Controlled(props: ComponentProps<typeof AlphaSlider>) {
-  const { onChange, value: initial, ...rest } = props;
+function AlphaSliderWrapper(props: AlphaSliderWrapperProps) {
+  const { onChange, value: initial, width = 240, ...rest } = props;
   const [value, setValue] = useState(initial);
 
   return (
-    <div style={{ width: 240 }}>
+    <div style={{ width }}>
       <AlphaSlider
         {...rest}
         onChange={next => {
@@ -37,5 +40,16 @@ function Controlled(props: ComponentProps<typeof AlphaSlider>) {
 }
 
 export const Default: Story = {
-  render: props => <Controlled {...props} />,
+  render: props => <AlphaSliderWrapper {...props} />,
+};
+
+export const Customized: Story = {
+  args: {
+    classNames: {
+      track: 'h-6 rounded-lg',
+      thumb: 'size-6',
+    },
+    width: 320,
+  },
+  render: props => <AlphaSliderWrapper {...props} />,
 };
