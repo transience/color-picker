@@ -1,17 +1,11 @@
-import {
-  type ButtonHTMLAttributes,
-  RefObject,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { type ButtonHTMLAttributes, useRef, useState } from 'react';
 
 import { cn, resolveLabel } from '~/modules/helpers';
 
 import GearIcon from '~/components/GearIcon';
 
 import Button from './components/Button';
+import Floater, { type FloaterPlacement } from './components/Floater';
 import RadioGroup from './components/RadioGroup';
 import { DEFAULT_LABELS } from './constants';
 import type {
@@ -24,7 +18,6 @@ import type {
 interface SettingsMenuProps {
   /** Per-part className overrides (`trigger` = button, `menu` = popover panel). */
   classNames?: SettingsMenuClassNames;
-  containerRef: RefObject<HTMLDivElement | null>;
   /** Current display format selection. */
   displayFormat: ColorFormat;
   /** Label/aria overrides. */
@@ -35,6 +28,11 @@ interface SettingsMenuProps {
   onChangeOutputFormat: (format: ColorFormat) => void;
   /** Current output format selection. */
   outputFormat: ColorFormat;
+  /**
+   * Floater placement relative to the trigger.
+   * @default 'bottom-end'
+   */
+  placement?: FloaterPlacement;
   /** Native HTML attributes forwarded to the trigger `<button>`. Internal a11y/handler attrs win. */
   triggerProps?: Omit<
     ButtonHTMLAttributes<HTMLButtonElement>,
@@ -51,31 +49,22 @@ const OPTIONS: SettingsOption[] = [
   { label: 'OkLab', value: 'oklab' },
 ];
 
-const GAP = 8;
-const ITEM_WIDTH = 144;
-const MIN_HORIZONTAL_WIDTH = ITEM_WIDTH * 2 + GAP * 3;
-// Paired with the `duration-200` class on the panel — keep these in sync.
-const CLOSE_DURATION_MS = 200;
-const CLOSE_UNMOUNT_SLACK_MS = 50;
+const PANEL_CLASSES =
+  'min-w-70 overflow-hidden rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200';
 
 export default function SettingsMenu(props: SettingsMenuProps) {
   const {
     classNames,
-    containerRef,
     displayFormat,
     labels,
     onChangeDisplayFormat,
     onChangeOutputFormat,
     outputFormat,
+    placement = 'bottom-end',
     triggerProps,
   } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const [isRendered, setIsRendered] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [layout, setLayout] = useState('column');
-  const [height, setHeight] = useState<string | number>('auto');
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
 
   const triggerLabel = labels?.trigger ?? DEFAULT_LABELS.settingsMenu.trigger;
   const titleLabel = resolveLabel(DEFAULT_LABELS.settingsMenu.title, labels?.title);
@@ -90,152 +79,68 @@ export default function SettingsMenu(props: SettingsMenuProps) {
     labels?.outputFormat,
   );
 
-  useLayoutEffect(() => {
-    const el = containerRef.current;
-
-    if (!el) {
-      return undefined;
-    }
-
-    const measure = () => {
-      setHeight(el.clientHeight * 0.8);
-      setLayout(el.clientWidth >= MIN_HORIZONTAL_WIDTH ? 'row' : 'column');
-    };
-
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(measure);
-
-    observer.observe(el);
-
-    return () => observer.disconnect();
-  }, [containerRef, isOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsRendered(true);
-      const frame = requestAnimationFrame(() => setIsVisible(true));
-
-      return () => cancelAnimationFrame(frame);
-    }
-
-    setIsVisible(false);
-    const timer = setTimeout(
-      () => setIsRendered(false),
-      CLOSE_DURATION_MS + CLOSE_UNMOUNT_SLACK_MS,
-    );
-
-    return () => clearTimeout(timer);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-
-    const handleMouseDown = (event: MouseEvent) => {
-      const target = event.target as Node;
-
-      if (triggerRef.current?.contains(target) || panelRef.current?.contains(target)) {
-        return;
-      }
-
-      setIsOpen(false);
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
-
+  // Returning focus to the trigger keeps ancestor focus-within popovers
+  // (HeroUI / React Aria hosts) from treating an option click as focus
+  // leaving the picker.
   const refocusTrigger = () => {
-    // Put focus back on the trigger (which lives inside the ColorPicker DOM)
-    // so ancestor popovers using focus-within dismissal do not fire when a
-    // menu option is clicked.
     triggerRef.current?.focus();
   };
 
+  const panel = (
+    <div className={cn(PANEL_CLASSES, classNames?.menu)} data-testid="SettingsMenu">
+      <div className="flex flex-col gap-3 p-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold">{titleLabel}</p>
+          <button
+            aria-label={closeLabel}
+            className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
+            onClick={() => setIsOpen(false)}
+            type="button"
+          >
+            {doneLabel}
+          </button>
+        </div>
+        <div className="flex flex-row justify-center flex-1 gap-6">
+          <RadioGroup
+            onChange={onChangeDisplayFormat}
+            onInteractionEnd={refocusTrigger}
+            options={OPTIONS}
+            title={displayFormatLabel}
+            value={displayFormat}
+          />
+          <RadioGroup
+            onChange={onChangeOutputFormat}
+            onInteractionEnd={refocusTrigger}
+            options={OPTIONS}
+            title={outputFormatLabel}
+            value={outputFormat}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div data-testid="SettingsMenuWrapper">
-      <Button
-        aria-label={triggerLabel}
-        {...triggerProps}
-        ref={triggerRef}
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-        className={cn(triggerProps?.className, classNames?.trigger)}
-        data-testid="SettingsTrigger"
-        onClick={() => setIsOpen(open => !open)}
+      <Floater
+        content={panel}
+        eventType="click"
+        onOpenChange={setIsOpen}
+        open={isOpen}
+        placement={placement}
       >
-        <GearIcon />
-      </Button>
-      {isRendered && (
-        <>
-          <div className="absolute inset-0" onClick={() => setIsOpen(false)} role="presentation" />
-          <div
-            ref={panelRef}
-            aria-hidden={!isOpen}
-            className={cn(
-              'absolute z-50 left-0 right-0 bottom-0',
-              'overflow-hidden rounded-t-lg shadow-lg',
-              'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200',
-              'transition-transform duration-200 ease-out',
-              isVisible ? 'translate-y-0' : 'translate-y-full',
-              classNames?.menu,
-            )}
-            data-testid="SettingsMenu"
-          >
-            <div className="flex flex-col overflow-y-auto" style={{ maxHeight: height }}>
-              <div className="sticky top-0 flex items-center justify-between p-3 bg-neutral-100 dark:bg-neutral-800">
-                <p className="text-sm font-semibold">{titleLabel}</p>
-                <button
-                  aria-label={closeLabel}
-                  className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                  onClick={() => setIsOpen(false)}
-                  type="button"
-                >
-                  {doneLabel}
-                </button>
-              </div>
-              <div
-                className={cn('flex flex-col flex-1 gap-3 pb-3 px-3', {
-                  'flex-row justify-center': layout === 'row',
-                })}
-              >
-                <RadioGroup
-                  onChange={onChangeDisplayFormat}
-                  onInteractionEnd={refocusTrigger}
-                  options={OPTIONS}
-                  title={displayFormatLabel}
-                  value={displayFormat}
-                />
-                {layout === 'column' && <div className="h-px bg-neutral-300 dark:bg-neutral-600" />}
-                <RadioGroup
-                  onChange={onChangeOutputFormat}
-                  onInteractionEnd={refocusTrigger}
-                  options={OPTIONS}
-                  title={outputFormatLabel}
-                  value={outputFormat}
-                />
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+        <Button
+          aria-label={triggerLabel}
+          {...triggerProps}
+          ref={triggerRef}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+          className={cn(triggerProps?.className, classNames?.trigger)}
+          data-testid="SettingsTrigger"
+        >
+          <GearIcon />
+        </Button>
+      </Floater>
     </div>
   );
 }

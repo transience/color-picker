@@ -32,7 +32,7 @@ Grouped by concern. Every field is stable across renders except the state values
 ### Refs
 
 - **`rootRef`** — callback ref to attach to the outermost element. Wires up the `data-interacting` attribute that host apps observe to pause autosave / URL sync during drags and keyboard input.
-- **`containerRef`** — imperative ref to the same element after mount. Forwarded to `SettingsMenu` for positioning; useful when a consumer needs to measure or position overlays against the picker root.
+- **`containerRef`** — imperative ref to the same element after mount. Useful when a consumer needs to measure or position overlays against the picker root.
 
 ### State
 

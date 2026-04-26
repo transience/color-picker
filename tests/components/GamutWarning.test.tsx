@@ -1,4 +1,4 @@
-import { render, screen } from 'tests/__setup__/test-utils';
+import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
 
 import GamutWarning from '../../src/components/GamutWarning';
 
@@ -43,6 +43,15 @@ describe('GamutWarning', () => {
     );
     const [a, b] = screen.getAllByTestId('GamutWarning');
 
-    expect(a.getAttribute('popovertarget')).not.toBe(b.getAttribute('popovertarget'));
+    fireEvent.click(a);
+    const aDescribedBy = a.getAttribute('aria-describedby');
+
+    fireEvent.click(a); // close to avoid two open tooltips simultaneously
+    fireEvent.click(b);
+    const bDescribedBy = b.getAttribute('aria-describedby');
+
+    expect(aDescribedBy).toBeTruthy();
+    expect(bDescribedBy).toBeTruthy();
+    expect(aDescribedBy).not.toBe(bDescribedBy);
   });
 });

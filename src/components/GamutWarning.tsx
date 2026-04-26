@@ -1,45 +1,35 @@
-import { type ButtonHTMLAttributes, useRef } from 'react';
+import { type ButtonHTMLAttributes } from 'react';
 
-import { cn, createId } from '../modules/helpers';
+import Floater from '~/components/Floater';
+
+import { cn } from '../modules/helpers';
 
 import WarningIcon from './WarningIcon';
 
-type GamutWarningProps = Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'popoverTarget' | 'aria-describedby' | 'type' | 'children'
->;
+type GamutWarningProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children'>;
+
+const TOOLTIP_CONTENT_CLASSES =
+  'pointer-events-none max-w-48 px-2.5 py-1.5 text-sm rounded-md shadow-lg bg-neutral-300 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-100';
 
 export default function GamutWarning(props: GamutWarningProps) {
-  const { className, style, ...rest } = props;
-  const idRef = useRef<string | null>(null);
+  const { className, ...rest } = props;
 
-  idRef.current ??= createId('gamut');
-
-  const id = idRef.current;
-  const anchorName = `--${id}`;
+  const content = 'Color is outside the sRGB gamut and clipped for hex/rgb/hsl display.';
 
   return (
-    <>
+    <Floater
+      content={<span role="tooltip">{content}</span>}
+      contentClassName={TOOLTIP_CONTENT_CLASSES}
+    >
       <button
-        aria-describedby={id}
+        aria-label={content}
         className={cn('inline-flex shrink-0 text-orange-400 cursor-pointer', className)}
         data-testid="GamutWarning"
         {...rest}
-        popoverTarget={id}
-        style={{ ...style, anchorName }}
         type="button"
       >
         <WarningIcon />
       </button>
-      <div
-        className="mb-1 px-3 py-2 max-w-48 rounded-md bg-neutral-300 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-100 text-sm shadow-lg"
-        id={id}
-        popover="auto"
-        role="tooltip"
-        style={{ positionAnchor: anchorName, positionArea: 'top' }}
-      >
-        Color is outside the sRGB gamut and clipped for hex/rgb/hsl display.
-      </div>
-    </>
+    </Floater>
   );
 }

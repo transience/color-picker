@@ -12,7 +12,7 @@ process.on('unhandledRejection', (reason, promise) => {
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
-    matches: false,
+    matches: query === '(hover: hover) and (pointer: fine)',
     media: query,
     onchange: null,
     addListener: vi.fn(), // deprecated

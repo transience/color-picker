@@ -266,9 +266,17 @@ Notable details:
 
 ## 9. SettingsMenu
 
-Trigger is a gear button; the panel is a slide-up popover positioned inside the picker root. On open it measures the root container via `ResizeObserver` and switches between a vertical column layout and a side-by-side row layout when the container is wide enough (`ITEM_WIDTH * 2 + GAP * 3` ≈ 312 px). The panel's max-height tracks 80% of the current root height so the menu never overflows the picker.
+Trigger is a gear button. The panel is portal'd to `document.body` and anchored to the trigger via `Floater` (`src/components/Floater.tsx`) — a small floating-UI primitive that handles fixed-coordinate positioning, top↔bottom auto-flip (with `start` / `end` alignment preserved), scroll/resize re-positioning, outside-click + Escape dismissal, and an opacity-fade visibility transition.
 
-Dismissal: outside `mousedown`, `Escape`, or the explicit **Done** button. On option click, focus is restored to the trigger so ancestor focus-within popovers (HeroUI / React Aria hosts) don't treat the selection as focus leaving the picker.
+SettingsMenu uses Floater in click-controlled mode. Default placement is `bottom-end`: the gear sits at the picker's right edge, so the panel right-aligns to the gear and extends left into the picker. Consumers can override via `<SettingsMenu placement>` (`FloaterPlacement` exported from `src/components/Floater.tsx`).
+
+Layout: always two `RadioGroup`s side-by-side. Panel sized by `min-w-70` (≈ 280 px) with intrinsic content driving the final width — no JS measurement, no `ResizeObserver`.
+
+State: SettingsMenu owns `isOpen` and passes it through Floater (`open` / `onOpenChange`). The **Done** button calls `setIsOpen(false)` directly. RadioGroup interactions refocus the gear trigger so ancestor focus-within popovers (HeroUI / React Aria hosts) don't treat the selection as focus leaving the picker.
+
+Dismissal: outside `mousedown` / `touchstart`, `Escape`, or the **Done** button.
+
+Floater is also used by `GamutWarning` (hover + focus tooltip with touch fallback to click).
 
 ---
 
