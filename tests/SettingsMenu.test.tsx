@@ -1,7 +1,5 @@
-import { useRef } from 'react';
-
 import SettingsMenu from '~/SettingsMenu';
-import { act, fireEvent, render, screen, within } from '~/test-utils';
+import { fireEvent, render, screen, within } from '~/test-utils';
 
 type Props = Parameters<typeof SettingsMenu>[0];
 
@@ -16,25 +14,16 @@ function getGroup(title: 'Display format' | 'Output format'): HTMLElement {
   return group;
 }
 
-function Host(props: Omit<Partial<Props>, 'containerRef'>) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  return (
-    <div ref={containerRef} data-testid="host">
-      <SettingsMenu
-        containerRef={containerRef}
-        displayFormat="auto"
-        onChangeDisplayFormat={() => {}}
-        onChangeOutputFormat={() => {}}
-        outputFormat="auto"
-        {...props}
-      />
-    </div>
+function renderMenu(props: Partial<Props> = {}) {
+  return render(
+    <SettingsMenu
+      displayFormat="auto"
+      onChangeDisplayFormat={() => {}}
+      onChangeOutputFormat={() => {}}
+      outputFormat="auto"
+      {...props}
+    />,
   );
-}
-
-function renderMenu(props: Omit<Partial<Props>, 'containerRef'> = {}) {
-  return render(<Host {...props} />);
 }
 
 describe('SettingsMenu', () => {
@@ -49,7 +38,7 @@ describe('SettingsMenu', () => {
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
 
-    expect(screen.getByTestId('SettingsMenuWrapper')).toMatchSnapshot();
+    expect(screen.getByTestId('SettingsMenu')).toMatchSnapshot();
   });
 
   it('fires onChangeDisplayFormat with the selected value', () => {
@@ -99,82 +88,47 @@ describe('SettingsMenu', () => {
   });
 
   it('closes on Escape', () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    renderMenu();
 
-    try {
-      renderMenu();
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+    expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
 
-      fireEvent.click(screen.getByTestId('SettingsTrigger'));
-      const panel = screen.getByTestId('SettingsMenu');
+    fireEvent.keyDown(document, { key: 'Escape' });
 
-      fireEvent.keyDown(document, { key: 'Escape' });
-
-      expect(panel).toHaveAttribute('aria-hidden', 'true');
-
-      act(() => {
-        vi.advanceTimersByTime(250);
-      });
-
-      expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
+    expect(screen.getByTestId('SettingsTrigger')).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('closes on outside mousedown', () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    render(
+      <>
+        <button data-testid="outside" type="button">
+          outside
+        </button>
+        <SettingsMenu
+          displayFormat="auto"
+          onChangeDisplayFormat={() => {}}
+          onChangeOutputFormat={() => {}}
+          outputFormat="auto"
+        />
+      </>,
+    );
 
-    try {
-      render(
-        <>
-          <button data-testid="outside" type="button">
-            outside
-          </button>
-          <Host />
-        </>,
-      );
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+    expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
 
-      fireEvent.click(screen.getByTestId('SettingsTrigger'));
-      const panel = screen.getByTestId('SettingsMenu');
+    fireEvent.mouseDown(screen.getByTestId('outside'));
 
-      fireEvent.mouseDown(screen.getByTestId('outside'));
-
-      expect(panel).toHaveAttribute('aria-hidden', 'true');
-
-      act(() => {
-        vi.advanceTimersByTime(250);
-      });
-
-      expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
   });
 
-  it('unmounts after timeout even when transitionend never fires', () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+  it('closes when the Done button is clicked', () => {
+    renderMenu();
 
-    try {
-      renderMenu();
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+    fireEvent.click(screen.getByRole('button', { name: 'Close settings' }));
 
-      fireEvent.click(screen.getByTestId('SettingsTrigger'));
-      expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
-
-      fireEvent.keyDown(document, { key: 'Escape' });
-      expect(screen.getByTestId('SettingsMenu')).toHaveAttribute('aria-hidden', 'true');
-
-      act(() => {
-        vi.advanceTimersByTime(249);
-      });
-      expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
-
-      act(() => {
-        vi.advanceTimersByTime(1);
-      });
-      expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
   });
 
   it('stays open when clicking inside the panel (but outside a button)', () => {
@@ -200,35 +154,15 @@ describe('SettingsMenu', () => {
     expect(outputHex).not.toHaveClass('text-neutral-900');
   });
 
-  describe('Layout', () => {
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
+  it('renders both groups side-by-side (row layout)', () => {
+    renderMenu();
 
-    it('renders column layout when container is narrow', () => {
-      vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(280);
-      renderMenu();
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
 
-      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+    const groups = getGroup('Display format').parentElement as HTMLElement;
 
-      const groups = getGroup('Display format').parentElement as HTMLElement;
-
-      expect(groups).not.toHaveClass('flex-row');
-      expect(groups.querySelector('.h-px')).toBeInTheDocument();
-    });
-
-    it('renders row layout when container is wide', () => {
-      vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(400);
-      renderMenu();
-
-      fireEvent.click(screen.getByTestId('SettingsTrigger'));
-
-      const groups = getGroup('Display format').parentElement as HTMLElement;
-
-      expect(groups).toHaveClass('flex-row');
-      expect(groups).toHaveClass('justify-center');
-      expect(groups.querySelector('.h-px')).not.toBeInTheDocument();
-    });
+    expect(groups).toHaveClass('flex-row');
+    expect(groups).toHaveClass('justify-center');
   });
 
   describe('triggerProps', () => {
@@ -238,6 +172,18 @@ describe('SettingsMenu', () => {
 
       expect(trigger).toHaveAttribute('id', 'custom-trigger');
       expect(trigger).toHaveAttribute('title', 'Settings');
+    });
+  });
+
+  describe('placement', () => {
+    it('accepts a custom placement', () => {
+      renderMenu({ placement: 'top-start' });
+
+      // Just verifies the prop is accepted without runtime errors.
+      // Floater coords behavior is covered in tests/components/Floater.test.tsx.
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+      expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
     });
   });
 });

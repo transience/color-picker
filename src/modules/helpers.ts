@@ -37,14 +37,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function createId(prefix: string): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return `${prefix}-${crypto.randomUUID().slice(0, 8)}`;
-  }
-
-  return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
 /**
  * Merges the defaultProps with literal values with the incoming props, removing undefined values from it that would override the defaultProps.
  * The result is a type-safe object with the defaultProps as required properties.

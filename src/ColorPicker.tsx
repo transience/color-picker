@@ -20,7 +20,6 @@ export default function ColorPicker(props: ColorPickerProps) {
   const picker = useColorPicker(props);
   const {
     alpha,
-    containerRef,
     currentHue,
     displayFormat,
     displayValue,
@@ -204,7 +203,6 @@ export default function ColorPicker(props: ColorPickerProps) {
       <SettingsMenu
         key="settings"
         classNames={classNames?.settingsMenu}
-        containerRef={containerRef}
         displayFormat={displayFormat}
         labels={labels?.settingsMenu}
         onChangeDisplayFormat={handleChangeDisplayFormat}

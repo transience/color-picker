@@ -2,11 +2,9 @@
 
 exports[`GamutWarning > renders correctly 1`] = `
 <button
-  aria-describedby="gamut-1"
+  aria-label="Color is outside the sRGB gamut and clipped for hex/rgb/hsl display."
   class="inline-flex shrink-0 text-orange-400 cursor-pointer"
   data-testid="GamutWarning"
-  popovertarget="gamut-1"
-  style="anchor-name: --gamut-1;"
   type="button"
 >
   <svg
