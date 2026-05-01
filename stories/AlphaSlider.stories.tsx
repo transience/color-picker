@@ -29,7 +29,7 @@ function AlphaSliderWrapper(props: AlphaSliderWrapperProps) {
         {...rest}
         onChange={next => {
           setValue(next);
-          onChange(next);
+          onChange?.(next);
         }}
         value={value}
       />

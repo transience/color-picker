@@ -16,8 +16,10 @@ interface NumericInputProps {
   max: number;
   /** Minimum allowed value. Typed and blurred values are clamped to this. */
   min: number;
-  /** Called with the committed numeric value on typing, arrow keys, and blur. */
-  onChange: (value: number) => void;
+  /**
+   * Called with the committed numeric value on typing, arrow keys, and blur.
+   * */
+  onChange?: (value: number) => void;
   /**
    * Increment used by `ArrowUp` / `ArrowDown` (and `10x` with `Shift`). Also
    * determines the decimal precision when quantizing keyboard steps.
@@ -58,7 +60,7 @@ export default function NumericInput(props: NumericInputProps) {
     const parsed = Number.parseFloat(raw.replace(',', '.'));
 
     if (!Number.isNaN(parsed)) {
-      onChange(clamp(parsed));
+      onChange?.(clamp(parsed));
     }
   };
 
@@ -78,7 +80,7 @@ export default function NumericInput(props: NumericInputProps) {
     const parsed = Number.parseFloat(editValue.replace(',', '.'));
 
     if (!Number.isNaN(parsed)) {
-      onChange(clamp(parsed));
+      onChange?.(clamp(parsed));
     }
 
     setIsEditing(false);
@@ -94,7 +96,7 @@ export default function NumericInput(props: NumericInputProps) {
       const next = clamp(quantize(raw, step));
 
       setEditValue(String(next));
-      onChange(next);
+      onChange?.(next);
     }
   };
 

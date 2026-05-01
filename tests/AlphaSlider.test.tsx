@@ -36,14 +36,13 @@ describe('AlphaSlider', () => {
 
   describe('Render', () => {
     it('renders correctly', () => {
-      render(<AlphaSlider color="#ff0044" onChange={() => {}} value={0.5} />);
-      const track = screen.getByRole('slider', { name: 'Alpha' }).parentElement!;
+      render(<AlphaSlider />);
 
-      expect(track).toMatchSnapshot();
+      expect(screen.getByRole('slider', { name: 'Alpha' })).toMatchSnapshot();
     });
 
     it('exposes ARIA slider attributes with [0, 1] bounds', () => {
-      render(<AlphaSlider color="#ff0044" onChange={() => {}} value={0.35} />);
+      render(<AlphaSlider color="#ff0044" value={0.35} />);
       const slider = screen.getByRole('slider', { name: 'Alpha' });
 
       expect(slider).toHaveAttribute('aria-valuemin', '0');
@@ -155,15 +154,7 @@ describe('AlphaSlider', () => {
 
   describe('Native attribute forwarding', () => {
     it('forwards native HTML attrs to the GradientSlider root', () => {
-      render(
-        <AlphaSlider
-          color="#ff0044"
-          data-foo="bar"
-          id="custom-alpha"
-          onChange={() => {}}
-          value={0.5}
-        />,
-      );
+      render(<AlphaSlider color="#ff0044" data-foo="bar" id="custom-alpha" value={0.5} />);
       const root = screen.getByTestId('GradientSlider');
 
       expect(root).toHaveAttribute('data-foo', 'bar');
@@ -171,7 +162,7 @@ describe('AlphaSlider', () => {
     });
 
     it('honors a consumer-supplied aria-label', () => {
-      render(<AlphaSlider aria-label="Opacity" color="#ff0044" onChange={() => {}} value={0.5} />);
+      render(<AlphaSlider aria-label="Opacity" color="#ff0044" value={0.5} />);
 
       expect(screen.getByRole('slider', { name: 'Opacity' })).toBeInTheDocument();
     });
@@ -179,7 +170,7 @@ describe('AlphaSlider', () => {
 
   describe('Disabled state', () => {
     it('sets aria-disabled and tabindex -1', () => {
-      render(<AlphaSlider color="#ff0044" isDisabled onChange={() => {}} value={0.5} />);
+      render(<AlphaSlider color="#ff0044" isDisabled value={0.5} />);
       const slider = screen.getByRole('slider', { name: 'Alpha' });
 
       expect(slider).toHaveAttribute('aria-disabled', 'true');

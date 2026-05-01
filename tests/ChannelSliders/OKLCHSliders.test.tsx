@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { formatCSS, getP3MaxChroma, parseCSS } from 'colorizr';
 
 import OKLCHSliders from '~/ChannelSliders/OKLCHSliders';
+import { DEFAULT_COLOR } from '~/constants';
 import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
-
-const DEFAULT_COLOR = 'oklch(0.6 0.15 30)';
 
 function Controlled(props: {
   channels?: Parameters<typeof OKLCHSliders>[0]['channels'];
@@ -41,15 +40,13 @@ describe('OKLCHSliders', () => {
 
   describe('Render', () => {
     it('renders L, C, H sliders', () => {
-      render(<Controlled />);
+      const { container } = render(<OKLCHSliders />);
 
-      expect(screen.getByRole('slider', { name: /lightness/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /chroma/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /hue/i })).toBeInTheDocument();
+      expect(container).toMatchSnapshot();
     });
 
     it('lightness slider uses 0-1 range (not 0-100)', () => {
-      render(<Controlled />);
+      render(<OKLCHSliders />);
       const lightness = screen.getByRole('slider', { name: /lightness/i });
 
       expect(lightness).toHaveAttribute('aria-valuemin', '0');
@@ -57,7 +54,7 @@ describe('OKLCHSliders', () => {
     });
 
     it('hue slider uses 0-360 range', () => {
-      render(<Controlled />);
+      render(<OKLCHSliders />);
       const hue = screen.getByRole('slider', { name: /hue/i });
 
       expect(hue).toHaveAttribute('aria-valuemin', '0');
@@ -65,15 +62,15 @@ describe('OKLCHSliders', () => {
     });
 
     it('chroma slider uses 0-maxChroma range', () => {
-      render(<Controlled initial="oklch(0.5 0.1 180)" />);
+      render(<OKLCHSliders />);
       const chroma = screen.getByRole('slider', { name: /chroma/i });
-      const expectedMax = getP3MaxChroma({ l: 0.5, c: 0, h: 180 });
+      const expectedMax = getP3MaxChroma({ l: 0.54, c: 0.914, h: 250 });
 
       expect(Number(chroma.getAttribute('aria-valuemax'))).toBeCloseTo(expectedMax, 3);
     });
 
     it('renders default labels L, C, H', () => {
-      render(<Controlled />);
+      render(<OKLCHSliders />);
 
       expect(screen.getByText('L')).toBeInTheDocument();
       expect(screen.getByText('C')).toBeInTheDocument();
@@ -81,13 +78,13 @@ describe('OKLCHSliders', () => {
     });
 
     it('hides hue when channels.h.hidden is true', () => {
-      render(<Controlled channels={{ h: { hidden: true } }} />);
+      render(<OKLCHSliders channels={{ h: { hidden: true } }} />);
 
       expect(screen.queryByRole('slider', { name: /hue/i })).not.toBeInTheDocument();
     });
 
     it('disables chroma via channels.c.disabled', () => {
-      render(<Controlled channels={{ c: { disabled: true } }} />);
+      render(<OKLCHSliders channels={{ c: { disabled: true } }} />);
 
       expect(screen.getByRole('slider', { name: /chroma/i })).toHaveAttribute(
         'aria-disabled',
@@ -96,7 +93,7 @@ describe('OKLCHSliders', () => {
     });
 
     it('omits NumericInputs when showInputs is false', () => {
-      render(<OKLCHSliders color={DEFAULT_COLOR} onChange={mockOnChange} showInputs={false} />);
+      render(<OKLCHSliders showInputs={false} />);
 
       expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });

@@ -135,17 +135,35 @@ export interface ColorPickerLabels {
   rgbSliders?: Partial<Record<'r' | 'g' | 'b', LabelSlot>>;
   /** SettingsMenu chrome strings. */
   settingsMenu?: {
-    /** Close-button aria-label. @default 'Close settings' */
+    /**
+     * Close-button aria-label.
+     * @default 'Close settings'
+     */
     close?: string;
-    /** Display-format radio-group title. @default 'Display format' */
+    /**
+     * Display-format radio-group title.
+     * @default 'Display format'
+     */
     displayFormat?: string;
-    /** Visible Done-button text. @default 'Done' */
+    /**
+     * Visible Done-button text.
+     * @default 'Done'
+     */
     done?: string;
-    /** Output-format radio-group title. @default 'Output format' */
+    /**
+     * Output-format radio-group title.
+     * @default 'Output format'
+     */
     outputFormat?: string;
-    /** Visible heading. @default 'Settings' */
+    /**
+     * Visible heading.
+     * @default 'Settings'
+     */
     title?: string;
-    /** Trigger aria-label. @default 'Color format settings' */
+    /**
+     * Trigger aria-label.
+     * @default 'Color format settings'
+     */
     trigger?: string;
   };
 }

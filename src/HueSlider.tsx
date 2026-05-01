@@ -1,36 +1,39 @@
 import { type HTMLAttributes, ReactNode } from 'react';
+import { parseCSS } from 'colorizr';
 
 import GradientSlider from './components/GradientSlider';
-import { hslHueGradient, oklchHueGradient } from './constants';
+import { DEFAULT_COLOR, hslHueGradient, oklchHueGradient } from './constants';
 import type { ColorMode, GradientSliderClassNames } from './types';
 
+const DEFAULT_HUE = parseCSS(DEFAULT_COLOR, 'oklch').h;
+
 interface HueSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  /** Accessible label for the slider thumb.
+  /**
+   * Accessible label for the slider thumb.
    * @default 'GlobalHue'
    */
   'aria-label'?: string;
   /** Per-part className overrides forwarded to the inner `GradientSlider`. */
   classNames?: GradientSliderClassNames;
-  /**
-   * Custom CSS `background` value.
-   */
+  /** Custom CSS `background` value. */
   gradient?: string;
   /**
    * Disables pointer and keyboard interaction and dims the track.
    * @default false
    */
   isDisabled?: boolean;
-  /**
-   * Optional label rendered to the left of the track (e.g. "H").
-   */
+  /** Optional label rendered to the left of the track (e.g. "H"). */
   label?: ReactNode;
   /**
    * Active color mode. Selects the gradient: `oklchHueGradient` for OKLCH,
    * `hslHueGradient` for HSL/RGB.
+   * @default 'oklch'
    */
-  mode: ColorMode;
-  /** Called on every drag/keyboard change with the new hue in `[0, 360]`. */
-  onChange: (hue: number) => void;
+  mode?: ColorMode;
+  /**
+   * Called on every drag/keyboard change with the new hue in `[0, 360]`.
+   */
+  onChange?: (hue: number) => void;
   /**
    * Called once when an interaction ends — pointer release, or 200 ms after
    * the last keyboard step. Receives the final hue value.
@@ -42,8 +45,11 @@ interface HueSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'
    * the interaction.
    */
   onChangeStart?: (hue: number) => void;
-  /** Current hue in `[0, 360]`. */
-  value: number;
+  /**
+   * Current hue in `[0, 360]`.
+   * @default DEFAULT_COLOR's OKLCH hue (~250)
+   */
+  value?: number;
 }
 
 export default function HueSlider(props: HueSliderProps) {
@@ -53,11 +59,11 @@ export default function HueSlider(props: HueSliderProps) {
     gradient,
     isDisabled,
     label,
-    mode,
+    mode = 'oklch',
     onChange,
     onChangeEnd,
     onChangeStart,
-    value,
+    value = DEFAULT_HUE,
     ...rest
   } = props;
 

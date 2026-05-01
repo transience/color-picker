@@ -11,15 +11,20 @@ interface ModeSelectorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onClic
   classNames?: ModeSelectorClassNames;
   /** Per-mode label/aria overrides. */
   labels?: ColorPickerLabels['modeSelector'];
-  /** Currently selected mode; its button gets the active background class. */
-  mode: ColorMode;
+  /**
+   * Currently selected mode; its button gets the active background class.
+   * @default 'oklch'
+   */
+  mode?: ColorMode;
   /**
    * Modes to render as buttons, in display order.
    * @default ['oklch', 'hsl', 'rgb']
    */
   modes?: ColorMode[];
-  /** Called with the clicked mode. The caller decides whether to switch. */
-  onClick: (value: ColorMode) => void;
+  /**
+   * Called with the clicked mode. The caller decides whether to switch.
+   */
+  onClick?: (value: ColorMode) => void;
 }
 
 export default function ModeSelector(props: ModeSelectorProps) {
@@ -27,7 +32,7 @@ export default function ModeSelector(props: ModeSelectorProps) {
     className,
     classNames,
     labels,
-    mode,
+    mode = 'oklch',
     modes = ['oklch', 'hsl', 'rgb'],
     onClick,
     ...rest
@@ -50,7 +55,7 @@ export default function ModeSelector(props: ModeSelectorProps) {
             aria-label={ariaLabel}
             className={classNames?.button}
             isActive={mode === m}
-            onClick={() => onClick(m)}
+            onClick={() => onClick?.(m)}
             variant="segmented"
           >
             {visible}

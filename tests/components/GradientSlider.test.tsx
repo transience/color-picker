@@ -61,14 +61,7 @@ describe('GradientSlider', () => {
 
   describe('Render', () => {
     it('renders correctly', () => {
-      render(
-        <GradientSlider
-          aria-label="Test slider"
-          gradient={GRADIENT}
-          onChange={mockOnChange}
-          value={50}
-        />,
-      );
+      render(<GradientSlider />);
 
       expect(screen.getByTestId('GradientSlider')).toMatchSnapshot();
     });

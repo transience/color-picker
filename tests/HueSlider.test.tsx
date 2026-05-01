@@ -3,16 +3,16 @@ import { fireEvent, render, screen } from '~/test-utils';
 
 describe('HueSlider', () => {
   it('renders with GlobalHue aria-label and [0, 360] bounds', () => {
-    render(<HueSlider mode="oklch" onChange={() => {}} value={180} />);
+    render(<HueSlider />);
     const slider = screen.getByRole('slider', { name: 'GlobalHue' });
 
     expect(slider).toHaveAttribute('aria-valuemin', '0');
     expect(slider).toHaveAttribute('aria-valuemax', '360');
-    expect(slider).toHaveAttribute('aria-valuenow', '180');
+    expect(slider).toHaveAttribute('aria-valuenow', '250');
   });
 
   it('uses the OKLCH gradient when mode is oklch', () => {
-    render(<HueSlider mode="oklch" onChange={() => {}} value={180} />);
+    render(<HueSlider mode="oklch" value={180} />);
     const track = screen.getByRole('slider').parentElement!;
 
     // JSDOM keeps oklch() as-is since it doesn't recognize it as a color to normalize.
@@ -20,13 +20,13 @@ describe('HueSlider', () => {
   });
 
   it('uses a different gradient for hsl and rgb than for oklch', () => {
-    const { rerender } = render(<HueSlider mode="oklch" onChange={() => {}} value={180} />);
+    const { rerender } = render(<HueSlider mode="oklch" value={180} />);
     const oklchBackground = screen.getByRole('slider').parentElement!.style.background;
 
-    rerender(<HueSlider mode="hsl" onChange={() => {}} value={180} />);
+    rerender(<HueSlider mode="hsl" value={180} />);
     const hslBackground = screen.getByRole('slider').parentElement!.style.background;
 
-    rerender(<HueSlider mode="rgb" onChange={() => {}} value={180} />);
+    rerender(<HueSlider mode="rgb" value={180} />);
     const rgbBackground = screen.getByRole('slider').parentElement!.style.background;
 
     expect(hslBackground).not.toEqual(oklchBackground);
@@ -54,9 +54,7 @@ describe('HueSlider', () => {
   });
 
   it('forwards native HTML attrs to the GradientSlider root', () => {
-    render(
-      <HueSlider data-foo="bar" id="custom-hue" mode="oklch" onChange={() => {}} value={180} />,
-    );
+    render(<HueSlider data-foo="bar" id="custom-hue" mode="oklch" value={180} />);
     const root = screen.getByTestId('GradientSlider');
 
     expect(root).toHaveAttribute('data-foo', 'bar');
@@ -64,7 +62,7 @@ describe('HueSlider', () => {
   });
 
   it('honors a consumer-supplied aria-label', () => {
-    render(<HueSlider aria-label="Hue angle" mode="oklch" onChange={() => {}} value={180} />);
+    render(<HueSlider aria-label="Hue angle" mode="oklch" value={180} />);
 
     expect(screen.getByRole('slider', { name: 'Hue angle' })).toBeInTheDocument();
   });

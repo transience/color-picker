@@ -5,8 +5,8 @@ import { cn } from '~/modules/helpers';
 import type { ColorFormat, SettingsOption } from '~/types';
 
 interface RadioGroupProps {
-  onChange: (format: ColorFormat) => void;
-  onInteractionEnd: () => void;
+  onChange?: (format: ColorFormat) => void;
+  onInteractionEnd?: () => void;
   options: SettingsOption[];
   title: ReactNode;
   value: ColorFormat;
@@ -35,8 +35,8 @@ export default function RadioGroup(props: RadioGroupProps) {
               },
             )}
             onClick={() => {
-              onChange(option.value);
-              onInteractionEnd();
+              onChange?.(option.value);
+              onInteractionEnd?.();
             }}
             // Prevent the click from stealing focus so ancestor popovers
             // (HeroUI / React Aria) don't treat it as focus moving outside.

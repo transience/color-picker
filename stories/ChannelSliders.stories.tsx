@@ -36,7 +36,7 @@ function ChannelSlidersWrapper(props: ChannelSlidersWrapperProps) {
         color={color}
         onChange={next => {
           setColor(next);
-          onChange(next);
+          onChange?.(next);
         }}
       />
     </div>

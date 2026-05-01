@@ -12,12 +12,17 @@ import useInteractionLifecycle from '../hooks/useInteractionLifecycle';
 import { clamp, cn, quantize, relativePosition } from '../modules/helpers';
 import type { GradientSliderClassNames } from '../types';
 
+const DEFAULT_GRADIENT = 'linear-gradient(to right, black, white)';
+
 interface GradientSliderProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   'aria-label' | 'onChange'
 > {
-  /** Accessible label for the slider thumb (required for screen readers). */
-  'aria-label': string;
+  /**
+   * Accessible label for the slider thumb.
+   * @default 'Slider'
+   */
+  'aria-label'?: string;
   /** Per-part className overrides (`root`, `track`, `thumb`). */
   classNames?: GradientSliderClassNames;
   /** Content rendered to the right of the track (e.g. a `NumericInput`). */
@@ -26,8 +31,9 @@ interface GradientSliderProps extends Omit<
    * CSS `background` value painted on the track. Supports any valid `background`
    * shorthand, including layered backgrounds (comma-separated) — used by
    * `AlphaSlider` to combine a color gradient with a checkerboard tile.
+   * @default 'linear-gradient(to right, black, white)'
    */
-  gradient: string;
+  gradient?: string;
   /**
    * Disables pointer + keyboard interaction and dims the track and thumb.
    * @default false
@@ -43,8 +49,11 @@ interface GradientSliderProps extends Omit<
    * @default 0
    */
   minValue?: number;
-  /** Called with the new value on drag, click, or keyboard step. */
-  onChange: (value: number) => void;
+  /**
+   * Called with the new value on drag, click, or keyboard step.
+   * @default noop
+   */
+  onChange?: (value: number) => void;
   /**
    * Called once when an interaction ends — pointer release, or 200 ms after the
    * last keyboard step (whichever applies). Receives the final value. Use to
@@ -65,8 +74,11 @@ interface GradientSliderProps extends Omit<
    * @default 1
    */
   step?: number;
-  /** Current value as a number in `[minValue, maxValue]`. */
-  value: number;
+  /**
+   * Current value as a number in `[minValue, maxValue]`.
+   * @default 0
+   */
+  value?: number;
 }
 
 const trackClassName = cn(
@@ -85,11 +97,11 @@ const thumbPressedClassName = 'ring-1 ring-black dark:ring-white';
 
 export default function GradientSlider(props: GradientSliderProps) {
   const {
-    'aria-label': ariaLabel,
+    'aria-label': ariaLabel = 'Slider',
     className,
     classNames,
     endContent,
-    gradient,
+    gradient = DEFAULT_GRADIENT,
     isDisabled,
     maxValue = 100,
     minValue = 0,
@@ -99,7 +111,7 @@ export default function GradientSlider(props: GradientSliderProps) {
     startContent,
     step = 1,
     style,
-    value,
+    value = 0,
     ...rest
   } = props;
 
@@ -158,7 +170,7 @@ export default function GradientSlider(props: GradientSliderProps) {
       const raw = minValue + x * (maxValue - minValue);
       const next = quantize(raw, step, minValue);
 
-      onChange(clamp(next, minValue, maxValue));
+      onChange?.(clamp(next, minValue, maxValue));
     });
   };
 
@@ -217,7 +229,7 @@ export default function GradientSlider(props: GradientSliderProps) {
 
     event.preventDefault();
     lifecycle.notifyKeyboardActivity();
-    onChange(clamp(quantize(next, step), minValue, maxValue));
+    onChange?.(clamp(quantize(next, step), minValue, maxValue));
   };
 
   const handleBlur = () => {

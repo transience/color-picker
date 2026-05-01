@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { formatCSS, parseCSS } from 'colorizr';
 
 import HSLSliders from '~/ChannelSliders/HSLSliders';
+import { DEFAULT_COLOR } from '~/constants';
 import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
-
-const DEFAULT_COLOR = formatCSS(parseCSS('#ff0044', 'hsl'), { format: 'oklch' });
 
 function Controlled(props: {
   channels?: Parameters<typeof HSLSliders>[0]['channels'];
@@ -42,28 +41,26 @@ describe('HSLSliders', () => {
 
   describe('Render', () => {
     it('renders H, S, L sliders', () => {
-      render(<Controlled />);
+      const { container } = render(<HSLSliders />);
 
-      expect(screen.getByRole('slider', { name: /hue/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /saturation/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /lightness/i })).toBeInTheDocument();
+      expect(container).toMatchSnapshot();
     });
 
     it('hides hue when channels.h.hidden is true', () => {
-      render(<Controlled channels={{ h: { hidden: true } }} />);
+      render(<HSLSliders channels={{ h: { hidden: true } }} />);
 
       expect(screen.queryByRole('slider', { name: /hue/i })).not.toBeInTheDocument();
       expect(screen.getByRole('slider', { name: /saturation/i })).toBeInTheDocument();
     });
 
     it('hides saturation when channels.s.hidden is true', () => {
-      render(<Controlled channels={{ s: { hidden: true } }} />);
+      render(<HSLSliders channels={{ s: { hidden: true } }} />);
 
       expect(screen.queryByRole('slider', { name: /saturation/i })).not.toBeInTheDocument();
     });
 
     it('disables lightness when channels.l.disabled is true', () => {
-      render(<Controlled channels={{ l: { disabled: true } }} />);
+      render(<HSLSliders channels={{ l: { disabled: true } }} />);
 
       expect(screen.getByRole('slider', { name: /lightness/i })).toHaveAttribute(
         'aria-disabled',
@@ -72,7 +69,7 @@ describe('HSLSliders', () => {
     });
 
     it('renders default labels H, S, L', () => {
-      render(<Controlled />);
+      render(<HSLSliders />);
 
       expect(screen.getByText('H')).toBeInTheDocument();
       expect(screen.getByText('S')).toBeInTheDocument();
@@ -80,7 +77,7 @@ describe('HSLSliders', () => {
     });
 
     it('uses custom label when provided', () => {
-      render(<Controlled labels={{ s: { label: <span data-testid="custom-s">Sat</span> } }} />);
+      render(<HSLSliders labels={{ s: { label: <span data-testid="custom-s">Sat</span> } }} />);
 
       expect(screen.getByTestId('custom-s')).toBeInTheDocument();
     });

@@ -31,9 +31,10 @@ describe('OKLCHPanel', () => {
 
   describe('Render', () => {
     it('renders correctly', () => {
-      render(<OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />);
+      render(<OKLCHPanel />);
 
       expect(screen.getByTestId('OKLCHPanel')).toMatchSnapshot();
+      expect(canvas.spy).toHaveBeenCalled();
     });
 
     it('calls renderOKLCHCanvas on mount via getContext', () => {

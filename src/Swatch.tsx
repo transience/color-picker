@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { DEFAULT_COLOR } from './constants';
 import transparentBg from './images/transparent-bg.gif';
 import { cn } from './modules/helpers';
 import type { SwatchClassNames } from './types';
@@ -34,12 +35,21 @@ interface SwatchBaseProps {
   /**
    * CSS color rendered on top of the checkerboard. When the color has alpha
    * `< 1`, the checkerboard shows through as translucency.
+   * @default DEFAULT_COLOR
    */
-  color: string;
+  color?: string;
 }
 
 export default function Swatch(props: SwatchProps) {
-  const { as = 'span', children, className, classNames, color, style, ...rest } = props;
+  const {
+    as = 'span',
+    children,
+    className,
+    classNames,
+    color = DEFAULT_COLOR,
+    style,
+    ...rest
+  } = props;
   const Root = as as ElementType;
   const extraProps = as === 'button' ? { type: 'button' as const } : {};
 

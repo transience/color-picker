@@ -30,7 +30,7 @@ function SaturationPanelWrapper(props: SaturationPanelWrapperProps) {
       <SaturationPanel
         onChange={(s, v) => {
           setState({ s, v });
-          onChange(s, v);
+          onChange?.(s, v);
         }}
         saturation={state.s}
         value={state.v}

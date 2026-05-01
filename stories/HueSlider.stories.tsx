@@ -37,7 +37,7 @@ function HueSliderWrapper(props: HueSliderWrapperProps) {
         {...rest}
         onChange={next => {
           setValue(next);
-          onChange(next);
+          onChange?.(next);
         }}
         value={value}
       />

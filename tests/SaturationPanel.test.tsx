@@ -17,7 +17,7 @@ describe('SaturationPanel', () => {
 
   describe('Render', () => {
     it('renders correctly', () => {
-      render(<SaturationPanel hue={240} onChange={mockOnChange} saturation={0.5} value={0.5} />);
+      render(<SaturationPanel />);
 
       expect(screen.getByTestId('SaturationPanel')).toMatchSnapshot();
     });

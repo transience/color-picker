@@ -21,7 +21,7 @@ exports[`Swatch > renders correctly 1`] = `
 >
   <span
     class="flex items-center justify-center size-full"
-    style="background-color: rgb(255, 0, 68);"
+    style="background-color: oklch(0.54 0.194 250);"
   />
 </span>
 `;

@@ -36,9 +36,9 @@ function ColorInputWrapper(props: ColorInputWrapperProps) {
           setValue(next);
 
           if (onChangeFormat) {
-            onChange(`${changedValue} -> ${next}`);
+            onChange?.(`${changedValue} -> ${next}`);
           } else {
-            onChange(next);
+            onChange?.(next);
           }
         }}
         startContent={showSwatch && <Swatch color={value} />}

@@ -39,7 +39,7 @@ function ChannelInputsWrapper(props: ChannelInputsWrapperProps) {
         color={color}
         onChange={next => {
           setColor(next);
-          onChange(next);
+          onChange?.(next);
         }}
       />
     </div>
