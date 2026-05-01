@@ -3,10 +3,15 @@ interface WarningIconProps {
 }
 
 export default function WarningIcon(props: WarningIconProps) {
-  const { className = 'size-4' } = props;
-
   return (
-    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      aria-hidden="true"
+      height="1em"
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <path
         d="m14.35 3.49 8.3 14.4a2.66 2.66 0 0 1-2.36 3.97H3.71a2.66 2.66 0 0 1-2.36-3.97l8.3-14.4a2.73 2.73 0 0 1 4.7 0m-2.73 1.13-8.3 14.4c-.13.25.06.57.39.57h16.58c.33 0 .52-.32.38-.57l-8.29-14.4c-.16-.28-.6-.28-.76 0m.38 10.8a1.52 1.52 0 1 1 0 3.03 1.52 1.52 0 0 1 0-3.04m0-6.45c.63 0 1.14.5 1.14 1.13v3.04a1.14 1.14 0 0 1-2.28 0V10.1c0-.62.51-1.13 1.14-1.13"
         fill="currentColor"
