@@ -27,7 +27,7 @@ export default function RadioGroup(props: RadioGroupProps) {
           <button
             key={option.value}
             className={cn(
-              'flex items-center justify-between py-1.5 text-sm text-left leading-none',
+              'flex items-center justify-between h-6 text-sm text-left leading-none',
               'text-neutral-700 dark:text-neutral-300',
               'hover:text-neutral-900 dark:hover:text-neutral-50',
               {

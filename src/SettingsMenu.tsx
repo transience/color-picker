@@ -96,11 +96,13 @@ export default function SettingsMenu(props: SettingsMenuProps) {
     triggerRef.current?.focus();
   };
 
-  const panel = (
-    <div className={cn(PANEL_CLASSES, classNames?.menu)} data-testid="SettingsMenu">
-      <div className="flex flex-col gap-3 p-3">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold">{titleLabel}</p>
+  let header = null;
+
+  if (titleLabel || doneLabel) {
+    header = (
+      <div className="flex items-center justify-between">
+        {!!titleLabel && <p className="text-sm font-semibold">{titleLabel}</p>}
+        {!!doneLabel && (
           <button
             aria-label={closeLabel}
             className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
@@ -109,7 +111,15 @@ export default function SettingsMenu(props: SettingsMenuProps) {
           >
             {doneLabel}
           </button>
-        </div>
+        )}
+      </div>
+    );
+  }
+
+  const panel = (
+    <div className={cn(PANEL_CLASSES, classNames?.menu)} data-testid="SettingsMenu">
+      <div className="flex flex-col gap-3 p-3">
+        {header}
         <div className="flex flex-row justify-center flex-1 gap-6">
           <RadioGroup
             onChange={onChangeDisplayFormat}

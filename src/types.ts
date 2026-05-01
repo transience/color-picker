@@ -144,22 +144,22 @@ export interface ColorPickerLabels {
      * Display-format radio-group title.
      * @default 'Display format'
      */
-    displayFormat?: string;
+    displayFormat?: ReactNode;
     /**
      * Visible Done-button text.
      * @default 'Done'
      */
-    done?: string;
+    done?: ReactNode;
     /**
      * Output-format radio-group title.
      * @default 'Output format'
      */
-    outputFormat?: string;
+    outputFormat?: ReactNode;
     /**
      * Visible heading.
      * @default 'Settings'
      */
-    title?: string;
+    title?: ReactNode;
     /**
      * Trigger aria-label.
      * @default 'Color format settings'

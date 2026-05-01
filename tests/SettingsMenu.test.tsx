@@ -97,12 +97,7 @@ describe('SettingsMenu', () => {
         <button data-testid="outside" type="button">
           outside
         </button>
-        <SettingsMenu
-          displayFormat="auto"
-          onChangeDisplayFormat={() => {}}
-          onChangeOutputFormat={() => {}}
-          outputFormat="auto"
-        />
+        <SettingsMenu />
       </>,
     );
 

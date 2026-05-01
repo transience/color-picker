@@ -37,7 +37,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           Display format
         </div>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
           type="button"
         >
           <span>
@@ -49,7 +49,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -61,7 +61,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -73,7 +73,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -85,7 +85,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -97,7 +97,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -119,7 +119,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           Output format
         </div>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
           type="button"
         >
           <span>
@@ -131,7 +131,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -143,7 +143,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -155,7 +155,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -167,7 +167,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
@@ -179,7 +179,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between py-1.5 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
           type="button"
         >
           <span>
