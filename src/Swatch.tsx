@@ -20,12 +20,12 @@ type SwatchButtonProps = SwatchBaseProps & { as: 'button' } & Omit<
     'color' | 'children' | 'type'
   >;
 
-type SwatchDivProps = SwatchBaseProps & { as?: 'div' } & Omit<
-    HTMLAttributes<HTMLDivElement>,
+type SwatchProps = SwatchSpanProps | SwatchButtonProps | SwatchAnchorProps;
+
+type SwatchSpanProps = SwatchBaseProps & { as?: 'span' } & Omit<
+    HTMLAttributes<HTMLSpanElement>,
     'color' | 'children'
   >;
-
-type SwatchProps = SwatchDivProps | SwatchButtonProps | SwatchAnchorProps;
 
 interface SwatchBaseProps {
   children?: ReactNode;
@@ -39,14 +39,17 @@ interface SwatchBaseProps {
 }
 
 export default function Swatch(props: SwatchProps) {
-  const { as = 'div', children, className, classNames, color, style, ...rest } = props;
+  const { as = 'span', children, className, classNames, color, style, ...rest } = props;
   const Root = as as ElementType;
   const extraProps = as === 'button' ? { type: 'button' as const } : {};
 
   return (
     <Root
       className={cn(
-        'block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0',
+        'inline-flex shrink-0 size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600',
+        {
+          'cursor-pointer': as === 'button' || as === 'a',
+        },
         className,
         classNames?.root,
       )}
