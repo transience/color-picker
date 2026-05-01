@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '~/test-utils';
 
 describe('Swatch', () => {
   it('renders correctly', () => {
-    render(<Swatch color="#ff0044" />);
+    render(<Swatch />);
 
     expect(screen.getByTestId('Swatch')).toMatchSnapshot();
   });

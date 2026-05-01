@@ -5,7 +5,7 @@ import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
 import NumericInput from '../components/NumericInput';
-import { DEFAULT_LABELS, oklchHueGradient } from '../constants';
+import { DEFAULT_COLOR, DEFAULT_LABELS, oklchHueGradient } from '../constants';
 import type {
   ChannelsConfig,
   ColorPickerLabels,
@@ -25,13 +25,13 @@ interface OKLCHSlidersProps {
   /** Per-part className overrides forwarded to each channel's `GradientSlider`. */
   channelSliderClassNames?: GradientSliderClassNames;
   /** Current color as any CSS string parseable by `colorizr`. */
-  color: string;
+  color?: string;
   /** Per-channel label/aria overrides. Falls back to `DEFAULT_LABELS.oklchSliders`. */
   labels?: ColorPickerLabels['oklchSliders'];
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of L/C/H changes. */
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   /**
    * Called once when an interaction on any of L/C/H ends. Receives the most
    * recently emitted OKLCH CSS string (or the incoming `color` if no value
@@ -54,7 +54,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   const {
     channels,
     channelSliderClassNames,
-    color,
+    color = DEFAULT_COLOR,
     labels,
     numericInputClassNames,
     onChange,
@@ -104,7 +104,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     const oklch = formatCSS(okLCH, { format: 'oklch' });
 
     recordEmit(oklch);
-    onChange(oklch);
+    onChange?.(oklch);
   };
 
   const handleChangeLightness = (lightness: number) => {

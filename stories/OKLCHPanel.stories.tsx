@@ -33,7 +33,7 @@ function OKLCHPanelWrapper(props: OKLCHPanelWrapperProps) {
         lightness={state.l}
         onChange={(l, c) => {
           setState({ l, c });
-          onChange(l, c);
+          onChange?.(l, c);
         }}
         {...rest}
       />
@@ -90,7 +90,7 @@ export const ClickStaysInGamut: Story = {
 
     const mock = args.onChange as unknown as { mock: { calls: Array<[number, number]> } };
     const [l, c] = mock.mock.calls[mock.mock.calls.length - 1];
-    const maxC = getP3MaxChroma({ l, c: 0, h: args.hue });
+    const maxC = getP3MaxChroma({ l, c: 0, h: args.hue! });
 
     // Invariant: panel must never emit chroma above the P3 ceiling at this
     // (l, h). This is the contract pointerToLC's clamp is supposed to uphold.

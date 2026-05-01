@@ -18,10 +18,10 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
         aria-label="Hue"
         aria-valuemax="359.9"
         aria-valuemin="0"
-        aria-valuenow="201"
+        aria-valuenow="209.59"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(55.8488% - 11.1697693803834px);"
+        style="left: calc(58.2356% - 11.647124201167px);"
         tabindex="0"
       />
     </div>
@@ -33,7 +33,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
         aria-label="Hue"
         class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
         type="text"
-        value="201"
+        value="210"
       />
       <span
         class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
@@ -49,7 +49,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
     S
     <div
       class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, rgb(110, 110, 110), rgb(0, 143, 220)); touch-action: none;"
+      style="background: linear-gradient(to right, rgb(109, 109, 109), rgb(0, 110, 217)); touch-action: none;"
     >
       <div
         aria-label="Saturation"
@@ -86,16 +86,16 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
     L
     <div
       class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 166, 255), rgb(255, 255, 255)); touch-action: none;"
+      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 129, 255), rgb(255, 255, 255)); touch-action: none;"
     >
       <div
         aria-label="Lightness"
         aria-valuemax="100"
         aria-valuemin="0"
-        aria-valuenow="43.14"
+        aria-valuenow="42.55"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(43.14% - 8.628px);"
+        style="left: calc(42.55% - 8.51px);"
         tabindex="0"
       />
     </div>
@@ -131,16 +131,16 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
     L
     <div
       class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, oklch(0 0.16 241), oklch(0.62 0.16 241), oklch(1 0.16 241)); touch-action: none;"
+      style="background: linear-gradient(to right, oklch(0 0.194 250), oklch(0.54 0.194 250), oklch(1 0.194 250)); touch-action: none;"
     >
       <div
         aria-label="Lightness"
         aria-valuemax="1"
         aria-valuemin="0"
-        aria-valuenow="0.62"
+        aria-valuenow="0.54"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(62% - 12.4px);"
+        style="left: calc(54% - 10.8px);"
         tabindex="0"
       />
     </div>
@@ -152,7 +152,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
         aria-label="Lightness"
         class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
         type="text"
-        value="62.0"
+        value="54.0"
       />
       <span
         class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
@@ -168,16 +168,16 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
     C
     <div
       class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, oklch(0.62 0 241), oklch(0.62 0.1886 241)); touch-action: none;"
+      style="background: linear-gradient(to right, oklch(0.54 0 250), oklch(0.54 0.19733 250)); touch-action: none;"
     >
       <div
         aria-label="Chroma"
-        aria-valuemax="0.1886"
+        aria-valuemax="0.19733"
         aria-valuemin="0"
-        aria-valuenow="0.16"
+        aria-valuenow="0.194"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(84.8356% - 16.9671261930011px);"
+        style="left: calc(98.3125% - 19.6624942988902px);"
         tabindex="0"
       />
     </div>
@@ -189,7 +189,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
         aria-label="Chroma"
         class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
         type="text"
-        value="0.160"
+        value="0.194"
       />
       <span
         class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
@@ -212,10 +212,10 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
         aria-label="Hue"
         aria-valuemax="360"
         aria-valuemin="0"
-        aria-valuenow="241"
+        aria-valuenow="250"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(66.9444% - 13.3888888888889px);"
+        style="left: calc(69.4444% - 13.8888888888889px);"
         tabindex="0"
       />
     </div>
@@ -227,7 +227,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
         aria-label="Hue"
         class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
         type="text"
-        value="241.0"
+        value="250.0"
       />
       <span
         class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
@@ -295,10 +295,10 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
         aria-label="Green"
         aria-valuemax="255"
         aria-valuemin="0"
-        aria-valuenow="143"
+        aria-valuenow="110"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(56.0784% - 11.2156862745098px);"
+        style="left: calc(43.1373% - 8.6274509803922px);"
         tabindex="0"
       />
     </div>
@@ -310,7 +310,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
         aria-label="Green"
         class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
         type="text"
-        value="143"
+        value="110"
       />
       <span
         class="w-2 text-xs text-neutral-500 dark:text-neutral-400"
@@ -333,10 +333,10 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
         aria-label="Blue"
         aria-valuemax="255"
         aria-valuemin="0"
-        aria-valuenow="220"
+        aria-valuenow="217"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(86.2745% - 17.2549019607843px);"
+        style="left: calc(85.098% - 17.0196078431373px);"
         tabindex="0"
       />
     </div>
@@ -348,7 +348,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
         aria-label="Blue"
         class="w-11 bg-black/10 dark:bg-white/10 text-right text-sm text-black/75 dark:text-white/75 outline-none focus:ring-1 focus:ring-black/20 dark:focus:ring-white/20 rounded px-0.5"
         type="text"
-        value="220"
+        value="217"
       />
       <span
         class="w-2 text-xs text-neutral-500 dark:text-neutral-400"

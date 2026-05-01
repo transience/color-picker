@@ -15,15 +15,7 @@ function getGroup(title: 'Display format' | 'Output format'): HTMLElement {
 }
 
 function renderMenu(props: Partial<Props> = {}) {
-  return render(
-    <SettingsMenu
-      displayFormat="auto"
-      onChangeDisplayFormat={() => {}}
-      onChangeOutputFormat={() => {}}
-      outputFormat="auto"
-      {...props}
-    />,
-  );
+  return render(<SettingsMenu {...props} />);
 }
 
 describe('SettingsMenu', () => {

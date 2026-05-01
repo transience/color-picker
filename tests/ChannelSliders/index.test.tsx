@@ -16,11 +16,8 @@ afterAll(() => {
   globalThis.requestAnimationFrame = originalRAF;
 });
 
-const TEST_OKLCH = 'oklch(0.62 0.16 241)';
-
 function createDefaultProps(overrides: Partial<Parameters<typeof ChannelSliders>[0]> = {}) {
   return {
-    color: TEST_OKLCH,
     mode: 'hsl' as const,
     onChange: mockOnChange,
     ...overrides,

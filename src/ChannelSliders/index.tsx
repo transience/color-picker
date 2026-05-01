@@ -2,6 +2,7 @@ import { type HTMLAttributes } from 'react';
 
 import { cn } from '~/modules/helpers';
 
+import { DEFAULT_COLOR } from '../constants';
 import useInteractionAttribute from '../hooks/useInteractionAttribute';
 import type {
   ChannelsConfig,
@@ -25,19 +26,27 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
   channelSliderClassNames?: GradientSliderClassNames;
   /** Extra classes appended to the wrapper that stacks the three sliders. */
   className?: string;
-  /** Current color as any CSS string parseable by `colorizr`. */
-  color: string;
+  /**
+   * Current color as any CSS string parseable by `colorizr`.
+   * @default DEFAULT_COLOR
+   */
+  color?: string;
   /**
    * Per-mode label/aria overrides. Only the slot matching the active `mode`
    * is forwarded (`rgbSliders` / `hslSliders` / `oklchSliders`).
    */
   labels?: Pick<ColorPickerLabels, 'hslSliders' | 'oklchSliders' | 'rgbSliders'>;
-  /** Active color mode; selects which slider set renders (RGB / HSL / OKLCH). */
-  mode: ColorMode;
+  /**
+   * Active color mode; selects which slider set renders (RGB / HSL / OKLCH).
+   * @default 'oklch'
+   */
+  mode?: ColorMode;
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
-  /** Called with an OKLCH CSS string whenever a slider changes. */
-  onChange: (value: string) => void;
+  /**
+   * Called with an OKLCH CSS string whenever a slider changes.
+   */
+  onChange?: (value: string) => void;
   /**
    * Called once when an interaction on any channel slider ends. Receives the
    * most recently emitted OKLCH CSS string.
@@ -61,9 +70,9 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     channels,
     channelSliderClassNames,
     className,
-    color,
+    color = DEFAULT_COLOR,
     labels,
-    mode,
+    mode = 'oklch',
     numericInputClassNames,
     onChange,
     onChangeEnd,

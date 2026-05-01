@@ -90,7 +90,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
     "lint": "eslint --fix .",
-    "typecheck": "tsc",
+    "typecheck": "tsc && tsc -p tests/tsconfig.json && tsc -p stories/tsconfig.json",
     "typevalidation": "attw -P",
     "format": "prettier \"**/*.{css,graphql,js,json,jsx,less,md,mdx,scss,ts,tsx,yaml,yml}\" --write",
     "size": "size-limit",

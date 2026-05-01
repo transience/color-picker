@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { formatCSS, parseCSS } from 'colorizr';
 
 import RGBSliders from '~/ChannelSliders/RGBSliders';
+import { DEFAULT_COLOR } from '~/constants';
 import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
-
-const DEFAULT_COLOR = formatCSS(parseCSS('#ff0044', 'rgb'), { format: 'oklch' });
 
 function Controlled(props: { channels?: Parameters<typeof RGBSliders>[0]['channels'] }) {
   const [color, setColor] = useState(DEFAULT_COLOR);
@@ -38,15 +37,13 @@ describe('RGBSliders', () => {
 
   describe('Render', () => {
     it('renders R, G, B sliders', () => {
-      render(<Controlled />);
+      const { container } = render(<RGBSliders />);
 
-      expect(screen.getByRole('slider', { name: /red/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /green/i })).toBeInTheDocument();
-      expect(screen.getByRole('slider', { name: /blue/i })).toBeInTheDocument();
+      expect(container).toMatchSnapshot();
     });
 
     it('exposes 0-255 range on every slider', () => {
-      render(<Controlled />);
+      render(<RGBSliders />);
 
       for (const name of [/red/i, /green/i, /blue/i]) {
         const slider = screen.getByRole('slider', { name });
@@ -57,7 +54,7 @@ describe('RGBSliders', () => {
     });
 
     it('renders default labels R, G, B', () => {
-      render(<Controlled />);
+      render(<RGBSliders />);
 
       expect(screen.getByText('R')).toBeInTheDocument();
       expect(screen.getByText('G')).toBeInTheDocument();
@@ -65,13 +62,13 @@ describe('RGBSliders', () => {
     });
 
     it('hides a channel via channels.r.hidden', () => {
-      render(<Controlled channels={{ r: { hidden: true } }} />);
+      render(<RGBSliders channels={{ r: { hidden: true } }} />);
 
       expect(screen.queryByRole('slider', { name: /red/i })).not.toBeInTheDocument();
     });
 
     it('disables a channel via channels.g.disabled', () => {
-      render(<Controlled channels={{ g: { disabled: true } }} />);
+      render(<RGBSliders channels={{ g: { disabled: true } }} />);
 
       expect(screen.getByRole('slider', { name: /green/i })).toHaveAttribute(
         'aria-disabled',
@@ -80,7 +77,7 @@ describe('RGBSliders', () => {
     });
 
     it('omits NumericInputs when showInputs is false', () => {
-      render(<RGBSliders color={DEFAULT_COLOR} onChange={mockOnChange} showInputs={false} />);
+      render(<RGBSliders showInputs={false} />);
 
       expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });

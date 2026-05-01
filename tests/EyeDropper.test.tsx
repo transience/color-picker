@@ -29,7 +29,7 @@ describe('EyeDropper', () => {
   it('returns null when the EyeDropper API is not available', () => {
     setEyeDropper(undefined);
 
-    render(<EyeDropper onChange={() => {}} />);
+    render(<EyeDropper />);
 
     expect(screen.queryByTestId('EyeDropper')).not.toBeInTheDocument();
   });
@@ -37,7 +37,7 @@ describe('EyeDropper', () => {
   it('renders a button when the EyeDropper API is available', () => {
     setEyeDropper(makeResolving('#112233'));
 
-    render(<EyeDropper onChange={() => {}} />);
+    render(<EyeDropper />);
 
     expect(screen.getByTestId('EyeDropper')).toMatchSnapshot();
   });
@@ -81,7 +81,7 @@ describe('EyeDropper', () => {
   it('forwards native HTML attrs to the trigger button', () => {
     setEyeDropper(makeResolving('#000000'));
 
-    render(<EyeDropper data-foo="bar" id="custom-eyedropper" onChange={() => {}} />);
+    render(<EyeDropper data-foo="bar" id="custom-eyedropper" />);
     const button = screen.getByTestId('EyeDropper');
 
     expect(button).toHaveAttribute('data-foo', 'bar');

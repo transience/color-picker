@@ -17,7 +17,7 @@ interface EyeDropperProps extends Omit<
    * Called with the picked color as an `sRGB` hex string (e.g. `#aabbcc`) when
    * the user selects a color. Not called if the user dismisses the picker.
    */
-  onChange: (color: string) => void;
+  onChange?: (color: string) => void;
 }
 
 interface EyeDropperWindow {
@@ -43,7 +43,7 @@ export default function EyeDropper(props: EyeDropperProps) {
     try {
       const result = await dropper.open();
 
-      onChange(result.sRGBHex);
+      onChange?.(result.sRGBHex);
     } catch {
       // User dismissed the picker — no-op.
     }

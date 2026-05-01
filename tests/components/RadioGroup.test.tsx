@@ -12,15 +12,7 @@ const OPTIONS: SettingsOption[] = [
 
 describe('RadioGroup', () => {
   it('renders the title and one button per option', () => {
-    render(
-      <RadioGroup
-        onChange={() => {}}
-        onInteractionEnd={() => {}}
-        options={OPTIONS}
-        title="Format"
-        value="auto"
-      />,
-    );
+    render(<RadioGroup options={OPTIONS} title="Format" value="auto" />);
 
     expect(screen.getByTestId('RadioGroup')).toMatchSnapshot();
   });
@@ -28,15 +20,7 @@ describe('RadioGroup', () => {
   it('fires onChange with the selected option value on click', () => {
     const onChange = vi.fn();
 
-    render(
-      <RadioGroup
-        onChange={onChange}
-        onInteractionEnd={() => {}}
-        options={OPTIONS}
-        title="Format"
-        value="auto"
-      />,
-    );
+    render(<RadioGroup onChange={onChange} options={OPTIONS} title="Format" value="auto" />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Hex' }));
 
@@ -62,15 +46,7 @@ describe('RadioGroup', () => {
   });
 
   it('prevents the mousedown default to keep focus on the current element', () => {
-    render(
-      <RadioGroup
-        onChange={() => {}}
-        onInteractionEnd={() => {}}
-        options={OPTIONS}
-        title="Format"
-        value="auto"
-      />,
-    );
+    render(<RadioGroup options={OPTIONS} title="Format" value="auto" />);
 
     const button = screen.getByRole('button', { name: 'Hex' });
     const event = fireEvent.mouseDown(button);
@@ -80,15 +56,7 @@ describe('RadioGroup', () => {
   });
 
   it('visually distinguishes the selected option from the others', () => {
-    render(
-      <RadioGroup
-        onChange={() => {}}
-        onInteractionEnd={() => {}}
-        options={OPTIONS}
-        title="Format"
-        value="hex"
-      />,
-    );
+    render(<RadioGroup options={OPTIONS} title="Format" value="hex" />);
 
     const selected = screen.getByRole('button', { name: 'Hex' });
     const unselected = screen.getByRole('button', { name: 'Auto' });

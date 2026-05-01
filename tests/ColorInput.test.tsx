@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import ColorInput from '~/ColorInput';
+import { DEFAULT_COLOR } from '~/constants';
 import { fireEvent, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
@@ -41,8 +42,8 @@ describe('ColorInput', () => {
   });
 
   describe('Render', () => {
-    it('renders the controlled value', () => {
-      render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
+    it('renders correctly', () => {
+      render(<ColorInput />);
 
       expect(screen.getByTestId('ColorInput')).toMatchSnapshot();
     });
@@ -52,7 +53,6 @@ describe('ColorInput', () => {
         <ColorInput
           onChange={mockOnChange}
           startContent={<span data-testid="color-swatch">C</span>}
-          value="#ff0044"
         />,
       );
 
@@ -61,11 +61,7 @@ describe('ColorInput', () => {
 
     it('renders endContent next to the input', () => {
       render(
-        <ColorInput
-          endContent={<span data-testid="gamut-icon">!</span>}
-          onChange={mockOnChange}
-          value="#ff0044"
-        />,
+        <ColorInput endContent={<span data-testid="gamut-icon">!</span>} onChange={mockOnChange} />,
       );
 
       expect(screen.getByTestId('ColorInput')).toMatchSnapshot();
@@ -74,7 +70,7 @@ describe('ColorInput', () => {
 
   describe('Edit mode', () => {
     it('enters edit mode on focus', () => {
-      render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
+      render(<ColorInput onChange={mockOnChange} />);
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
@@ -85,14 +81,14 @@ describe('ColorInput', () => {
     });
 
     it('reverts to controlled value on blur', () => {
-      render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
+      render(<ColorInput onChange={mockOnChange} />);
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: 'garbage' } });
       fireEvent.blur(input);
 
-      expect(screen.getByDisplayValue('#ff0044')).toBeInTheDocument();
+      expect(screen.getByDisplayValue(DEFAULT_COLOR)).toBeInTheDocument();
     });
   });
 
@@ -306,7 +302,7 @@ describe('ColorInput', () => {
 
   describe('Invalid input', () => {
     it('does not emit for garbage strings', () => {
-      render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
+      render(<ColorInput onChange={mockOnChange} />);
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
@@ -316,7 +312,7 @@ describe('ColorInput', () => {
     });
 
     it('does not emit when blurring with garbage (display-only revert)', () => {
-      render(<ColorInput onChange={mockOnChange} value="#ff0044" />);
+      render(<ColorInput onChange={mockOnChange} />);
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
@@ -324,7 +320,7 @@ describe('ColorInput', () => {
       fireEvent.blur(input);
 
       expect(mockOnChange).not.toHaveBeenCalled();
-      expect(screen.getByDisplayValue('#ff0044')).toBeInTheDocument();
+      expect(screen.getByDisplayValue(DEFAULT_COLOR)).toBeInTheDocument();
     });
 
     it('trims whitespace before validating', () => {

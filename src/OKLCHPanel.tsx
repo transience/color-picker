@@ -7,8 +7,9 @@ import {
   useRef,
   useState,
 } from 'react';
+import { parseCSS } from 'colorizr';
 
-import { panelClasses } from './constants';
+import { DEFAULT_COLOR, panelClasses } from './constants';
 import useInteractionLifecycle from './hooks/useInteractionLifecycle';
 import { clamp, cn, relativePosition } from './modules/helpers';
 import {
@@ -23,20 +24,31 @@ import type { PanelClassNames } from './types';
 const CANVAS_WIDTH = 256;
 const CANVAS_HEIGHT = 128;
 
+const DEFAULTS = parseCSS(DEFAULT_COLOR, 'oklch');
+
 interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  /** OKLCH chroma as an absolute value (typical sRGB range: `[0, ~0.4]`). */
-  chroma: number;
+  /**
+   * OKLCH chroma as an absolute value (typical sRGB range: `[0, ~0.4]`).
+   * @default DEFAULT_COLOR's OKLCH chroma
+   */
+  chroma?: number;
   /** Per-part className overrides (`root`, `thumb`). */
   classNames?: PanelClassNames;
-  /** OKLCH hue in degrees `[0, 360)`. Drives the rendered panel's color space. */
-  hue: number;
-  /** OKLCH lightness as a float in `[0, 1]`. */
-  lightness: number;
+  /**
+   * OKLCH hue in degrees `[0, 360)`. Drives the rendered panel's color space.
+   * @default DEFAULT_COLOR's OKLCH hue
+   */
+  hue?: number;
+  /**
+   * OKLCH lightness as a float in `[0, 1]`.
+   * @default DEFAULT_COLOR's OKLCH lightness
+   */
+  lightness?: number;
   /**
    * Called during drag with the new lightness (float `[0, 1]`) and chroma
    * (absolute value, clamped to the P3 gamut for the current hue).
    */
-  onChange: (l: number, c: number) => void;
+  onChange?: (l: number, c: number) => void;
   /**
    * Called once when an interaction ends (pointer release). Receives the
    * current lightness and chroma.
@@ -51,11 +63,11 @@ interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
 
 export default function OKLCHPanel(props: OKLCHPanelProps) {
   const {
-    chroma,
+    chroma = DEFAULTS.c,
     className,
     classNames,
-    hue,
-    lightness,
+    hue = DEFAULTS.h,
+    lightness = DEFAULTS.l,
     onChange,
     onChangeEnd,
     onChangeStart,
@@ -140,7 +152,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
 
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
-      onChange(clamp(l, 0, 1), Math.max(0, c));
+      onChange?.(clamp(l, 0, 1), Math.max(0, c));
     });
   };
 

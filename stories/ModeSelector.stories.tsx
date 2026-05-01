@@ -24,7 +24,7 @@ export default {
 
 function ModeSelectorWrapper(props: ModeSelectorWrapperProps) {
   const { mode: initial, onClick, ...rest } = props;
-  const [mode, setMode] = useState<ColorMode>(initial);
+  const [mode, setMode] = useState<ColorMode | undefined>(initial);
 
   return (
     <ModeSelector
@@ -32,7 +32,7 @@ function ModeSelectorWrapper(props: ModeSelectorWrapperProps) {
       mode={mode}
       onClick={next => {
         setMode(next);
-        onClick(next);
+        onClick?.(next);
       }}
     />
   );

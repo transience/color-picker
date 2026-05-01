@@ -4,7 +4,7 @@ import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } fro
 import { cn, resolveLabel } from '~/modules/helpers';
 
 import NumericInput from './components/NumericInput';
-import { DEFAULT_LABELS } from './constants';
+import { DEFAULT_COLOR, DEFAULT_LABELS } from './constants';
 import type {
   ChannelInputsClassNames,
   ColorMode,
@@ -15,15 +15,19 @@ import type {
 type ChannelInputKey = 'a' | 'b' | 'c' | 'g' | 'h' | 'l' | 'r' | 's';
 
 interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'onChange'> {
-  /** Current alpha value as a float in `[0, 1]`. Rendered as the 4th input when `showAlpha` is on. */
-  alpha: number;
+  /**
+   * Current alpha value as a float in `[0, 1]`. Rendered as the 4th input when `showAlpha` is on.
+   * @default 1
+   */
+  alpha?: number;
   /** Per-part className overrides. */
   classNames?: ChannelInputsClassNames;
   /**
    * Current color as a CSS string (any format parseable by `colorizr`). The
    * component derives the per-channel values for the active `mode` from it.
+   * @default DEFAULT_COLOR
    */
-  color: string;
+  color?: string;
   /**
    * Per-channel label/aria overrides for this input row.
    *
@@ -31,14 +35,22 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
    * to the corresponding `DEFAULT_LABELS.channelInputs` entry.
    */
   labels?: ColorPickerLabels['channelInputs'];
-  /** Active color mode; selects which three channels are rendered (RGB / HSL / OKLCH). */
-  mode: ColorMode;
+  /**
+   * Active color mode; selects which three channels are rendered (RGB / HSL / OKLCH).
+   * @default 'oklch'
+   */
+  mode?: ColorMode;
   /** Per-part className overrides forwarded to each `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
-  /** Called with an OKLCH CSS string whenever a channel value changes. */
-  onChange: (value: string) => void;
-  /** Called with the new alpha in `[0, 1]` when the alpha input changes. */
-  onChangeAlpha: (alpha: number) => void;
+  /**
+   * Called with an OKLCH CSS string whenever a channel value changes.
+   */
+  onChange?: (value: string) => void;
+  /**
+   * Called with the new alpha in `[0, 1]` when the alpha input changes.
+   * @default noop
+   */
+  onChangeAlpha?: (alpha: number) => void;
   /**
    * Adds a 4th input labelled `A` for the alpha channel, stepped `0.01`.
    * @default false
@@ -60,12 +72,12 @@ interface FieldDefinition {
 
 export default function ChannelInputs(props: ChannelInputsProps) {
   const {
-    alpha,
+    alpha = 1,
     className,
     classNames,
-    color,
+    color = DEFAULT_COLOR,
     labels,
-    mode,
+    mode = 'oklch',
     numericInputClassNames,
     onChange,
     onChangeAlpha,
@@ -94,7 +106,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
   const fields = useMemo<FieldDefinition[]>(() => {
     if (mode === 'rgb') {
       const rgb = parseCSS(color, 'rgb');
-      const emit = (next: RGB) => onChange(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: RGB) => onChange?.(formatCSS(next, { format: 'oklch' }));
 
       return [
         {
@@ -127,7 +139,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     if (mode === 'oklch') {
       const lch = parseCSS(color, 'oklch');
       const maxC = getP3MaxChroma({ l: lch.l, c: 0, h: lch.h });
-      const emit = (next: LCH) => onChange(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: LCH) => onChange?.(formatCSS(next, { format: 'oklch' }));
 
       return [
         {
@@ -163,7 +175,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     }
 
     const hsl = parseCSS(color, 'hsl');
-    const emit = (next: HSL) => onChange(formatCSS(next, { format: 'oklch' }));
+    const emit = (next: HSL) => onChange?.(formatCSS(next, { format: 'oklch' }));
 
     return [
       {

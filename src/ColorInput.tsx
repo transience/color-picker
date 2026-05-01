@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { isValidColor } from 'colorizr';
 
-import { DEFAULT_LABELS } from './constants';
+import { DEFAULT_COLOR, DEFAULT_LABELS } from './constants';
 import { cn } from './modules/helpers';
 import type { ColorInputClassNames } from './types';
 
@@ -25,16 +25,18 @@ interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
   /**
    * Called with the typed value each time it becomes a valid CSS color.
    * Bare hex strings (e.g. `ff0044`) are auto-prefixed with `#` before emit.
-   * Incomplete hex input is held until valid — no partial emissions.
+   *
+   * Invalid input is held until valid — no partial emissions.
    */
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   /** Content rendered at the left edge of the input. */
   startContent?: ReactNode;
   /**
    * Displayed color string when the input is not focused. The caller supplies
    * this in its preferred format (hex, `oklch(...)`, etc.).
+   * @default DEFAULT_COLOR
    */
-  value: string;
+  value?: string;
 }
 
 export default function ColorInput(props: ColorInputProps) {
@@ -45,7 +47,7 @@ export default function ColorInput(props: ColorInputProps) {
     endContent,
     onChange,
     startContent,
-    value,
+    value = DEFAULT_COLOR,
     ...rest
   } = props;
   const [editValue, setEditValue] = useState('');
@@ -94,7 +96,7 @@ export default function ColorInput(props: ColorInputProps) {
       const prefixed = `#${trimmed}`;
 
       setEditValue(prefixed);
-      onChange(prefixed);
+      onChange?.(prefixed);
 
       return;
     }
@@ -107,7 +109,7 @@ export default function ColorInput(props: ColorInputProps) {
     }
 
     if (isValidColor(trimmed)) {
-      onChange(trimmed);
+      onChange?.(trimmed);
     } else {
       pendingSyncRef.current = false;
     }

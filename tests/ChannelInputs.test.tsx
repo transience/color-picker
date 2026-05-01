@@ -6,57 +6,25 @@ import { fireEvent, render, screen } from '~/test-utils';
 describe('ChannelInputs', () => {
   describe('Render', () => {
     it('renders correctly in HSL mode', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="hsl(180 50% 40%)"
-          mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs mode="hsl" />);
 
       expect(screen.getByTestId('ChannelInputs')).toMatchSnapshot();
     });
 
     it('renders correctly in RGB mode', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="rgb(100 150 200)"
-          mode="rgb"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs mode="rgb" />);
 
       expect(screen.getByTestId('ChannelInputs')).toMatchSnapshot();
     });
 
     it('renders correctly in OKLCH mode', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="oklch(0.5 0.12 120)"
-          mode="oklch"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs mode="oklch" />);
 
       expect(screen.getByTestId('ChannelInputs')).toMatchSnapshot();
     });
 
     it('displays rounded HSL values', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="hsl(180 50% 40%)"
-          mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={1} color="hsl(180 50% 40%)" mode="hsl" />);
 
       expect(screen.getByDisplayValue('180')).toBeInTheDocument();
       expect(screen.getByDisplayValue('50')).toBeInTheDocument();
@@ -64,15 +32,7 @@ describe('ChannelInputs', () => {
     });
 
     it('displays rounded RGB values', () => {
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="rgb(100 150 200)"
-          mode="rgb"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={1} color="rgb(100 150 200)" mode="rgb" />);
 
       expect(screen.getByDisplayValue('100')).toBeInTheDocument();
       expect(screen.getByDisplayValue('150')).toBeInTheDocument();
@@ -80,47 +40,21 @@ describe('ChannelInputs', () => {
     });
 
     it('does not render an alpha input by default', () => {
-      render(
-        <ChannelInputs
-          alpha={0.5}
-          color="#ff0044"
-          mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={0.5} color="#ff0044" mode="hsl" />);
 
       expect(screen.getAllByRole('textbox')).toHaveLength(3);
       expect(screen.queryByText('A')).not.toBeInTheDocument();
     });
 
     it('adds a 4th alpha input labelled A when showAlpha is true', () => {
-      render(
-        <ChannelInputs
-          alpha={0.5}
-          color="#ff0044"
-          mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-          showAlpha
-        />,
-      );
+      render(<ChannelInputs alpha={0.5} color="#ff0044" mode="hsl" showAlpha />);
 
       expect(screen.getAllByRole('textbox')).toHaveLength(4);
       expect(screen.getByText('A')).toBeInTheDocument();
     });
 
     it('displays alpha with 2-decimal precision', () => {
-      render(
-        <ChannelInputs
-          alpha={0.5}
-          color="#ff0044"
-          mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
-          showAlpha
-        />,
-      );
+      render(<ChannelInputs alpha={0.5} color="#ff0044" mode="hsl" showAlpha />);
 
       expect(screen.getByDisplayValue('0.50')).toBeInTheDocument();
     });
@@ -136,8 +70,6 @@ describe('ChannelInputs', () => {
             l: { label: 'Lum' },
           }}
           mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
         />,
       );
 
@@ -164,15 +96,7 @@ describe('ChannelInputs', () => {
       (mode, color, index, typed) => {
         const onChange = vi.fn();
 
-        render(
-          <ChannelInputs
-            alpha={1}
-            color={color}
-            mode={mode}
-            onChange={onChange}
-            onChangeAlpha={() => {}}
-          />,
-        );
+        render(<ChannelInputs alpha={1} color={color} mode={mode} onChange={onChange} />);
 
         const input = screen.getAllByRole('textbox')[index];
 
@@ -190,15 +114,7 @@ describe('ChannelInputs', () => {
       const startRgb = parseCSS(startColor, 'rgb');
       const expected = formatCSS({ ...startRgb, r: 200 }, { format: 'oklch' });
 
-      render(
-        <ChannelInputs
-          alpha={1}
-          color={startColor}
-          mode="rgb"
-          onChange={onChange}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={1} color={startColor} mode="rgb" onChange={onChange} />);
 
       const rInput = screen.getAllByRole('textbox')[0];
 
@@ -214,15 +130,7 @@ describe('ChannelInputs', () => {
       const startHsl = parseCSS(startColor, 'hsl');
       const expected = formatCSS({ ...startHsl, h: 180 }, { format: 'oklch' });
 
-      render(
-        <ChannelInputs
-          alpha={1}
-          color={startColor}
-          mode="hsl"
-          onChange={onChange}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={1} color={startColor} mode="hsl" onChange={onChange} />);
 
       const hInput = screen.getAllByRole('textbox')[0];
 
@@ -238,15 +146,7 @@ describe('ChannelInputs', () => {
       const startLch = parseCSS(startColor, 'oklch');
       const expected = formatCSS({ ...startLch, l: 0.75 }, { format: 'oklch' });
 
-      render(
-        <ChannelInputs
-          alpha={1}
-          color={startColor}
-          mode="oklch"
-          onChange={onChange}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={1} color={startColor} mode="oklch" onChange={onChange} />);
 
       const lInput = screen.getAllByRole('textbox')[0];
 
@@ -264,7 +164,6 @@ describe('ChannelInputs', () => {
           alpha={1}
           color="#ff0044"
           mode="hsl"
-          onChange={() => {}}
           onChangeAlpha={onChangeAlpha}
           showAlpha
         />,
@@ -286,7 +185,6 @@ describe('ChannelInputs', () => {
           alpha={0.5}
           color="#ff0044"
           mode="hsl"
-          onChange={() => {}}
           onChangeAlpha={onChangeAlpha}
           showAlpha
         />,
@@ -303,15 +201,7 @@ describe('ChannelInputs', () => {
     it('filters non-numeric characters instead of emitting', () => {
       const onChange = vi.fn();
 
-      render(
-        <ChannelInputs
-          alpha={1}
-          color="hsl(0 100% 50%)"
-          mode="hsl"
-          onChange={onChange}
-          onChangeAlpha={() => {}}
-        />,
-      );
+      render(<ChannelInputs alpha={1} color="hsl(0 100% 50%)" mode="hsl" onChange={onChange} />);
 
       const hueInput = screen.getAllByRole('textbox')[0];
 
@@ -330,8 +220,6 @@ describe('ChannelInputs', () => {
           classNames={{ root: 'extra-wrapper' }}
           color="#ff0044"
           mode="hsl"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
         />,
       );
 
@@ -345,8 +233,6 @@ describe('ChannelInputs', () => {
           color="#ff0044"
           mode="hsl"
           numericInputClassNames={{ input: 'custom-numeric-input' }}
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
           showAlpha
         />,
       );
@@ -370,8 +256,6 @@ describe('ChannelInputs', () => {
           data-foo="bar"
           id="custom-channels"
           mode="oklch"
-          onChange={() => {}}
-          onChangeAlpha={() => {}}
         />,
       );
       const root = screen.getByTestId('ChannelInputs');

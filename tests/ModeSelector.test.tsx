@@ -9,7 +9,7 @@ describe('ModeSelector', () => {
   });
 
   it('renders all modes by default', () => {
-    render(<ModeSelector mode="hsl" onClick={mockOnClick} />);
+    render(<ModeSelector />);
 
     expect(screen.getByTestId('ModeSelector')).toMatchSnapshot();
   });

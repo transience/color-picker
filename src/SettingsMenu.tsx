@@ -18,16 +18,26 @@ import type {
 interface SettingsMenuProps {
   /** Per-part className overrides (`trigger` = button, `menu` = popover panel). */
   classNames?: SettingsMenuClassNames;
-  /** Current display format selection. */
-  displayFormat: ColorFormat;
+  /**
+   * Current display format selection.
+   * @default 'auto'
+   */
+  displayFormat?: ColorFormat;
   /** Label/aria overrides. */
   labels?: ColorPickerLabels['settingsMenu'];
-  /** Fired when the user picks a new display format in the menu. */
-  onChangeDisplayFormat: (format: ColorFormat) => void;
-  /** Fired when the user picks a new output format in the menu. */
-  onChangeOutputFormat: (format: ColorFormat) => void;
-  /** Current output format selection. */
-  outputFormat: ColorFormat;
+  /**
+   * Fired when the user picks a new display format in the menu.
+   */
+  onChangeDisplayFormat?: (format: ColorFormat) => void;
+  /**
+   * Fired when the user picks a new output format in the menu.
+   */
+  onChangeOutputFormat?: (format: ColorFormat) => void;
+  /**
+   * Current output format selection.
+   * @default 'auto'
+   */
+  outputFormat?: ColorFormat;
   /**
    * Floater placement relative to the trigger.
    * @default 'bottom-end'
@@ -55,11 +65,11 @@ const PANEL_CLASSES =
 export default function SettingsMenu(props: SettingsMenuProps) {
   const {
     classNames,
-    displayFormat,
+    displayFormat = 'auto',
     labels,
     onChangeDisplayFormat,
     onChangeOutputFormat,
-    outputFormat,
+    outputFormat = 'auto',
     placement = 'bottom-end',
     triggerProps,
   } = props;
