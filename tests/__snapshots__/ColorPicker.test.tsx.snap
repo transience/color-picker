@@ -18,9 +18,9 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
   <div
     class="flex items-center gap-2"
   >
-    <div
+    <span
       aria-hidden="true"
-      class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      class="inline-flex shrink-0 size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600"
       data-testid="Swatch"
       style="background-image: url("/src/images/transparent-bg.gif");"
     >
@@ -28,7 +28,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
         class="flex items-center justify-center size-full"
         style="background-color: rgb(255, 0, 68);"
       />
-    </div>
+    </span>
     <div
       class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
       data-testid="ColorInput"
@@ -234,9 +234,9 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
   <div
     class="flex items-center gap-2"
   >
-    <div
+    <span
       aria-hidden="true"
-      class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      class="inline-flex shrink-0 size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600"
       data-testid="Swatch"
       style="background-image: url("/src/images/transparent-bg.gif");"
     >
@@ -244,7 +244,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
         class="flex items-center justify-center size-full"
         style="background-color: oklch(0.63269 0.25404 19.902);"
       />
-    </div>
+    </span>
     <div
       class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
       data-testid="ColorInput"
@@ -425,9 +425,9 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
   <div
     class="flex items-center gap-2"
   >
-    <div
+    <span
       aria-hidden="true"
-      class="block size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600 shrink-0"
+      class="inline-flex shrink-0 size-8 rounded-full overflow-hidden border border-neutral-300 dark:border-neutral-600"
       data-testid="Swatch"
       style="background-image: url("/src/images/transparent-bg.gif");"
     >
@@ -435,7 +435,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
         class="flex items-center justify-center size-full"
         style="background-color: rgb(255, 0, 68);"
       />
-    </div>
+    </span>
     <div
       class="flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2"
       data-testid="ColorInput"
