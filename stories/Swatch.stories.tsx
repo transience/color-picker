@@ -43,9 +43,9 @@ export const Anchor: Story = {
 export const Customized: Story = {
   args: {
     color: DEFAULT_COLOR.replace(')', ' /0.5)'),
-    children: <EyeDropperIcon className="size-12 text-neutral-600" />,
+    children: <EyeDropperIcon />,
     classNames: {
-      root: 'rounded-lg size-24',
+      root: 'rounded-lg size-24 text-4xl text-neutral-600',
     },
   },
 };
