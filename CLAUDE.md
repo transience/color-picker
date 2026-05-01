@@ -6,7 +6,7 @@
 
 - Peer: React 16.8 – 19. Hooks only.
 - Tailwind CSS v4 utilities. Consumers configure Tailwind themselves — no stylesheet ships.
-- ESM + CJS via `tsup`. Size-limited: 25 kB ESM / 30 kB CJS.
+- ESM + CJS via `tsup`. Size-limited: 30 kB ESM / 35 kB CJS.
 - Runtime deps: `clsx`, `colorizr`, `tailwind-merge`. **Do not add new runtime deps without discussion.**
 
 ## Commands
