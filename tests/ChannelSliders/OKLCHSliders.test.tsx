@@ -4,7 +4,7 @@ import { getP3MaxChroma, parseCSS } from 'colorizr';
 import OKLCHSliders from '~/ChannelSliders/OKLCHSliders';
 import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
 
-const mockOnChangeColor = vi.fn();
+const mockOnChange = vi.fn();
 
 const DEFAULT_COLOR = 'oklch(0.6 0.15 30)';
 
@@ -19,8 +19,8 @@ function Controlled(props: {
     <OKLCHSliders
       channels={channels}
       color={color}
-      onChangeColor={next => {
-        mockOnChangeColor(next);
+      onChange={next => {
+        mockOnChange(next);
         setColor(next);
       }}
     />
@@ -96,9 +96,7 @@ describe('OKLCHSliders', () => {
     });
 
     it('omits NumericInputs when showInputs is false', () => {
-      render(
-        <OKLCHSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} showInputs={false} />,
-      );
+      render(<OKLCHSliders color={DEFAULT_COLOR} onChange={mockOnChange} showInputs={false} />);
 
       expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });
@@ -110,7 +108,7 @@ describe('OKLCHSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /lightness/i }), { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it('emits OKLCH when chroma changes', () => {
@@ -118,7 +116,7 @@ describe('OKLCHSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /chroma/i }), { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it('emits OKLCH when hue changes', () => {
@@ -126,7 +124,7 @@ describe('OKLCHSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it.each([
@@ -140,8 +138,8 @@ describe('OKLCHSliders', () => {
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: typed } });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
-      expect(mockOnChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
+      expect(mockOnChange).toHaveBeenCalled();
+      expect(mockOnChange.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
     });
   });
 
@@ -159,7 +157,7 @@ describe('OKLCHSliders', () => {
       // Bump lightness up — chroma should scale to new max while preserving the 50% ratio
       fireEvent.keyDown(screen.getByRole('slider', { name: /lightness/i }), { key: 'ArrowRight' });
 
-      const emitted = mockOnChangeColor.mock.calls[0][0];
+      const emitted = mockOnChange.mock.calls[0][0];
       const { c: newC, h: newH, l: newL } = parseCSS(emitted, 'oklch');
       const newMaxC = getP3MaxChroma({ l: newL, c: 0, h: newH });
       const newRelative = newMaxC > 0 ? newC / newMaxC : 0;
@@ -181,7 +179,7 @@ describe('OKLCHSliders', () => {
         shiftKey: true,
       });
 
-      const emitted = mockOnChangeColor.mock.calls[0][0];
+      const emitted = mockOnChange.mock.calls[0][0];
       const { c: newC, h: newH, l: newL } = parseCSS(emitted, 'oklch');
       const newMaxC = getP3MaxChroma({ l: newL, c: 0, h: newH });
       const newRelative = newMaxC > 0 ? newC / newMaxC : 0;
@@ -194,7 +192,7 @@ describe('OKLCHSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /chroma/i }), { key: 'ArrowRight' });
 
-      const emitted = mockOnChangeColor.mock.calls[0][0];
+      const emitted = mockOnChange.mock.calls[0][0];
       const { c, h, l } = parseCSS(emitted, 'oklch');
 
       expect(l).toBeCloseTo(0.6, 2);

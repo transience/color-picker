@@ -1,6 +1,5 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 
 import ModeSelector from '../src/ModeSelector';
 import type { ColorMode } from '../src/types';
@@ -14,7 +13,6 @@ export default {
   component: ModeSelector,
   args: {
     mode: 'oklch',
-    onClick: fn(),
   },
   argTypes: {
     mode: {

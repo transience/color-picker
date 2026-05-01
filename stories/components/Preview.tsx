@@ -83,7 +83,7 @@ export default function Preview({ color }: PreviewProps) {
             gradient={gradient}
             maxValue={1}
             minValue={0}
-            onValueChange={setValue}
+            onChange={setValue}
             startContent={<span style={{ color }}>Accent</span>}
             step={0.1}
             value={value}

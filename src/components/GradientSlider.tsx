@@ -11,7 +11,10 @@ import {
 import { clamp, cn, quantize, relativePosition } from '../modules/helpers';
 import type { GradientSliderClassNames } from '../types';
 
-interface GradientSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'aria-label'> {
+interface GradientSliderProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'aria-label' | 'onChange'
+> {
   /** Accessible label for the slider thumb (required for screen readers). */
   'aria-label': string;
   /** Per-part className overrides (`root`, `track`, `thumb`). */
@@ -40,7 +43,7 @@ interface GradientSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'aria
    */
   minValue?: number;
   /** Called with the new value on drag, click, or keyboard step. */
-  onValueChange: (value: number) => void;
+  onChange: (value: number) => void;
   /** Content rendered to the left of the track (e.g. a channel letter label). */
   startContent?: ReactNode;
   /**
@@ -77,7 +80,7 @@ export default function GradientSlider(props: GradientSliderProps) {
     isDisabled,
     maxValue = 100,
     minValue = 0,
-    onValueChange,
+    onChange,
     startContent,
     step = 1,
     style,
@@ -131,7 +134,7 @@ export default function GradientSlider(props: GradientSliderProps) {
       const raw = minValue + x * (maxValue - minValue);
       const next = quantize(raw, step, minValue);
 
-      onValueChange(clamp(next, minValue, maxValue));
+      onChange(clamp(next, minValue, maxValue));
     });
   };
 
@@ -187,7 +190,7 @@ export default function GradientSlider(props: GradientSliderProps) {
     }
 
     event.preventDefault();
-    onValueChange(clamp(quantize(next, step), minValue, maxValue));
+    onChange(clamp(quantize(next, step), minValue, maxValue));
   };
 
   const percentage = clamp(((value - minValue) / (maxValue - minValue)) * 100, 0, 100);

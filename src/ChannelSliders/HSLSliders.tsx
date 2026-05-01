@@ -25,7 +25,7 @@ interface HSLSlidersProps {
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of H/S/L changes. */
-  onChangeColor: (value: string) => void;
+  onChange: (value: string) => void;
   /**
    * Render a `NumericInput` as each slider's `endContent`.
    * @default true
@@ -40,7 +40,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
     color,
     labels,
     numericInputClassNames,
-    onChangeColor,
+    onChange,
     showInputs = true,
   } = props;
 
@@ -89,7 +89,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
     const oklch = formatCSS(newHsl, { format: 'oklch' });
 
     lastEmittedRef.current = oklch;
-    onChangeColor(oklch);
+    onChange(oklch);
   };
 
   return (
@@ -115,7 +115,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={hslHueGradient}
           isDisabled={hueConfig?.disabled}
           maxValue={359.9}
-          onValueChange={v => update({ h: v, s, l })}
+          onChange={v => update({ h: v, s, l })}
           startContent={hueSlot.label}
           step={1}
           value={h}
@@ -142,7 +142,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={saturationGradient}
           isDisabled={saturationConfig?.disabled}
           maxValue={100}
-          onValueChange={v => update({ h, s: v, l })}
+          onChange={v => update({ h, s: v, l })}
           startContent={saturationSlot.label}
           step={1}
           value={s}
@@ -169,7 +169,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={lightnessGradient}
           isDisabled={lightnessConfig?.disabled}
           maxValue={100}
-          onValueChange={v => update({ h, s, l: v })}
+          onChange={v => update({ h, s, l: v })}
           startContent={lightnessSlot.label}
           step={1}
           value={l}

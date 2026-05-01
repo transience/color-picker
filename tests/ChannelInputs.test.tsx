@@ -11,8 +11,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color="hsl(180 50% 40%)"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -25,8 +25,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color="rgb(100 150 200)"
           mode="rgb"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -39,8 +39,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color="oklch(0.5 0.12 120)"
           mode="oklch"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -53,8 +53,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color="hsl(180 50% 40%)"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -69,8 +69,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color="rgb(100 150 200)"
           mode="rgb"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -85,8 +85,8 @@ describe('ChannelInputs', () => {
           alpha={0.5}
           color="#ff0044"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -100,8 +100,8 @@ describe('ChannelInputs', () => {
           alpha={0.5}
           color="#ff0044"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
           showAlpha
         />,
       );
@@ -116,8 +116,8 @@ describe('ChannelInputs', () => {
           alpha={0.5}
           color="#ff0044"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
           showAlpha
         />,
       );
@@ -136,8 +136,8 @@ describe('ChannelInputs', () => {
             l: { label: 'Lum' },
           }}
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -162,15 +162,15 @@ describe('ChannelInputs', () => {
     ] as const)(
       'emits an OKLCH string when the %s channel at index %d changes',
       (mode, color, index, typed) => {
-        const onChangeColor = vi.fn();
+        const onChange = vi.fn();
 
         render(
           <ChannelInputs
             alpha={1}
             color={color}
             mode={mode}
-            onAlphaChange={() => {}}
-            onChangeColor={onChangeColor}
+            onChange={onChange}
+            onChangeAlpha={() => {}}
           />,
         );
 
@@ -179,13 +179,13 @@ describe('ChannelInputs', () => {
         fireEvent.focus(input);
         fireEvent.change(input, { target: { value: typed } });
 
-        expect(onChangeColor).toHaveBeenCalled();
-        expect(onChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
+        expect(onChange).toHaveBeenCalled();
+        expect(onChange.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
       },
     );
 
     it('emits the concrete OKLCH conversion when an RGB channel changes', () => {
-      const onChangeColor = vi.fn();
+      const onChange = vi.fn();
       const startColor = 'rgb(100 100 100)';
       const startRgb = parseCSS(startColor, 'rgb');
       const expected = formatCSS({ ...startRgb, r: 200 }, { format: 'oklch' });
@@ -195,8 +195,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color={startColor}
           mode="rgb"
-          onAlphaChange={() => {}}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -205,11 +205,11 @@ describe('ChannelInputs', () => {
       fireEvent.focus(rInput);
       fireEvent.change(rInput, { target: { value: '200' } });
 
-      expect(onChangeColor).toHaveBeenLastCalledWith(expected);
+      expect(onChange).toHaveBeenLastCalledWith(expected);
     });
 
     it('emits the concrete OKLCH conversion when an HSL channel changes', () => {
-      const onChangeColor = vi.fn();
+      const onChange = vi.fn();
       const startColor = 'hsl(0 100% 50%)';
       const startHsl = parseCSS(startColor, 'hsl');
       const expected = formatCSS({ ...startHsl, h: 180 }, { format: 'oklch' });
@@ -219,8 +219,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color={startColor}
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -229,11 +229,11 @@ describe('ChannelInputs', () => {
       fireEvent.focus(hInput);
       fireEvent.change(hInput, { target: { value: '180' } });
 
-      expect(onChangeColor).toHaveBeenLastCalledWith(expected);
+      expect(onChange).toHaveBeenLastCalledWith(expected);
     });
 
     it('emits the concrete OKLCH conversion when an OKLCH channel changes (L=75% → l=0.75)', () => {
-      const onChangeColor = vi.fn();
+      const onChange = vi.fn();
       const startColor = 'oklch(0.5 0.1 120)';
       const startLch = parseCSS(startColor, 'oklch');
       const expected = formatCSS({ ...startLch, l: 0.75 }, { format: 'oklch' });
@@ -243,8 +243,8 @@ describe('ChannelInputs', () => {
           alpha={1}
           color={startColor}
           mode="oklch"
-          onAlphaChange={() => {}}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -253,19 +253,19 @@ describe('ChannelInputs', () => {
       fireEvent.focus(lInput);
       fireEvent.change(lInput, { target: { value: '75' } });
 
-      expect(onChangeColor).toHaveBeenLastCalledWith(expected);
+      expect(onChange).toHaveBeenLastCalledWith(expected);
     });
 
-    it('emits onAlphaChange with the parsed alpha value', () => {
-      const onAlphaChange = vi.fn();
+    it('emits onChangeAlpha with the parsed alpha value', () => {
+      const onChangeAlpha = vi.fn();
 
       render(
         <ChannelInputs
           alpha={1}
           color="#ff0044"
           mode="hsl"
-          onAlphaChange={onAlphaChange}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={onChangeAlpha}
           showAlpha
         />,
       );
@@ -275,19 +275,19 @@ describe('ChannelInputs', () => {
       fireEvent.focus(alphaInput);
       fireEvent.change(alphaInput, { target: { value: '0.5' } });
 
-      expect(onAlphaChange).toHaveBeenCalledWith(0.5);
+      expect(onChangeAlpha).toHaveBeenCalledWith(0.5);
     });
 
     it('clamps the alpha input above 1 back to 1', () => {
-      const onAlphaChange = vi.fn();
+      const onChangeAlpha = vi.fn();
 
       render(
         <ChannelInputs
           alpha={0.5}
           color="#ff0044"
           mode="hsl"
-          onAlphaChange={onAlphaChange}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={onChangeAlpha}
           showAlpha
         />,
       );
@@ -297,19 +297,19 @@ describe('ChannelInputs', () => {
       fireEvent.focus(alphaInput);
       fireEvent.change(alphaInput, { target: { value: '2' } });
 
-      expect(onAlphaChange).toHaveBeenLastCalledWith(1);
+      expect(onChangeAlpha).toHaveBeenLastCalledWith(1);
     });
 
     it('filters non-numeric characters instead of emitting', () => {
-      const onChangeColor = vi.fn();
+      const onChange = vi.fn();
 
       render(
         <ChannelInputs
           alpha={1}
           color="hsl(0 100% 50%)"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -318,7 +318,7 @@ describe('ChannelInputs', () => {
       fireEvent.focus(hueInput);
       fireEvent.change(hueInput, { target: { value: 'abc' } });
 
-      expect(onChangeColor).not.toHaveBeenCalled();
+      expect(onChange).not.toHaveBeenCalled();
     });
   });
 
@@ -330,8 +330,8 @@ describe('ChannelInputs', () => {
           classNames={{ root: 'extra-wrapper' }}
           color="#ff0044"
           mode="hsl"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
 
@@ -345,8 +345,8 @@ describe('ChannelInputs', () => {
           color="#ff0044"
           mode="hsl"
           numericInputClassNames={{ input: 'custom-numeric-input' }}
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
           showAlpha
         />,
       );
@@ -370,8 +370,8 @@ describe('ChannelInputs', () => {
           data-foo="bar"
           id="custom-channels"
           mode="oklch"
-          onAlphaChange={() => {}}
-          onChangeColor={() => {}}
+          onChange={() => {}}
+          onChangeAlpha={() => {}}
         />,
       );
       const root = screen.getByTestId('ChannelInputs');

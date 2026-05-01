@@ -15,7 +15,7 @@ import HSLSliders from './HSLSliders';
 import OKLCHSliders from './OKLCHSliders';
 import RGBSliders from './RGBSliders';
 
-interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
+interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'onChange'> {
   /**
    * Per-channel toggles (`disabled`, `hidden`). Only keys matching the
    * active `mode` are used.
@@ -37,7 +37,7 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever a slider changes. */
-  onChangeColor: (value: string) => void;
+  onChange: (value: string) => void;
   /**
    * Render a `NumericInput` as each slider's `endContent`. Turn off for a
    * sliders-only layout (e.g. when a standalone inputs row is shown elsewhere).
@@ -55,7 +55,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     labels,
     mode,
     numericInputClassNames,
-    onChangeColor,
+    onChange,
     showInputs = true,
     ...rest
   } = props;
@@ -75,7 +75,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           color={color}
           labels={labels?.hslSliders}
           numericInputClassNames={numericInputClassNames}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
           showInputs={showInputs}
         />
       )}
@@ -86,7 +86,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           color={color}
           labels={labels?.rgbSliders}
           numericInputClassNames={numericInputClassNames}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
           showInputs={showInputs}
         />
       )}
@@ -97,7 +97,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           color={color}
           labels={labels?.oklchSliders}
           numericInputClassNames={numericInputClassNames}
-          onChangeColor={onChangeColor}
+          onChange={onChange}
           showInputs={showInputs}
         />
       )}

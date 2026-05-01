@@ -29,7 +29,7 @@ interface OKLCHSlidersProps {
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of L/C/H changes. */
-  onChangeColor: (value: string) => void;
+  onChange: (value: string) => void;
   /**
    * Render a `NumericInput` as each slider's `endContent`.
    * @default true
@@ -44,7 +44,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     color,
     labels,
     numericInputClassNames,
-    onChangeColor,
+    onChange,
     showInputs = true,
   } = props;
 
@@ -80,7 +80,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   );
 
   const update = (okLCH: LCH) => {
-    onChangeColor(formatCSS(okLCH, { format: 'oklch' }));
+    onChange(formatCSS(okLCH, { format: 'oklch' }));
   };
 
   const handleChangeLightness = (lightness: number) => {
@@ -125,7 +125,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           gradient={lightnessGradient}
           isDisabled={lightnessConfig?.disabled}
           maxValue={1}
-          onValueChange={handleChangeLightness}
+          onChange={handleChangeLightness}
           startContent={lightnessSlot.label}
           step={0.001}
           value={l}
@@ -153,7 +153,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           gradient={chromaGradient}
           isDisabled={chromaConfig?.disabled}
           maxValue={maxChroma}
-          onValueChange={handleChangeChroma}
+          onChange={handleChangeChroma}
           startContent={chromaSlot.label}
           step={0.001}
           value={c}
@@ -181,7 +181,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           gradient={oklchHueGradient}
           isDisabled={hueConfig?.disabled}
           maxValue={360}
-          onValueChange={handleChangeHue}
+          onChange={handleChangeHue}
           startContent={hueSlot.label}
           step={0.01}
           value={h}

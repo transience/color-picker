@@ -4,7 +4,7 @@ import { formatCSS, parseCSS } from 'colorizr';
 import RGBSliders from '~/ChannelSliders/RGBSliders';
 import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
 
-const mockOnChangeColor = vi.fn();
+const mockOnChange = vi.fn();
 
 const DEFAULT_COLOR = formatCSS(parseCSS('#ff0044', 'rgb'), { format: 'oklch' });
 
@@ -16,8 +16,8 @@ function Controlled(props: { channels?: Parameters<typeof RGBSliders>[0]['channe
     <RGBSliders
       channels={channels}
       color={color}
-      onChangeColor={next => {
-        mockOnChangeColor(next);
+      onChange={next => {
+        mockOnChange(next);
         setColor(next);
       }}
     />
@@ -80,9 +80,7 @@ describe('RGBSliders', () => {
     });
 
     it('omits NumericInputs when showInputs is false', () => {
-      render(
-        <RGBSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} showInputs={false} />,
-      );
+      render(<RGBSliders color={DEFAULT_COLOR} onChange={mockOnChange} showInputs={false} />);
 
       expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });
@@ -94,7 +92,7 @@ describe('RGBSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /red/i }), { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it('emits OKLCH when green changes', () => {
@@ -102,7 +100,7 @@ describe('RGBSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /green/i }), { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it('emits OKLCH when blue changes', () => {
@@ -110,7 +108,7 @@ describe('RGBSliders', () => {
 
       fireEvent.keyDown(screen.getByRole('slider', { name: /blue/i }), { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it.each([
@@ -124,8 +122,8 @@ describe('RGBSliders', () => {
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: typed } });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
-      expect(mockOnChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
+      expect(mockOnChange).toHaveBeenCalled();
+      expect(mockOnChange.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
     });
   });
 
@@ -134,11 +132,9 @@ describe('RGBSliders', () => {
       const greenRgb = parseCSS('#00ff00', 'rgb');
       const oklchGreen = formatCSS(greenRgb, { format: 'oklch' });
 
-      const { rerender } = render(
-        <RGBSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} />,
-      );
+      const { rerender } = render(<RGBSliders color={DEFAULT_COLOR} onChange={mockOnChange} />);
 
-      rerender(<RGBSliders color={oklchGreen} onChangeColor={mockOnChangeColor} />);
+      rerender(<RGBSliders color={oklchGreen} onChange={mockOnChange} />);
 
       const red = screen.getByRole('slider', { name: /red/i });
       const green = screen.getByRole('slider', { name: /green/i });

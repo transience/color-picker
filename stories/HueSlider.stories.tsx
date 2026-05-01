@@ -1,6 +1,5 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 
 import HueSlider from '../src/HueSlider';
 
@@ -15,7 +14,6 @@ export default {
   component: HueSlider,
   args: {
     mode: 'oklch',
-    onChange: fn(),
     value: 180,
   },
   argTypes: {

@@ -61,7 +61,7 @@ export default function HueSlider(props: HueSliderProps) {
       gradient={currentGradient}
       isDisabled={isDisabled}
       maxValue={360}
-      onValueChange={onChange}
+      onChange={onChange}
       startContent={label}
       value={value}
       {...rest}

@@ -19,7 +19,6 @@ export default {
   title: 'ColorInput',
   component: ColorInput,
   args: {
-    onChange: fn(),
     value: DEFAULT_COLOR,
   },
 } satisfies Meta<typeof ColorInput>;
@@ -74,7 +73,7 @@ export const Customized: Story = {
  * approximates only loosely.
  */
 export const PasteBareHexAndBlur: Story = {
-  args: { value: '' },
+  args: { onChange: fn(), value: '' },
   tags: ['!dev'],
   render: props => <ColorInputWrapper {...props} />,
   play: async ({ args, canvasElement }) => {

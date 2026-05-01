@@ -154,7 +154,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         labels={labels}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
-        onChangeColor={handleChangeColorInput}
+        onChange={handleChangeColorInput}
         showInputs={showInputs}
       />
     );
@@ -167,8 +167,8 @@ export default function ColorPicker(props: ColorPickerProps) {
         labels={labels?.channelInputs}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
-        onAlphaChange={handleChangeAlpha}
-        onChangeColor={handleChangeColorInput}
+        onChange={handleChangeColorInput}
+        onChangeAlpha={handleChangeAlpha}
         showAlpha={showAlpha}
       />
     );

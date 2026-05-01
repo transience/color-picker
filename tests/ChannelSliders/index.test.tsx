@@ -1,7 +1,7 @@
 import ChannelSliders from 'src/ChannelSliders';
 import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
 
-const mockOnChangeColor = vi.fn();
+const mockOnChange = vi.fn();
 const originalRAF = globalThis.requestAnimationFrame;
 
 beforeAll(() => {
@@ -22,7 +22,7 @@ function createDefaultProps(overrides: Partial<Parameters<typeof ChannelSliders>
   return {
     color: TEST_OKLCH,
     mode: 'hsl' as const,
-    onChangeColor: mockOnChangeColor,
+    onChange: mockOnChange,
     ...overrides,
   };
 }
@@ -52,16 +52,16 @@ describe('ChannelSliders', () => {
       );
     });
 
-    it('slider change calls onChangeColor with OKLCH value', () => {
+    it('slider change calls onChange with OKLCH value', () => {
       render(<ChannelSliders {...createDefaultProps({ mode: 'hsl' })} />);
 
       const hueSlider = screen.getByRole('slider', { name: /hue/i });
 
       fireEvent.keyDown(hueSlider, { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
+      expect(mockOnChange).toHaveBeenCalled();
 
-      const call = mockOnChangeColor.mock.calls[0][0];
+      const call = mockOnChange.mock.calls[0][0];
 
       expect(call).toMatch(/^oklch\(/);
     });
@@ -86,16 +86,16 @@ describe('ChannelSliders', () => {
       expect(screen.getByRole('slider', { name: /blue/i })).not.toHaveAttribute('aria-disabled');
     });
 
-    it('slider change calls onChangeColor with OKLCH value', () => {
+    it('slider change calls onChange with OKLCH value', () => {
       render(<ChannelSliders {...createDefaultProps({ mode: 'rgb' })} />);
 
       const redSlider = screen.getByRole('slider', { name: /red/i });
 
       fireEvent.keyDown(redSlider, { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
+      expect(mockOnChange).toHaveBeenCalled();
 
-      const call = mockOnChangeColor.mock.calls[0][0];
+      const call = mockOnChange.mock.calls[0][0];
 
       expect(call).toMatch(/^oklch\(/);
     });
@@ -121,16 +121,16 @@ describe('ChannelSliders', () => {
       );
     });
 
-    it('slider change calls onChangeColor with OKLCH value', () => {
+    it('slider change calls onChange with OKLCH value', () => {
       render(<ChannelSliders {...createDefaultProps({ mode: 'oklch' })} />);
 
       const hueSlider = screen.getByRole('slider', { name: /hue/i });
 
       fireEvent.keyDown(hueSlider, { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
+      expect(mockOnChange).toHaveBeenCalled();
 
-      const call = mockOnChangeColor.mock.calls[0][0];
+      const call = mockOnChange.mock.calls[0][0];
 
       expect(call).toMatch(/^oklch\(/);
     });
