@@ -25,7 +25,7 @@ function Controlled(props: {
       isDisabled={isDisabled}
       maxValue={maxValue}
       minValue={minValue}
-      onValueChange={next => {
+      onChange={next => {
         mockOnChange(next);
         setValue(next);
       }}
@@ -53,7 +53,7 @@ describe('GradientSlider', () => {
         <GradientSlider
           aria-label="Test slider"
           gradient={GRADIENT}
-          onValueChange={mockOnChange}
+          onChange={mockOnChange}
           value={50}
         />,
       );
@@ -67,7 +67,7 @@ describe('GradientSlider', () => {
           aria-label="Test slider"
           endContent={<span data-testid="end">end</span>}
           gradient={GRADIENT}
-          onValueChange={mockOnChange}
+          onChange={mockOnChange}
           startContent={<span data-testid="start">start</span>}
           value={50}
         />,
@@ -84,7 +84,7 @@ describe('GradientSlider', () => {
           gradient={GRADIENT}
           maxValue={360}
           minValue={0}
-          onValueChange={mockOnChange}
+          onChange={mockOnChange}
           value={120}
         />,
       );
@@ -304,7 +304,7 @@ describe('GradientSlider', () => {
           aria-label="Test"
           gradient={GRADIENT}
           isDisabled
-          onValueChange={mockOnChange}
+          onChange={mockOnChange}
           value={50}
         />,
       );
@@ -319,7 +319,7 @@ describe('GradientSlider', () => {
           aria-label="Test"
           gradient={GRADIENT}
           isDisabled
-          onValueChange={mockOnChange}
+          onChange={mockOnChange}
           value={50}
         />,
       );

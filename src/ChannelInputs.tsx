@@ -14,7 +14,7 @@ import type {
 
 type ChannelInputKey = 'a' | 'b' | 'c' | 'g' | 'h' | 'l' | 'r' | 's';
 
-interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
+interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'onChange'> {
   /** Current alpha value as a float in `[0, 1]`. Rendered as the 4th input when `showAlpha` is on. */
   alpha: number;
   /** Per-part className overrides. */
@@ -35,10 +35,10 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
   mode: ColorMode;
   /** Per-part className overrides forwarded to each `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
-  /** Called with the new alpha in `[0, 1]` when the alpha input changes. */
-  onAlphaChange: (alpha: number) => void;
   /** Called with an OKLCH CSS string whenever a channel value changes. */
-  onChangeColor: (value: string) => void;
+  onChange: (value: string) => void;
+  /** Called with the new alpha in `[0, 1]` when the alpha input changes. */
+  onChangeAlpha: (alpha: number) => void;
   /**
    * Adds a 4th input labelled `A` for the alpha channel, stepped `0.01`.
    * @default false
@@ -67,8 +67,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     labels,
     mode,
     numericInputClassNames,
-    onAlphaChange,
-    onChangeColor,
+    onChange,
+    onChangeAlpha,
     showAlpha,
     ...rest
   } = props;
@@ -94,7 +94,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
   const fields = useMemo<FieldDefinition[]>(() => {
     if (mode === 'rgb') {
       const rgb = parseCSS(color, 'rgb');
-      const emit = (next: RGB) => onChangeColor(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: RGB) => onChange(formatCSS(next, { format: 'oklch' }));
 
       return [
         {
@@ -127,7 +127,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     if (mode === 'oklch') {
       const lch = parseCSS(color, 'oklch');
       const maxC = getP3MaxChroma({ l: lch.l, c: 0, h: lch.h });
-      const emit = (next: LCH) => onChangeColor(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: LCH) => onChange(formatCSS(next, { format: 'oklch' }));
 
       return [
         {
@@ -163,7 +163,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     }
 
     const hsl = parseCSS(color, 'hsl');
-    const emit = (next: HSL) => onChangeColor(formatCSS(next, { format: 'oklch' }));
+    const emit = (next: HSL) => onChange(formatCSS(next, { format: 'oklch' }));
 
     return [
       {
@@ -194,7 +194,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.l)}`,
       },
     ];
-  }, [color, mode, slot, onChangeColor]);
+  }, [color, mode, slot, onChange]);
 
   const labelClassName = cn(
     'text-xs text-neutral-500 dark:text-neutral-400 leading-none',
@@ -229,7 +229,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
             classNames={mergedNumericClassNames}
             max={1}
             min={0}
-            onChange={onAlphaChange}
+            onChange={onChangeAlpha}
             step={0.01}
             value={alpha.toFixed(2)}
           />

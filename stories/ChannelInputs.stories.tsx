@@ -1,6 +1,5 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 
 import ChannelInputs from '../src/ChannelInputs';
 import { DEFAULT_COLOR } from '../src/constants';
@@ -20,7 +19,6 @@ export default {
   args: {
     color: DEFAULT_COLOR,
     mode: 'oklch',
-    onChangeColor: fn(),
   },
   argTypes: {
     mode: {
@@ -31,7 +29,7 @@ export default {
 } satisfies Meta<typeof ChannelInputs>;
 
 function ChannelInputsWrapper(props: ChannelInputsWrapperProps) {
-  const { color: initial, onChangeColor, width = 240, ...rest } = props;
+  const { color: initial, onChange, width = 240, ...rest } = props;
   const [color, setColor] = useState(initial);
 
   return (
@@ -39,9 +37,9 @@ function ChannelInputsWrapper(props: ChannelInputsWrapperProps) {
       <ChannelInputs
         {...rest}
         color={color}
-        onChangeColor={next => {
+        onChange={next => {
           setColor(next);
-          onChangeColor(next);
+          onChange(next);
         }}
       />
     </div>

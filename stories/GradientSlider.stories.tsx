@@ -14,7 +14,7 @@ export default {
   title: 'GradientSlider',
   component: GradientSlider,
   args: {
-    onValueChange: fn(),
+    onChange: fn(),
     'aria-label': 'Test slider',
     gradient: 'linear-gradient(to right, black, white)',
     minValue: 0,
@@ -24,16 +24,16 @@ export default {
 } satisfies Meta<typeof GradientSlider>;
 
 function GradientSliderWrapper(props: GradientSliderWrapperProps) {
-  const { onValueChange, value: initial, width = 240, ...rest } = props;
+  const { onChange, value: initial, width = 240, ...rest } = props;
   const [value, setValue] = useState(initial ?? 50);
 
   return (
     <div style={{ width }}>
       <GradientSlider
         {...rest}
-        onValueChange={next => {
+        onChange={next => {
           setValue(next);
-          onValueChange(next);
+          onChange(next);
         }}
         value={value}
       />
@@ -88,11 +88,11 @@ export const KeyboardClampsAtBounds: Story = {
     await userEvent.keyboard('{ArrowRight}');
 
     await waitFor(() => expect(thumb.getAttribute('aria-valuenow')).toBe('100'));
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(100);
+    await expect(args.onChange).toHaveBeenLastCalledWith(100);
 
     // Home jumps to minValue from clamped max.
     await userEvent.keyboard('{Home}');
     await waitFor(() => expect(thumb.getAttribute('aria-valuenow')).toBe('0'));
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(0);
+    await expect(args.onChange).toHaveBeenLastCalledWith(0);
   },
 };

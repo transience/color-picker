@@ -57,7 +57,7 @@ export default function AlphaSlider(props: AlphaSliderProps) {
       isDisabled={isDisabled}
       maxValue={1}
       minValue={0}
-      onValueChange={onChange}
+      onChange={onChange}
       startContent={label}
       step={0.01}
       value={value}

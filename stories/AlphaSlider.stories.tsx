@@ -1,6 +1,5 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 
 import AlphaSlider from '../src/AlphaSlider';
 import { DEFAULT_COLOR } from '../src/constants';
@@ -16,7 +15,6 @@ export default {
   component: AlphaSlider,
   args: {
     color: DEFAULT_COLOR,
-    onChange: fn(),
     value: 0.5,
   },
 } satisfies Meta<typeof AlphaSlider>;

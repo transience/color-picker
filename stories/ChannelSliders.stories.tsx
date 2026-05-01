@@ -1,6 +1,5 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 
 import ChannelSliders from '../src/ChannelSliders';
 
@@ -16,7 +15,6 @@ export default {
   args: {
     color: '#ff0044',
     mode: 'oklch',
-    onChangeColor: fn(),
     showInputs: true,
   },
   argTypes: {
@@ -28,7 +26,7 @@ export default {
 } satisfies Meta<typeof ChannelSliders>;
 
 function ChannelSlidersWrapper(props: ChannelSlidersWrapperProps) {
-  const { color: initial, onChangeColor, width = 320, ...rest } = props;
+  const { color: initial, onChange, width = 320, ...rest } = props;
   const [color, setColor] = useState(initial);
 
   return (
@@ -36,9 +34,9 @@ function ChannelSlidersWrapper(props: ChannelSlidersWrapperProps) {
       <ChannelSliders
         {...rest}
         color={color}
-        onChangeColor={next => {
+        onChange={next => {
           setColor(next);
-          onChangeColor(next);
+          onChange(next);
         }}
       />
     </div>

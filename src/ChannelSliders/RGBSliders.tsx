@@ -25,7 +25,7 @@ interface RGBSlidersProps {
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
   numericInputClassNames?: NumericInputClassNames;
   /** Called with an OKLCH CSS string whenever any of R/G/B changes. */
-  onChangeColor: (value: string) => void;
+  onChange: (value: string) => void;
   /**
    * Render a `NumericInput` as each slider's `endContent`.
    * @default true
@@ -40,7 +40,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
     color,
     labels,
     numericInputClassNames,
-    onChangeColor,
+    onChange,
     showInputs = true,
   } = props;
 
@@ -78,7 +78,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
     const oklch = formatCSS(newRgb, { format: 'oklch' });
 
     lastEmittedRef.current = oklch;
-    onChangeColor(oklch);
+    onChange(oklch);
   };
 
   return (
@@ -104,7 +104,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
           gradient="linear-gradient(to right, rgb(0 0 0), rgb(255 0 0))"
           isDisabled={redConfig?.disabled}
           maxValue={255}
-          onValueChange={v => update({ r: v, g, b })}
+          onChange={v => update({ r: v, g, b })}
           startContent={redSlot.label}
           step={1}
           value={r}
@@ -131,7 +131,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
           gradient="linear-gradient(to right, rgb(0 0 0), rgb(0 255 0))"
           isDisabled={greenConfig?.disabled}
           maxValue={255}
-          onValueChange={v => update({ r, g: v, b })}
+          onChange={v => update({ r, g: v, b })}
           startContent={greenSlot.label}
           step={1}
           value={g}
@@ -158,7 +158,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
           gradient="linear-gradient(to right, rgb(0 0 0), rgb(0 0 255))"
           isDisabled={blueConfig?.disabled}
           maxValue={255}
-          onValueChange={v => update({ r, g, b: v })}
+          onChange={v => update({ r, g, b: v })}
           startContent={blueSlot.label}
           step={1}
           value={b}

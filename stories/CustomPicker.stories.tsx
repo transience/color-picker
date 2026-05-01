@@ -170,7 +170,7 @@ export const PalettePicker: Story = {
         <ChannelSliders
           color={picker.solidColor}
           mode="oklch"
-          onChangeColor={picker.handleChangeColorInput}
+          onChange={picker.handleChangeColorInput}
           showInputs
         />
 

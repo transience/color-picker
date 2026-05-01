@@ -4,7 +4,7 @@ import { formatCSS, parseCSS } from 'colorizr';
 import HSLSliders from '~/ChannelSliders/HSLSliders';
 import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
 
-const mockOnChangeColor = vi.fn();
+const mockOnChange = vi.fn();
 
 const DEFAULT_COLOR = formatCSS(parseCSS('#ff0044', 'hsl'), { format: 'oklch' });
 
@@ -20,8 +20,8 @@ function Controlled(props: {
       channels={channels}
       color={color}
       labels={labels}
-      onChangeColor={next => {
-        mockOnChangeColor(next);
+      onChange={next => {
+        mockOnChange(next);
         setColor(next);
       }}
     />
@@ -86,9 +86,7 @@ describe('HSLSliders', () => {
     });
 
     it('omits NumericInputs when showInputs is false', () => {
-      render(
-        <HSLSliders color={DEFAULT_COLOR} onChangeColor={mockOnChangeColor} showInputs={false} />,
-      );
+      render(<HSLSliders color={DEFAULT_COLOR} onChange={mockOnChange} showInputs={false} />);
 
       expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });
@@ -101,8 +99,8 @@ describe('HSLSliders', () => {
 
       fireEvent.keyDown(hue, { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange).toHaveBeenCalled();
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it('emits OKLCH when saturation changes', () => {
@@ -111,7 +109,7 @@ describe('HSLSliders', () => {
 
       fireEvent.keyDown(sat, { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it('emits OKLCH when lightness changes', () => {
@@ -120,7 +118,7 @@ describe('HSLSliders', () => {
 
       fireEvent.keyDown(light, { key: 'ArrowRight' });
 
-      expect(mockOnChangeColor.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
 
     it.each([
@@ -134,8 +132,8 @@ describe('HSLSliders', () => {
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: typed } });
 
-      expect(mockOnChangeColor).toHaveBeenCalled();
-      expect(mockOnChangeColor.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
+      expect(mockOnChange).toHaveBeenCalled();
+      expect(mockOnChange.mock.calls.at(-1)?.[0]).toMatch(/^oklch\(/);
     });
   });
 
@@ -144,14 +142,12 @@ describe('HSLSliders', () => {
       const redHsl = parseCSS('#ff0000', 'hsl');
       const oklchRed = formatCSS(redHsl, { format: 'oklch' });
 
-      const { rerender } = render(
-        <HSLSliders color={oklchRed} onChangeColor={mockOnChangeColor} />,
-      );
+      const { rerender } = render(<HSLSliders color={oklchRed} onChange={mockOnChange} />);
 
       const blueHsl = parseCSS('#0000ff', 'hsl');
       const oklchBlue = formatCSS(blueHsl, { format: 'oklch' });
 
-      rerender(<HSLSliders color={oklchBlue} onChangeColor={mockOnChangeColor} />);
+      rerender(<HSLSliders color={oklchBlue} onChange={mockOnChange} />);
 
       const hue = screen.getByRole('slider', { name: /hue/i });
 
