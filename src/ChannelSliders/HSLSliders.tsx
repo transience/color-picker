@@ -117,6 +117,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
         <GradientSlider
           aria-label={hueSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="HueSlider"
           endContent={
             showInputs ? (
               <NumericInput
@@ -146,6 +147,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
         <GradientSlider
           aria-label={saturationSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="SaturationSlider"
           endContent={
             showInputs ? (
               <NumericInput
@@ -175,6 +177,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
         <GradientSlider
           aria-label={lightnessSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="LightnessSlider"
           endContent={
             showInputs ? (
               <NumericInput

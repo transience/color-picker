@@ -46,7 +46,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
   >
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="HueSlider"
     >
       H
       <div
@@ -83,7 +83,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
     </div>
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="SaturationSlider"
     >
       S
       <div
@@ -120,7 +120,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
     </div>
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="LightnessSlider"
     >
       L
       <div
@@ -262,7 +262,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
   >
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="LightnessSlider"
     >
       L
       <div
@@ -299,7 +299,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
     </div>
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="ChromaSlider"
     >
       C
       <div
@@ -337,7 +337,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
     </div>
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="HueSlider"
     >
       H
       <div
@@ -453,7 +453,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
   >
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="RedSlider"
     >
       R
       <div
@@ -491,7 +491,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
     </div>
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="GreenSlider"
     >
       G
       <div
@@ -529,7 +529,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
     </div>
     <div
       class="flex items-center gap-2"
-      data-testid="GradientSlider"
+      data-testid="BlueSlider"
     >
       B
       <div

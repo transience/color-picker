@@ -131,6 +131,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
         <GradientSlider
           aria-label={lightnessSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="LightnessSlider"
           endContent={
             showInputs ? (
               <NumericInput
@@ -161,6 +162,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
         <GradientSlider
           aria-label={chromaSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="ChromaSlider"
           endContent={
             showInputs ? (
               <NumericInput
@@ -191,6 +193,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
         <GradientSlider
           aria-label={hueSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="HueSlider"
           endContent={
             showInputs ? (
               <NumericInput
