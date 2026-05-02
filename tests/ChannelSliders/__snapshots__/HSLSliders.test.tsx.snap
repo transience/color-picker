@@ -4,7 +4,7 @@ exports[`HSLSliders > Render > renders H, S, L sliders 1`] = `
 <div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="HueSlider"
   >
     H
     <div
@@ -41,7 +41,7 @@ exports[`HSLSliders > Render > renders H, S, L sliders 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="SaturationSlider"
   >
     S
     <div
@@ -78,7 +78,7 @@ exports[`HSLSliders > Render > renders H, S, L sliders 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="LightnessSlider"
   >
     L
     <div

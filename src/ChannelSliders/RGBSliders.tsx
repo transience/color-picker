@@ -106,6 +106,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
         <GradientSlider
           aria-label={redSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="RedSlider"
           endContent={
             showInputs ? (
               <NumericInput
@@ -135,6 +136,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
         <GradientSlider
           aria-label={greenSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="GreenSlider"
           endContent={
             showInputs ? (
               <NumericInput
@@ -164,6 +166,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
         <GradientSlider
           aria-label={blueSlot.ariaLabel}
           classNames={channelSliderClassNames}
+          data-testid="BlueSlider"
           endContent={
             showInputs ? (
               <NumericInput

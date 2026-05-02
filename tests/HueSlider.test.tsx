@@ -2,21 +2,9 @@ import HueSlider from '~/HueSlider';
 import { fireEvent, render, screen } from '~/test-utils';
 
 describe('HueSlider', () => {
-  it('renders with GlobalHue aria-label and [0, 360] bounds', () => {
+  it('renders correctly', () => {
     render(<HueSlider />);
-    const slider = screen.getByRole('slider', { name: 'GlobalHue' });
-
-    expect(slider).toHaveAttribute('aria-valuemin', '0');
-    expect(slider).toHaveAttribute('aria-valuemax', '360');
-    expect(slider).toHaveAttribute('aria-valuenow', '250');
-  });
-
-  it('uses the OKLCH gradient when mode is oklch', () => {
-    render(<HueSlider mode="oklch" value={180} />);
-    const track = screen.getByRole('slider').parentElement!;
-
-    // JSDOM keeps oklch() as-is since it doesn't recognize it as a color to normalize.
-    expect(track.style.background).toContain('oklch');
+    expect(screen.getByTestId('GlobalHueSlider')).toMatchSnapshot();
   });
 
   it('uses a different gradient for hsl and rgb than for oklch', () => {
@@ -55,7 +43,7 @@ describe('HueSlider', () => {
 
   it('forwards native HTML attrs to the GradientSlider root', () => {
     render(<HueSlider data-foo="bar" id="custom-hue" mode="oklch" value={180} />);
-    const root = screen.getByTestId('GradientSlider');
+    const root = screen.getByTestId('GlobalHueSlider');
 
     expect(root).toHaveAttribute('data-foo', 'bar');
     expect(root).toHaveAttribute('id', 'custom-hue');

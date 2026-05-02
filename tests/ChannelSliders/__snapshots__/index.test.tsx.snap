@@ -7,7 +7,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
 >
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="HueSlider"
   >
     H
     <div
@@ -44,7 +44,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="SaturationSlider"
   >
     S
     <div
@@ -81,7 +81,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="LightnessSlider"
   >
     L
     <div
@@ -126,7 +126,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
 >
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="LightnessSlider"
   >
     L
     <div
@@ -163,7 +163,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="ChromaSlider"
   >
     C
     <div
@@ -201,7 +201,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="HueSlider"
   >
     H
     <div
@@ -246,7 +246,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
 >
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="RedSlider"
   >
     R
     <div
@@ -284,7 +284,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="GreenSlider"
   >
     G
     <div
@@ -322,7 +322,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="BlueSlider"
   >
     B
     <div

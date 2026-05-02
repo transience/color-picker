@@ -73,6 +73,7 @@ export default function AlphaSlider(props: AlphaSliderProps) {
     <GradientSlider
       aria-label={ariaLabel}
       classNames={classNames}
+      data-testid="AlphaSlider"
       gradient={gradient}
       isDisabled={isDisabled}
       maxValue={1}

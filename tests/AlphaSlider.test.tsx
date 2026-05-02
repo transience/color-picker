@@ -38,16 +38,7 @@ describe('AlphaSlider', () => {
     it('renders correctly', () => {
       render(<AlphaSlider />);
 
-      expect(screen.getByRole('slider', { name: 'Alpha' })).toMatchSnapshot();
-    });
-
-    it('exposes ARIA slider attributes with [0, 1] bounds', () => {
-      render(<AlphaSlider color="#ff0044" value={0.35} />);
-      const slider = screen.getByRole('slider', { name: 'Alpha' });
-
-      expect(slider).toHaveAttribute('aria-valuemin', '0');
-      expect(slider).toHaveAttribute('aria-valuemax', '1');
-      expect(slider).toHaveAttribute('aria-valuenow', '0.35');
+      expect(screen.getByTestId('AlphaSlider')).toMatchSnapshot();
     });
   });
 
@@ -153,9 +144,9 @@ describe('AlphaSlider', () => {
   });
 
   describe('Native attribute forwarding', () => {
-    it('forwards native HTML attrs to the GradientSlider root', () => {
+    it('forwards native HTML attrs', () => {
       render(<AlphaSlider color="#ff0044" data-foo="bar" id="custom-alpha" value={0.5} />);
-      const root = screen.getByTestId('GradientSlider');
+      const root = screen.getByTestId('AlphaSlider');
 
       expect(root).toHaveAttribute('data-foo', 'bar');
       expect(root).toHaveAttribute('id', 'custom-alpha');

@@ -77,6 +77,7 @@ export default function HueSlider(props: HueSliderProps) {
     <GradientSlider
       aria-label={ariaLabel}
       classNames={classNames}
+      data-testid="GlobalHueSlider"
       gradient={currentGradient}
       isDisabled={isDisabled}
       maxValue={360}

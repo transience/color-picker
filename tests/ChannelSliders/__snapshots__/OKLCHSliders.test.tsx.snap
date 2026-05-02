@@ -4,7 +4,7 @@ exports[`OKLCHSliders > Render > renders L, C, H sliders 1`] = `
 <div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="LightnessSlider"
   >
     L
     <div
@@ -41,7 +41,7 @@ exports[`OKLCHSliders > Render > renders L, C, H sliders 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="ChromaSlider"
   >
     C
     <div
@@ -79,7 +79,7 @@ exports[`OKLCHSliders > Render > renders L, C, H sliders 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="HueSlider"
   >
     H
     <div

@@ -4,7 +4,7 @@ exports[`RGBSliders > Render > renders R, G, B sliders 1`] = `
 <div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="RedSlider"
   >
     R
     <div
@@ -42,7 +42,7 @@ exports[`RGBSliders > Render > renders R, G, B sliders 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="GreenSlider"
   >
     G
     <div
@@ -80,7 +80,7 @@ exports[`RGBSliders > Render > renders R, G, B sliders 1`] = `
   </div>
   <div
     class="flex items-center gap-2"
-    data-testid="GradientSlider"
+    data-testid="BlueSlider"
   >
     B
     <div
