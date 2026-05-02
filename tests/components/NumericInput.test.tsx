@@ -217,6 +217,17 @@ describe('NumericInput', () => {
       expect(mockOnChange).toHaveBeenCalledWith(360);
     });
 
+    it('does not emit onChange on blur when value is unchanged', () => {
+      render(<NumericInput {...createDefaultProps({ value: '180' })} />);
+
+      const input = screen.getByDisplayValue('180');
+
+      fireEvent.focus(input);
+      fireEvent.blur(input);
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
     it('steps through consecutive ArrowUps when focused', () => {
       render(<Controlled initial="180" />);
 
