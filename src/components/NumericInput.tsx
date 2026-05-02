@@ -79,7 +79,7 @@ export default function NumericInput(props: NumericInputProps) {
   const handleBlur = () => {
     const parsed = Number.parseFloat(editValue.replace(',', '.'));
 
-    if (!Number.isNaN(parsed)) {
+    if (!Number.isNaN(parsed) && clamp(parsed) !== Number.parseFloat(value)) {
       onChange?.(clamp(parsed));
     }
 
