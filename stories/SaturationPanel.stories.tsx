@@ -1,5 +1,6 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { action } from 'storybook/actions';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import SaturationPanel from '../src/SaturationPanel';
@@ -14,7 +15,9 @@ export default {
   title: 'SaturationPanel',
   component: SaturationPanel,
   args: {
-    onChange: fn(),
+    onChange: action('onChange'),
+    onChangeEnd: action('onChangeEnd'),
+    onChangeStart: action('onChangeStart'),
   },
 } satisfies Meta<typeof SaturationPanel>;
 
@@ -64,7 +67,7 @@ export const Customized: Story = {
  * values match.
  */
 export const ClickReturnsValidValues: Story = {
-  args: { hue: 30, saturation: 0.1, value: 0.6 },
+  args: { onChange: fn(), hue: 30, saturation: 0.1, value: 0.6 },
   tags: ['!dev'],
   render: props => <SaturationPanelWrapper {...props} />,
   play: async ({ args, canvasElement }) => {

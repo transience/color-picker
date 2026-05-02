@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatCSS, parseCSS, type RGB } from 'colorizr';
 
 import { resolveLabel } from '~/modules/helpers';
@@ -12,6 +12,8 @@ import type {
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
+
+import useChannelLifecycle from './useChannelLifecycle';
 
 interface RGBSlidersProps {
   /** Per-channel toggles for `r`, `g`, and `b` (`disabled`, `hidden`). */
@@ -27,6 +29,17 @@ interface RGBSlidersProps {
   /** Called with an OKLCH CSS string whenever any of R/G/B changes. */
   onChange: (value: string) => void;
   /**
+   * Called once when an interaction on any of R/G/B ends. Receives the most
+   * recently emitted OKLCH CSS string (or the incoming `color` if no value
+   * was emitted during the interaction).
+   */
+  onChangeEnd?: (value: string) => void;
+  /**
+   * Called once when an interaction on any of R/G/B begins. Receives the
+   * incoming `color` (the value before any change).
+   */
+  onChangeStart?: (value: string) => void;
+  /**
    * Render a `NumericInput` as each slider's `endContent`.
    * @default true
    */
@@ -41,10 +54,16 @@ export default function RGBSliders(props: RGBSlidersProps) {
     labels,
     numericInputClassNames,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     showInputs = true,
   } = props;
 
-  const lastEmittedRef = useRef<string>('');
+  const { handleEnd, handleStart, lastEmittedRef, recordEmit } = useChannelLifecycle(
+    color,
+    onChangeStart,
+    onChangeEnd,
+  );
   const [rgb, setRgb] = useState<RGB>(() => parseCSS(color, 'rgb'));
 
   // Re-derive RGB only from external changes (not our own round-trip)
@@ -52,7 +71,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
     if (color !== lastEmittedRef.current) {
       setRgb(parseCSS(color, 'rgb'));
     }
-  }, [color]);
+  }, [color, lastEmittedRef]);
 
   const { b, g, r } = rgb;
   const redConfig = channels?.r;
@@ -77,7 +96,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
 
     const oklch = formatCSS(newRgb, { format: 'oklch' });
 
-    lastEmittedRef.current = oklch;
+    recordEmit(oklch);
     onChange(oklch);
   };
 
@@ -104,7 +123,9 @@ export default function RGBSliders(props: RGBSlidersProps) {
           gradient="linear-gradient(to right, rgb(0 0 0), rgb(255 0 0))"
           isDisabled={redConfig?.disabled}
           maxValue={255}
-          onChange={v => update({ r: v, g, b })}
+          onChange={(v: number) => update({ r: v, g, b })}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={redSlot.label}
           step={1}
           value={r}
@@ -131,7 +152,9 @@ export default function RGBSliders(props: RGBSlidersProps) {
           gradient="linear-gradient(to right, rgb(0 0 0), rgb(0 255 0))"
           isDisabled={greenConfig?.disabled}
           maxValue={255}
-          onChange={v => update({ r, g: v, b })}
+          onChange={(v: number) => update({ r, g: v, b })}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={greenSlot.label}
           step={1}
           value={g}
@@ -158,7 +181,9 @@ export default function RGBSliders(props: RGBSlidersProps) {
           gradient="linear-gradient(to right, rgb(0 0 0), rgb(0 0 255))"
           isDisabled={blueConfig?.disabled}
           maxValue={255}
-          onChange={v => update({ r, g, b: v })}
+          onChange={(v: number) => update({ r, g, b: v })}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={blueSlot.label}
           step={1}
           value={b}

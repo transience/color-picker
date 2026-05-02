@@ -84,6 +84,53 @@ describe('SaturationPanel', () => {
     });
   });
 
+  describe('Lifecycle callbacks', () => {
+    it('pointerDown fires onChangeStart with the values before drag', () => {
+      const onChangeStart = vi.fn();
+
+      render(
+        <SaturationPanel
+          hue={0}
+          onChange={mockOnChange}
+          onChangeStart={onChangeStart}
+          saturation={0.3}
+          value={0.7}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      fireEvent.pointerDown(panel, { clientX: 50, clientY: 50, pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeStart).toHaveBeenCalledWith(0.3, 0.7);
+    });
+
+    it('lostPointerCapture fires onChangeEnd', () => {
+      const onChangeEnd = vi.fn();
+
+      render(
+        <SaturationPanel
+          hue={0}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+          saturation={0.5}
+          value={0.5}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      firePointerDrag(panel, [
+        { x: 50, y: 50 },
+        { x: 150, y: 80 },
+      ]);
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('Native attribute forwarding', () => {
     it('forwards native HTML attrs to the root', () => {
       render(

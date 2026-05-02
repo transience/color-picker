@@ -50,7 +50,9 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     defaultMode,
     displayFormat: displayFormatProp,
     onChange,
+    onChangeEnd,
     onChangeMode,
+    onChangeStart,
     outputFormat: outputFormatProp,
     precision,
     showAlpha,
@@ -75,7 +77,9 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   const modeRef = useRef(mode);
   const oklchRef = useRef(oklch);
   const onChangeRef = useRef(onChange);
+  const onChangeEndRef = useRef(onChangeEnd);
   const onChangeModeRef = useRef(onChangeMode);
+  const onChangeStartRef = useRef(onChangeStart);
   const outputFormatRef = useRef(outputFormat);
   const precisionRef = useRef(precision);
   const showAlphaRef = useRef(showAlpha);
@@ -86,7 +90,9 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   modeRef.current = mode;
   oklchRef.current = oklch;
   onChangeRef.current = onChange;
+  onChangeEndRef.current = onChangeEnd;
   onChangeModeRef.current = onChangeMode;
+  onChangeStartRef.current = onChangeStart;
   outputFormatRef.current = outputFormat;
   precisionRef.current = precision;
   showAlphaRef.current = showAlpha;
@@ -110,7 +116,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     }
   }, [color]);
 
-  const emit = useCallback((oklchValue: string) => {
+  const renderOutput = useCallback((oklchValue: string) => {
     const resolved = resolveOutputFormat(
       outputFormatRef.current,
       displayFormatRef.current,
@@ -118,13 +124,21 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     );
     const alphaForOutput =
       showAlphaRef.current && alphaRef.current < 1 ? alphaRef.current : undefined;
-    const final = formatColor(oklchValue, resolved, alphaForOutput, precisionRef.current);
 
-    lastEmittedRef.current = final;
-    onChangeRef.current?.(final);
-
-    return final;
+    return formatColor(oklchValue, resolved, alphaForOutput, precisionRef.current);
   }, []);
+
+  const emit = useCallback(
+    (oklchValue: string) => {
+      const final = renderOutput(oklchValue);
+
+      lastEmittedRef.current = final;
+      onChangeRef.current?.(final);
+
+      return final;
+    },
+    [renderOutput],
+  );
 
   const handleChangeAlpha = useCallback(
     (next: number) => {
@@ -218,6 +232,29 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     onChangeModeRef.current?.(value);
   }, []);
 
+  const formatCurrent = useCallback(() => {
+    const oklchValue =
+      modeRef.current === 'oklch'
+        ? formatCSS(oklchRef.current, 'oklch')
+        : convertCSS(hsvToHex(hsvRef.current), 'oklch');
+
+    return renderOutput(oklchValue);
+  }, [renderOutput]);
+
+  // Invariant: child sliders/panels call this BEFORE mutating their value, so
+  // `formatCurrent()` here returns the pre-interaction color. Reordering a
+  // child to call `notifyPointerStart` after `handleMove` would silently break
+  // the public `onChangeStart`'s "value before any change" contract.
+  const handleInteractionStart = useCallback(() => {
+    if (!onChangeStartRef.current) return;
+    onChangeStartRef.current(formatCurrent());
+  }, [formatCurrent]);
+
+  const handleInteractionEnd = useCallback(() => {
+    if (!onChangeEndRef.current) return;
+    onChangeEndRef.current(formatCurrent());
+  }, [formatCurrent]);
+
   // Primitive derivations: un-memoized. Comparison / ternary cost is below the
   // useMemo call + dep-array overhead. React compares primitives by value in
   // downstream dep arrays, so stability is preserved.
@@ -250,12 +287,10 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   return {
     rootRef,
     containerRef,
-    mode,
-    hsv,
-    oklch,
     alpha,
+    currentHue,
     displayFormat,
-    outputFormat,
+    displayValue,
     handleChangeAlpha,
     handleChangeColorInput,
     handleChangeDisplayFormat,
@@ -265,12 +300,16 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     handleChangeOutputFormat,
     handleChangeSaturationPanel,
     handleClickMode,
+    handleInteractionEnd,
+    handleInteractionStart,
+    hsv,
     isOklch,
-    currentHue,
-    solidColor,
-    displayValue,
-    swatchColor,
-    showGamutWarning,
+    mode,
+    oklch,
+    outputFormat,
     props: merged,
+    showGamutWarning,
+    solidColor,
+    swatchColor,
   };
 }

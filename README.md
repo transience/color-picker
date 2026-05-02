@@ -85,6 +85,8 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 | **displayFormat**<br />Initial text format for the `ColorInput`. `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.                             | `ColorFormat` | `'auto'` |
 | **modes**<br />Modes shown in the mode switcher.                                                                                               | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
 | **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`.                                                    | `(value: string) => void` | — |
+| **onChangeStart**<br />Fires once when the user begins interacting with any slider or panel — `pointerdown` or first value-changing keydown after idle. | `(value: string) => void` | — |
+| **onChangeEnd**<br />Fires once when the user finishes interacting — pointer release, or 200 ms after the last keyboard step. | `(value: string) => void` | — |
 | **onChangeMode**<br />Called when the user flips the mode via the switcher.                                                                    | `(mode: ColorMode) => void` | — |
 | **outputFormat**<br />Initial format `onChange` emits. `'auto'` follows the resolved `displayFormat`.                                          | `ColorFormat` | `'auto'` |
 | **precision**<br />Decimal digits for non-hex output. Ignored for `hex`.                                                                       | `number` | `5` |
@@ -167,6 +169,25 @@ const picker = useColorPicker({ color, onChange: setColor });
 ```
 
 See [`docs/HOOK.md`](./docs/HOOK.md) for the full return reference, composition map, and working examples.
+
+## Interaction signal
+
+The picker has a `data-interacting` attribute on its root element, set to `"true"` during any interaction. The attribute stays `"true"` for the whole interaction. Drag the panel, then a slider — no flicker off in between. Use it as a single DOM or CSS signal regardless of which slider or panel the user is touching.
+
+```tsx
+new MutationObserver(() => {
+  const isInteracting = root.hasAttribute('data-interacting');
+  // ...
+}).observe(root, { attributes: true, attributeFilter: ['data-interacting'] });
+```
+
+```css
+.color-picker[data-interacting] .live-preview {
+  pointer-events: none;
+}
+```
+
+See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md#7-interaction-pipeline) for the deeper write-up.
 
 ## Color engine
 

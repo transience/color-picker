@@ -13,6 +13,8 @@ import type {
   NumericInputClassNames,
 } from '../types';
 
+import useChannelLifecycle from './useChannelLifecycle';
+
 interface OKLCHSlidersProps {
   /**
    * Per-channel toggles for `l`, `c`, and `h` (`disabled`, `hidden`).
@@ -31,6 +33,17 @@ interface OKLCHSlidersProps {
   /** Called with an OKLCH CSS string whenever any of L/C/H changes. */
   onChange: (value: string) => void;
   /**
+   * Called once when an interaction on any of L/C/H ends. Receives the most
+   * recently emitted OKLCH CSS string (or the incoming `color` if no value
+   * was emitted during the interaction).
+   */
+  onChangeEnd?: (value: string) => void;
+  /**
+   * Called once when an interaction on any of L/C/H begins. Receives the
+   * incoming `color` (the value before any change).
+   */
+  onChangeStart?: (value: string) => void;
+  /**
    * Render a `NumericInput` as each slider's `endContent`.
    * @default true
    */
@@ -45,8 +58,16 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     labels,
     numericInputClassNames,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     showInputs = true,
   } = props;
+
+  const { handleEnd, handleStart, recordEmit } = useChannelLifecycle(
+    color,
+    onChangeStart,
+    onChangeEnd,
+  );
 
   const { c, h, l } = useMemo(() => parseCSS(color, 'oklch'), [color]);
   const lightnessConfig = channels?.l;
@@ -80,7 +101,10 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   );
 
   const update = (okLCH: LCH) => {
-    onChange(formatCSS(okLCH, { format: 'oklch' }));
+    const oklch = formatCSS(okLCH, { format: 'oklch' });
+
+    recordEmit(oklch);
+    onChange(oklch);
   };
 
   const handleChangeLightness = (lightness: number) => {
@@ -126,6 +150,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={lightnessConfig?.disabled}
           maxValue={1}
           onChange={handleChangeLightness}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={lightnessSlot.label}
           step={0.001}
           value={l}
@@ -154,6 +180,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={chromaConfig?.disabled}
           maxValue={maxChroma}
           onChange={handleChangeChroma}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={chromaSlot.label}
           step={0.001}
           value={c}
@@ -182,6 +210,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={hueConfig?.disabled}
           maxValue={360}
           onChange={handleChangeHue}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={hueSlot.label}
           step={0.01}
           value={h}

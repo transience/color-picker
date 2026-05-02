@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import ColorPicker from '~/ColorPicker';
 import {
+  act,
   fireEvent,
   firePointerDrag,
   mockCanvasContext,
@@ -781,6 +782,106 @@ describe('ColorPicker', () => {
 
       for (const [value] of mockOnChange.mock.calls) {
         expect(value).toMatch(/^oklch\(/);
+      }
+    });
+  });
+
+  describe('Lifecycle callbacks', () => {
+    it('emits onChangeStart and onChangeEnd around a panel drag', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <ColorPicker color="#ff0044" onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />,
+      );
+      const panel = screen.getByTestId('OKLCHPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      firePointerDrag(panel, [
+        { x: 0, y: 100 },
+        { x: 200, y: 0 },
+      ]);
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      expect(onChangeStart.mock.calls[0][0]).toMatch(/^oklch\(/);
+      expect(onChangeEnd.mock.calls[0][0]).toMatch(/^oklch\(/);
+    });
+
+    it('emits onChangeStart and onChangeEnd around a channel slider drag', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <ColorPicker color="#ff0044" onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />,
+      );
+      const lightnessTrack = screen.getAllByRole('slider')[0].parentElement!;
+
+      mockRect(lightnessTrack, { left: 0, top: 0, width: 200, height: 12 });
+      firePointerDrag(lightnessTrack, [
+        { x: 50, y: 6 },
+        { x: 150, y: 6 },
+      ]);
+      fireEvent.lostPointerCapture(lightnessTrack, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+    });
+
+    it('Start fires with the pre-drag color and End fires with the post-drag color', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <ColorPicker color="#ff0044" onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />,
+      );
+      const panel = screen.getByTestId('OKLCHPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      firePointerDrag(panel, [
+        { x: 0, y: 100 },
+        { x: 200, y: 0 },
+      ]);
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      const startValue = onChangeStart.mock.calls[0][0];
+      const endValue = onChangeEnd.mock.calls[0][0];
+
+      // Both formatted; Start reflects pre-drag state, End reflects post-drag.
+      expect(startValue).toMatch(/^oklch\(/);
+      expect(endValue).toMatch(/^oklch\(/);
+      expect(startValue).not.toBe(endValue);
+    });
+
+    it('keyboard fires onChangeStart immediately and onChangeEnd after 200 ms idle', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(
+          <ColorPicker color="#ff0044" onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />,
+        );
+        const sliders = screen.getAllByRole('slider');
+        // Lightness is the first OKLCH slider in the channel block.
+        const lightnessThumb = sliders[0];
+
+        fireEvent.keyDown(lightnessThumb, { key: 'ArrowRight' });
+
+        expect(onChangeStart).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).not.toHaveBeenCalled();
+
+        act(() => {
+          vi.advanceTimersByTime(200);
+        });
+
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd.mock.calls[0][0]).toMatch(/^oklch\(/);
+        expect(onChangeStart.mock.calls[0][0]).not.toBe(onChangeEnd.mock.calls[0][0]);
+      } finally {
+        vi.useRealTimers();
       }
     });
   });

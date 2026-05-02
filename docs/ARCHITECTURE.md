@@ -250,6 +250,18 @@ The 2D panel thumbs are pointer-only — no role, no ARIA, no key handling. Keyb
 
 This replaced an older, fragile convention: `data-slot="thumb"` + `dataset.dragging` toggled inside each slider's pointer handlers, with the host app running a `MutationObserver` on `document.body` to catch attribute changes. The convention coupled a magic string to the slider's internal DOM — a rename (or a typo like `data-slot="track"` vs `"thumb"`) silently broke the signal, and drags started getting "stuck" after 10–20 pixels with no obvious cause. The current event-delegation model lives entirely inside the picker and exposes a single documented attribute on the root.
 
+### `useInteractionLifecycle` and `onChangeStart` / `onChangeEnd`
+
+`src/hooks/useInteractionLifecycle.ts` is the per-component counterpart to `useInteractionAttribute`. Where the attribute hook only toggles a DOM flag, the lifecycle hook calls value-bearing callbacks at the boundaries of an interaction. It backs the new `onChangeStart` / `onChangeEnd` props on `GradientSlider`, `OKLCHPanel`, `SaturationPanel`, and (forwarded) every wrapper up to `ColorPicker`.
+
+Timing rules mirror `useInteractionAttribute`:
+
+- Pointer: `pointerdown` → start, `lostpointercapture` → end.
+- Keyboard: first value-changing keydown after idle → start, 200 ms after the last keydown (or `blur` outside the slider) → end.
+- Pointer takes precedence — starting a pointer drag mid-keyboard interaction fires the keyboard's pending end before the pointer's start.
+
+Use `onChangeStart` / `onChangeEnd` for value-bearing logic (e.g. snapshotting at start, persisting to a URL only at end). Use `data-interacting` for purely visual/CSS reactions or when an external host needs a single signal across the whole picker.
+
 ---
 
 ## 8. Channel slider internals

@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-import { fireEvent, firePointerDrag, mockRAFSync, mockRect, render, screen } from '~/test-utils';
+import {
+  act,
+  fireEvent,
+  firePointerDrag,
+  mockRAFSync,
+  mockRect,
+  render,
+  screen,
+} from '~/test-utils';
 
 import GradientSlider from '~/components/GradientSlider';
 
@@ -13,9 +21,11 @@ function Controlled(props: {
   isDisabled?: boolean;
   maxValue?: number;
   minValue?: number;
+  onChangeEnd?: (value: number) => void;
+  onChangeStart?: (value: number) => void;
   step?: number;
 }) {
-  const { initial, isDisabled, maxValue, minValue, step } = props;
+  const { initial, isDisabled, maxValue, minValue, onChangeEnd, onChangeStart, step } = props;
   const [value, setValue] = useState(initial ?? 50);
 
   return (
@@ -29,6 +39,8 @@ function Controlled(props: {
         mockOnChange(next);
         setValue(next);
       }}
+      onChangeEnd={onChangeEnd}
+      onChangeStart={onChangeStart}
       step={step}
       value={value}
     />
@@ -294,6 +306,204 @@ describe('GradientSlider', () => {
       fireEvent.keyDown(slider, { key: 'ArrowRight' });
 
       expect(mockOnChange).toHaveBeenCalledWith(0.501);
+    });
+  });
+
+  describe('Lifecycle callbacks', () => {
+    it('pointerDown fires onChangeStart with the value before drag', () => {
+      const onChangeStart = vi.fn();
+
+      render(<Controlled initial={50} onChangeStart={onChangeStart} />);
+      const track = screen.getByRole('slider').parentElement!;
+
+      mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+      fireEvent.pointerDown(track, { clientX: 100, clientY: 6, pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeStart).toHaveBeenCalledWith(50);
+    });
+
+    it('lostPointerCapture fires onChangeEnd with the final value', () => {
+      const onChangeEnd = vi.fn();
+
+      render(<Controlled initial={0} onChangeEnd={onChangeEnd} />);
+      const track = screen.getByRole('slider').parentElement!;
+
+      mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+
+      firePointerDrag(track, [
+        { x: 0, y: 6 },
+        { x: 200, y: 6 },
+      ]);
+      fireEvent.lostPointerCapture(track, { pointerId: 1 });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      expect(onChangeEnd).toHaveBeenCalledWith(100);
+    });
+
+    it('keyboard fires onChangeStart immediately and onChangeEnd after idle', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(<Controlled initial={50} onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />);
+        const slider = screen.getByRole('slider');
+
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+
+        expect(onChangeStart).toHaveBeenCalledTimes(1);
+        expect(onChangeStart).toHaveBeenCalledWith(50);
+        expect(onChangeEnd).not.toHaveBeenCalled();
+
+        act(() => {
+          vi.advanceTimersByTime(200);
+        });
+
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).toHaveBeenCalledWith(51);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('multiple keydowns within idle window coalesce to a single Start/End pair', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(<Controlled initial={50} onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />);
+        const slider = screen.getByRole('slider');
+
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+        act(() => {
+          vi.advanceTimersByTime(50);
+        });
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+        act(() => {
+          vi.advanceTimersByTime(50);
+        });
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+        act(() => {
+          vi.advanceTimersByTime(199);
+        });
+
+        expect(onChangeStart).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).not.toHaveBeenCalled();
+
+        act(() => {
+          vi.advanceTimersByTime(1);
+        });
+
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).toHaveBeenCalledWith(53);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('blur fires onChangeEnd immediately on an active keyboard interaction', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(<Controlled initial={50} onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />);
+        const slider = screen.getByRole('slider');
+
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+
+        expect(onChangeStart).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).not.toHaveBeenCalled();
+
+        fireEvent.blur(slider);
+
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).toHaveBeenCalledWith(51);
+
+        // Idle timer that was pending must not double-fire End.
+        act(() => {
+          vi.advanceTimersByTime(200);
+        });
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('pointer interrupting an active keyboard session ends keyboard before starting pointer', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(<Controlled initial={50} onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />);
+        const track = screen.getByRole('slider').parentElement!;
+        const slider = screen.getByRole('slider');
+
+        mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+
+        expect(onChangeStart).toHaveBeenCalledTimes(1);
+        expect(onChangeStart).toHaveBeenLastCalledWith(50);
+        expect(onChangeEnd).not.toHaveBeenCalled();
+
+        // Pointer takes precedence — closes the keyboard session, then starts
+        // pointer. Both Start/End fire with the post-keyboard value (51); the
+        // pointer's `handleMove` (which clamps to 0) runs after `onStart`.
+        fireEvent.pointerDown(track, { clientX: 0, clientY: 6, pointerId: 1 });
+
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).toHaveBeenLastCalledWith(51);
+        expect(onChangeStart).toHaveBeenCalledTimes(2);
+        expect(onChangeStart).toHaveBeenLastCalledWith(51);
+
+        // Pending keyboard idle timer was cancelled — no extra End.
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not fire Start/End when disabled', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(
+          <Controlled
+            initial={50}
+            isDisabled
+            onChangeEnd={onChangeEnd}
+            onChangeStart={onChangeStart}
+          />,
+        );
+        const track = screen.getByRole('slider').parentElement!;
+        const slider = screen.getByRole('slider');
+
+        mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+        fireEvent.pointerDown(track, { clientX: 100, clientY: 6, pointerId: 1 });
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+
+        expect(onChangeStart).not.toHaveBeenCalled();
+        expect(onChangeEnd).not.toHaveBeenCalled();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

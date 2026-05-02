@@ -154,4 +154,66 @@ describe('HSLSliders', () => {
       expect(Number(hue.getAttribute('aria-valuenow'))).toBeCloseTo(blueHsl.h, 0);
     });
   });
+
+  describe('Lifecycle callbacks', () => {
+    it('onChangeStart fires with the current color (not a stale value) on a drag after an external color change', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+      const redOklch = formatCSS(parseCSS('#ff0000', 'hsl'), { format: 'oklch' });
+      const blueOklch = formatCSS(parseCSS('#0000ff', 'hsl'), { format: 'oklch' });
+
+      const { rerender } = render(
+        <HSLSliders
+          color={redOklch}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
+        />,
+      );
+      const hueTrack = screen.getByRole('slider', { name: /hue/i }).parentElement!;
+
+      // First drag emits — populates lastEmittedRef.
+      hueTrack.getBoundingClientRect = () =>
+        ({
+          left: 0,
+          top: 0,
+          width: 200,
+          height: 12,
+          right: 200,
+          bottom: 12,
+          x: 0,
+          y: 0,
+        }) as DOMRect;
+      fireEvent.pointerDown(hueTrack, { clientX: 100, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(hueTrack, { pointerId: 1 });
+
+      onChangeStart.mockClear();
+      onChangeEnd.mockClear();
+
+      // Parent updates color externally.
+      rerender(
+        <HSLSliders
+          color={blueOklch}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
+        />,
+      );
+
+      // Second interaction: pointerdown then immediate release without movement.
+      // RAF mocked sync; pointerDown still calls update via handleMove. Skip handleMove
+      // by going straight to lostPointerCapture after a no-op pointerdown by setting
+      // pointerCapture only on a non-track element. Instead — simulate the boundary
+      // events directly to assert handleStart / handleEnd contract.
+      // Here we just call the start/end via a fresh pointerDown at exact same x with
+      // no movement — handleMove will emit, but the post-Start reset means
+      // lastEmittedRef tracks only this interaction.
+      fireEvent.pointerDown(hueTrack, { clientX: 100, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(hueTrack, { pointerId: 1 });
+
+      // Start should fire with the *current* color (blue), not the prior red.
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeStart.mock.calls[0][0]).toBe(blueOklch);
+    });
+  });
 });

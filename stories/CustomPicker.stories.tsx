@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { formatCSS, readableColor } from 'colorizr';
-import { fn } from 'storybook/test';
+import { action } from 'storybook/actions';
 
 import {
   ChannelSliders,
   ColorInput,
+  ColorPickerProps,
   EyeDropper,
   GamutWarning,
   HueSlider,
@@ -19,35 +20,34 @@ import {
 import { DEFAULT_COLOR } from '../src/constants';
 import { cn } from '../src/modules/helpers';
 
-type Story = StoryObj<Props>;
-
-interface Props {
-  color: string;
-  onChange: (value: string) => void;
-}
+type Story = StoryObj<ColorPickerProps>;
 
 export default {
   title: 'useColorPicker',
   args: {
     color: DEFAULT_COLOR,
-    onChange: fn(),
+    onChange: action('onChange'),
+    onChangeStart: action('onChangeStart'),
+    onChangeEnd: action('onChangeEnd'),
   },
-} satisfies Meta<Props>;
+} satisfies Meta<ColorPickerProps>;
 
 const PALETTE_LIGHTNESS = [0.92, 0.82, 0.72, 0.62, 0.52, 0.42, 0.32, 0.22];
 const PALETTE_HUES = [0, 30, 60, 90, 120, 180, 240, 300];
 const PALETTE_CHROMA = 0.15;
 
 export const CustomLayout: Story = {
-  render: function CustomLayoutPicker(props: Props) {
-    const { color: initial, onChange } = props;
+  render: function CustomLayoutPicker(props: ColorPickerProps) {
+    const { color: initial, onChange, ...rest } = props;
+
     const [color, setColor] = useState(initial);
     const picker = useColorPicker({
       color,
       onChange: (next: string) => {
         setColor(next);
-        onChange(next);
+        onChange?.(next);
       },
+      ...rest,
     });
 
     const isDark = readableColor(picker.swatchColor, 'apca') === '#ffffff';
@@ -62,12 +62,16 @@ export const CustomLayout: Story = {
               hue={picker.oklch.h}
               lightness={picker.oklch.l}
               onChange={picker.handleChangeOklchPanel}
+              onChangeEnd={picker.handleInteractionEnd}
+              onChangeStart={picker.handleInteractionStart}
             />
           ) : (
             <SaturationPanel
               classNames={{ root: 'rounded-lg' }}
               hue={picker.hsv.h}
               onChange={picker.handleChangeSaturationPanel}
+              onChangeEnd={picker.handleInteractionEnd}
+              onChangeStart={picker.handleInteractionStart}
               saturation={picker.hsv.s}
               value={picker.hsv.v}
             />
@@ -98,6 +102,8 @@ export const CustomLayout: Story = {
               <HueSlider
                 mode={picker.mode}
                 onChange={picker.isOklch ? picker.handleChangeOklchHue : picker.handleChangeHsvHue}
+                onChangeEnd={picker.handleInteractionEnd}
+                onChangeStart={picker.handleInteractionStart}
                 value={picker.currentHue}
               />
               <div className="flex items-center justify-between">
@@ -126,12 +132,17 @@ export const CustomLayout: Story = {
 };
 
 export const PalettePicker: Story = {
-  render: function PalettePicker() {
-    const [color, setColor] = useState(DEFAULT_COLOR);
+  render: function PalettePicker(props: ColorPickerProps) {
+    const { color: initial, onChange, ...rest } = props;
+    const [color, setColor] = useState(initial);
     const picker = useColorPicker({
       color,
       defaultMode: 'oklch',
-      onChange: setColor,
+      onChange: value => {
+        setColor(value);
+        onChange?.(value);
+      },
+      ...rest,
     });
 
     const cells = useMemo(
@@ -171,6 +182,8 @@ export const PalettePicker: Story = {
           color={picker.solidColor}
           mode="oklch"
           onChange={picker.handleChangeColorInput}
+          onChangeEnd={picker.handleInteractionEnd}
+          onChangeStart={picker.handleInteractionStart}
           showInputs
         />
 
