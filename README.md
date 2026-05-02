@@ -16,7 +16,10 @@ A modern, OKLCH-first React/Tailwind color picker.
 </p>
 <p align="center"><sub>Default layout &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Custom layout</sub></p>
 
-👉 **[Live demo (Storybook)](https://transience.github.io/color-picker/)**
+<h3 style="vertical-align: middle;">
+    👉 <a href="https://transience.github.io/color-picker/?path=/story/colorpicker--default" target="_blank">Live Demo <img alt="Open story" src="https://cdn.svglogos.dev/logos/storybook-icon.svg" width="16" /></a>
+</h3>
+
 
 ## Setup
 
@@ -135,24 +138,23 @@ Most Tailwind apps already ship `tailwind-merge`, so it dedupes in your bundle. 
 
 Individual parts are also exported as standalone widgets — drop a swatch, alpha slider, or mode switcher anywhere in your UI.
 
-| Export              | Purpose                                                                     |
-|---------------------|-----------------------------------------------------------------------------|
-| **ColorPicker**     | The full picker.                                                            |
-| **useColorPicker**  | State hook powering `ColorPicker`. See [Hook](#hook).                       |
-| **AlphaSlider**     | Checkerboard-backed alpha slider.                                           |
-| **ChannelInputs**   | Per-mode input group (L/C/H, H/S/L, or R/G/B).                              |
-| **ChannelSliders**  | Per-mode slider group (L/C/H, H/S/L, or R/G/B).                             |
-| **ColorInput**      | CSS color string input with validation.                                     |
-| **EyeDropper**      | Screen color picker button (omits when `window.EyeDropper` is unavailable). |
-| **GamutWarning**    | Popover-anchored icon shown when an OKLCH color falls outside sRGB.         |
-| **GradientSlider**  | Low-level 1D slider with a CSS-gradient track.                              |
-| **HueSlider**       | Standalone mode-aware hue slider (OKLCH or HSL gradient).                   |
-| **ModeSelector**    | OKLCH / HSL / RGB mode switcher.                                            |
-| **OKLCHPanel**      | 2D OKLCH chroma/lightness panel with sRGB gamut overlay.                    |
-| **SaturationPanel** | 2D HSV saturation/value panel (used for HSL and RGB modes).                 |
-| **SettingsMenu**    | Display/output format picker popover.                                       |
-| **Swatch**          | Circular color preview over a checkerboard. Accepts `children` for icon overlays. |
-
+| Export                                                  | Purpose         |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| <a href="https://transience.github.io/color-picker/?path=/story/colorpicker--default" target="_blank">Color Picker</a> | The full picker.                                                                 |
+| <a href="https://transience.github.io/color-picker/?path=/story/usecolorpicker--custom-layout" target="_blank">useColorPicker</a> | State hook powering `ColorPicker`. See [Hook](#hook).                            |
+| <a href="https://transience.github.io/color-picker/?path=/story/alphaslider--default" target="_blank">AlphaSlider</a> | Checkerboard-backed alpha slider.                                                |
+| <a href="https://transience.github.io/color-picker/?path=/story/channelinputs--default" target="_blank">ChannelInputs</a> | Per-mode input group (L/C/H, H/S/L, or R/G/B).                                   |
+| <a href="https://transience.github.io/color-picker/?path=/story/channelsliders--default" target="_blank">ChannelSliders</a> | Per-mode slider group (L/C/H, H/S/L, or R/G/B).                                  |
+| <a href="https://transience.github.io/color-picker/?path=/story/colorinput--default" target="_blank">ColorInput</a> | CSS color string input with validation.                                          |
+| <a href="https://transience.github.io/color-picker/?path=/story/eyedropper--default" target="_blank">EyeDropper</a> | Screen color picker button (omits when `window.EyeDropper` is unavailable).      |
+| <a href="https://transience.github.io/color-picker/?path=/story/gamutwarning--default" target="_blank">GamutWarning</a> | Popover-anchored icon shown when an OKLCH color falls outside sRGB.              |
+| <a href="https://transience.github.io/color-picker/?path=/story/gradientslider--default" target="_blank">GradientSlider</a> | Low-level 1D slider with a CSS-gradient track.                                   |
+| <a href="https://transience.github.io/color-picker/?path=/story/hueslider--default" target="_blank">HueSlider</a> | Standalone mode-aware hue slider (OKLCH or HSL gradient).                        |
+| <a href="https://transience.github.io/color-picker/?path=/story/modeselector--default" target="_blank">ModeSelector</a> | OKLCH / HSL / RGB mode switcher.                                                 |
+| <a href="https://transience.github.io/color-picker/?path=/story/oklchpanel--default" target="_blank">OKLCHPanel</a> | 2D OKLCH chroma/lightness panel with sRGB gamut overlay.                         |
+| <a href="https://transience.github.io/color-picker/?path=/story/saturationpanel--default" target="_blank">SaturationPanel</a> | 2D HSV saturation/value panel (used for HSL and RGB modes).                      |
+| <a href="https://transience.github.io/color-picker/?path=/story/settingsmenu--default" target="_blank">SettingsMenu</a> | Display/output format picker popover.                                            |
+| <a href="https://transience.github.io/color-picker/?path=/story/swatch--default" target="_blank">Swatch</a>  | Circular color preview over a checkerboard. Accepts `children` for icon overlays. |
 
 The constants (`hslHueGradient`, `oklchHueGradient`) and all types (`ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `HSV`, `ChannelsConfig`, `ColorPickerClassNames`, etc.) are also exported.
 

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import ColorPicker from '../src/ColorPicker';
+import { DEFAULT_COLOR } from '../src/constants';
 import { defaultProps } from '../src/hooks/useColorPicker';
 
 import Preview from './components/Preview';
@@ -145,12 +146,14 @@ export const Toolbar: Story = {
   render: props => <ColorPickerWrapper {...props} />,
 };
 
-export const KeyboardE2E: Story = {
+export const KeyboardUpdates: Story = {
   args: {
-    color: 'oklch(0.7 0.15 250)',
+    color: 'hsl(209.3deg 91.49% 63.14%)',
     defaultMode: 'hsl',
     showSliders: true,
     onChange: fn(),
+    onChangeStart: fn(),
+    onChangeEnd: fn(),
   },
   tags: ['!dev'],
   render: props => <ColorPickerWrapper {...props} />,
@@ -171,5 +174,55 @@ export const KeyboardE2E: Story = {
 
     await expect(nextValue).toBeGreaterThan(initialValue);
     await expect(args.onChange).toHaveBeenCalled();
+  },
+};
+
+export const KeyboardFocus: Story = {
+  args: {
+    color: DEFAULT_COLOR,
+    onChange: fn(),
+    onChangeStart: fn(),
+    onChangeEnd: fn(),
+  },
+  tags: ['!dev'],
+  render: props => <ColorPickerWrapper {...props} />,
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    // With showGlobalHue=false and mode=hsl, there's exactly one Hue slider
+    // (the HSL ChannelSliders' hue track).
+    const colorInput = await canvas.findByRole('textbox', { name: 'Color value' });
+
+    colorInput.focus();
+
+    // move focus to Lightness slider
+    await userEvent.keyboard('{Tab}');
+    // move focus to Lightness input
+    await userEvent.keyboard('{Tab}');
+
+    // move focus to Chroma slider
+    await userEvent.keyboard('{Tab}');
+    // move focus to Lightness input
+    await userEvent.keyboard('{Shift}{Tab}');
+    // move focus back to Chroma slider
+    await userEvent.keyboard('{Tab}');
+    // move focus to Chroma input
+    await userEvent.keyboard('{Tab}');
+
+    // move focus to Hue slider
+    await userEvent.keyboard('{Tab}');
+    // move focus to Hue input
+    await userEvent.keyboard('{Tab}');
+    // move focus back to Hue slider
+    await userEvent.keyboard('{Shift}{Tab}');
+    // move focus to Hue input
+    await userEvent.keyboard('{Tab}');
+
+    // move focus to EyeDropper
+    await userEvent.keyboard('{Tab}');
+
+    // move focus to ModeSelector
+    await userEvent.keyboard('{Tab}');
+
+    await expect(args.onChange).not.toHaveBeenCalled();
   },
 };

@@ -93,7 +93,7 @@ Each return field maps directly onto the props of a built-in sub-component. The 
 
 ## Examples
 
-> 👉 More live examples in [Storybook → useColorPicker](https://transience.github.io/color-picker/?path=/story/usecolorpicker--custom-layout). Source: [`stories/CustomPicker.stories.tsx`](../stories/CustomPicker.stories.tsx).
+> 👉 More live examples in [Storybook → useColorPicker](https://transience.github.io/color-picker/?path=/story/usecolorpicker--custom-layout). Source: [`stories/useColorPicker.stories.tsx`](../stories/useColorPicker.stories.tsx).
 
 ### Composing primitives
 
