@@ -56,7 +56,7 @@ exports[`RGBSliders > Render > renders R, G, B sliders 1`] = `
         aria-valuenow="110"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(43.1373% - 8.6274509803922px);"
+        style="left: calc(43.137% - 8.627px);"
         tabindex="0"
       />
     </div>
@@ -94,7 +94,7 @@ exports[`RGBSliders > Render > renders R, G, B sliders 1`] = `
         aria-valuenow="217"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(85.098% - 17.0196078431373px);"
+        style="left: calc(85.098% - 17.02px);"
         tabindex="0"
       />
     </div>

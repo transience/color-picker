@@ -237,6 +237,7 @@ export default function GradientSlider(props: GradientSliderProps) {
   };
 
   const percentage = clamp(((value - minValue) / (maxValue - minValue)) * 100, 0, 100);
+  const left = `calc(${percentage.toFixed(3)}% - ${(percentage * thumbOffset).toFixed(3)}px)`;
 
   return (
     <div
@@ -266,7 +267,7 @@ export default function GradientSlider(props: GradientSliderProps) {
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           role="slider"
-          style={{ left: `calc(${percentage}% - ${percentage * thumbOffset}px)` }}
+          style={{ left }}
           tabIndex={isDisabled ? -1 : 0}
         />
       </div>
