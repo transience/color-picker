@@ -1,6 +1,7 @@
 import { type HTMLAttributes, type PointerEvent, useRef } from 'react';
 
 import { panelClasses } from './constants';
+import useInteractionLifecycle from './hooks/useInteractionLifecycle';
 import { cn, relativePosition } from './modules/helpers';
 import type { PanelClassNames } from './types';
 
@@ -14,6 +15,16 @@ interface SaturationPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
    * `[0, 1]`.
    */
   onChange: (s: number, v: number) => void;
+  /**
+   * Called once when an interaction ends (pointer release). Receives the
+   * current saturation and value.
+   */
+  onChangeEnd?: (s: number, v: number) => void;
+  /**
+   * Called once when an interaction begins (`pointerdown`). Receives the
+   * saturation and value at the start of the interaction.
+   */
+  onChangeStart?: (s: number, v: number) => void;
   /** HSV saturation as a float in `[0, 1]` — drives the thumb's X position. */
   saturation: number;
   /** HSV value (brightness) as a float in `[0, 1]` — drives the thumb's Y position. */
@@ -21,9 +32,28 @@ interface SaturationPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
 }
 
 export default function SaturationPanel(props: SaturationPanelProps) {
-  const { className, classNames, hue, onChange, saturation, style, value, ...rest } = props;
+  const {
+    className,
+    classNames,
+    hue,
+    onChange,
+    onChangeEnd,
+    onChangeStart,
+    saturation,
+    style,
+    value,
+    ...rest
+  } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
+  const valuesRef = useRef({ s: saturation, v: value });
+
+  valuesRef.current = { s: saturation, v: value };
+
+  const lifecycle = useInteractionLifecycle({
+    onStart: () => onChangeStart?.(valuesRef.current.s, valuesRef.current.v),
+    onEnd: () => onChangeEnd?.(valuesRef.current.s, valuesRef.current.v),
+  });
 
   const handleMove = (event: PointerEvent) => {
     if (!containerRef.current) return;
@@ -40,6 +70,7 @@ export default function SaturationPanel(props: SaturationPanelProps) {
   const handlePointerDown = (event: PointerEvent) => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    lifecycle.notifyPointerStart();
     handleMove(event);
   };
 
@@ -49,11 +80,17 @@ export default function SaturationPanel(props: SaturationPanelProps) {
     }
   };
 
+  const handleLostPointerCapture = () => {
+    cancelAnimationFrame(rafRef.current);
+    lifecycle.notifyPointerEnd();
+  };
+
   return (
     <div
       ref={containerRef}
       className={cn(panelClasses.root, className, classNames?.root)}
       data-testid="SaturationPanel"
+      onLostPointerCapture={handleLostPointerCapture}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       style={{

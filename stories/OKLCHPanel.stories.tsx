@@ -1,6 +1,7 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { getP3MaxChroma } from 'colorizr';
+import { action } from 'storybook/actions';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import OKLCHPanel from '../src/OKLCHPanel';
@@ -15,7 +16,9 @@ export default {
   title: 'OKLCHPanel',
   component: OKLCHPanel,
   args: {
-    onChange: fn(),
+    onChange: action('onChange'),
+    onChangeStart: action('onChangeStart'),
+    onChangeEnd: action('onChangeEnd'),
   },
 } satisfies Meta<typeof OKLCHPanel>;
 
@@ -68,7 +71,7 @@ export const Customized: Story = {
  * natively — two things the jsdom unit test has to mock.
  */
 export const ClickStaysInGamut: Story = {
-  args: { hue: 30, chroma: 0.1, lightness: 0.6 },
+  args: { onChange: fn(), hue: 30, chroma: 0.1, lightness: 0.6 },
   tags: ['!dev'],
   render: props => <OKLCHPanelWrapper {...props} />,
   play: async ({ args, canvasElement }) => {

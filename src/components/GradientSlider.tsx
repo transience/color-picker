@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 
+import useInteractionLifecycle from '../hooks/useInteractionLifecycle';
 import { clamp, cn, quantize, relativePosition } from '../modules/helpers';
 import type { GradientSliderClassNames } from '../types';
 
@@ -44,6 +45,18 @@ interface GradientSliderProps extends Omit<
   minValue?: number;
   /** Called with the new value on drag, click, or keyboard step. */
   onChange: (value: number) => void;
+  /**
+   * Called once when an interaction ends — pointer release, or 200 ms after the
+   * last keyboard step (whichever applies). Receives the final value. Use to
+   * commit expensive side effects (URL sync, autosave) only on release.
+   */
+  onChangeEnd?: (value: number) => void;
+  /**
+   * Called once when an interaction begins — `pointerdown` or first
+   * value-changing keydown after idle. Receives the value at the start of the
+   * interaction (useful for undo snapshots).
+   */
+  onChangeStart?: (value: number) => void;
   /** Content rendered to the left of the track (e.g. a channel letter label). */
   startContent?: ReactNode;
   /**
@@ -81,6 +94,8 @@ export default function GradientSlider(props: GradientSliderProps) {
     maxValue = 100,
     minValue = 0,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     startContent,
     step = 1,
     style,
@@ -91,11 +106,20 @@ export default function GradientSlider(props: GradientSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
+  const valueRef = useRef(value);
   const [isDragging, setIsDragging] = useState(false);
   // Width of the thumb in pixels, divided by 100. Drives the inset-thumb math
   // in the `left` style below so the thumb stays inside the track at both ends
   // regardless of the consumer's size override.
   const [thumbOffset, setThumbOffset] = useState(0.2);
+
+  valueRef.current = value;
+
+  const lifecycle = useInteractionLifecycle({
+    isDisabled,
+    onStart: () => onChangeStart?.(valueRef.current),
+    onEnd: () => onChangeEnd?.(valueRef.current),
+  });
 
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
@@ -143,6 +167,7 @@ export default function GradientSlider(props: GradientSliderProps) {
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    lifecycle.notifyPointerStart();
     setIsDragging(true);
     handleMove(event);
   };
@@ -156,6 +181,7 @@ export default function GradientSlider(props: GradientSliderProps) {
   const handleLostPointerCapture = () => {
     setIsDragging(false);
     cancelAnimationFrame(rafRef.current);
+    lifecycle.notifyPointerEnd();
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -190,7 +216,12 @@ export default function GradientSlider(props: GradientSliderProps) {
     }
 
     event.preventDefault();
+    lifecycle.notifyKeyboardActivity();
     onChange(clamp(quantize(next, step), minValue, maxValue));
+  };
+
+  const handleBlur = () => {
+    lifecycle.notifyBlur();
   };
 
   const percentage = clamp(((value - minValue) / (maxValue - minValue)) * 100, 0, 100);
@@ -220,6 +251,7 @@ export default function GradientSlider(props: GradientSliderProps) {
           aria-valuemin={minValue}
           aria-valuenow={value}
           className={cn(thumbClassName, isDragging && thumbPressedClassName, classNames?.thumb)}
+          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           role="slider"
           style={{ left: `calc(${percentage}% - ${percentage * thumbOffset}px)` }}

@@ -9,6 +9,7 @@ import {
 } from 'react';
 
 import { panelClasses } from './constants';
+import useInteractionLifecycle from './hooks/useInteractionLifecycle';
 import { clamp, cn, relativePosition } from './modules/helpers';
 import {
   lcToPointer,
@@ -36,10 +37,31 @@ interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
    * (absolute value, clamped to the P3 gamut for the current hue).
    */
   onChange: (l: number, c: number) => void;
+  /**
+   * Called once when an interaction ends (pointer release). Receives the
+   * current lightness and chroma.
+   */
+  onChangeEnd?: (l: number, c: number) => void;
+  /**
+   * Called once when an interaction begins (`pointerdown`). Receives the
+   * lightness and chroma at the start of the interaction.
+   */
+  onChangeStart?: (l: number, c: number) => void;
 }
 
 export default function OKLCHPanel(props: OKLCHPanelProps) {
-  const { chroma, className, classNames, hue, lightness, onChange, style, ...rest } = props;
+  const {
+    chroma,
+    className,
+    classNames,
+    hue,
+    lightness,
+    onChange,
+    onChangeEnd,
+    onChangeStart,
+    style,
+    ...rest
+  } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderRef = useRef<OKLCHCanvasResult>({ hsvHue: 0, srgbBoundary: [] });
@@ -100,6 +122,14 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
   }, [canvasResult]);
 
   const rafRef = useRef(0);
+  const valuesRef = useRef({ l: lightness, c: chroma });
+
+  valuesRef.current = { l: lightness, c: chroma };
+
+  const lifecycle = useInteractionLifecycle({
+    onStart: () => onChangeStart?.(valuesRef.current.l, valuesRef.current.c),
+    onEnd: () => onChangeEnd?.(valuesRef.current.l, valuesRef.current.c),
+  });
 
   const handleMove = (event: PointerEvent) => {
     if (!containerRef.current) return;
@@ -117,6 +147,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
   const handlePointerDown = (event: PointerEvent) => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    lifecycle.notifyPointerStart();
     handleMove(event);
   };
 
@@ -126,6 +157,11 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     }
   };
 
+  const handleLostPointerCapture = () => {
+    cancelAnimationFrame(rafRef.current);
+    lifecycle.notifyPointerEnd();
+  };
+
   const thumb = lcToPointer(hue, lightness, chroma);
 
   return (
@@ -133,6 +169,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
       ref={containerRef}
       className={cn(panelClasses.root, className, classNames?.root)}
       data-testid="OKLCHPanel"
+      onLostPointerCapture={handleLostPointerCapture}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       style={{ ...style, touchAction: 'none' }}

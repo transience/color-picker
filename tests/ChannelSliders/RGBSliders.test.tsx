@@ -145,4 +145,55 @@ describe('RGBSliders', () => {
       expect(Number(blue.getAttribute('aria-valuenow'))).toBeCloseTo(0, 0);
     });
   });
+
+  describe('Lifecycle callbacks', () => {
+    it('onChangeStart fires with the current color (not a stale value) on a drag after an external color change', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+      const redOklch = formatCSS(parseCSS('#ff0000', 'rgb'), { format: 'oklch' });
+      const blueOklch = formatCSS(parseCSS('#0000ff', 'rgb'), { format: 'oklch' });
+
+      const { rerender } = render(
+        <RGBSliders
+          color={redOklch}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
+        />,
+      );
+      const redTrack = screen.getByRole('slider', { name: /red/i }).parentElement!;
+
+      redTrack.getBoundingClientRect = () =>
+        ({
+          left: 0,
+          top: 0,
+          width: 200,
+          height: 12,
+          right: 200,
+          bottom: 12,
+          x: 0,
+          y: 0,
+        }) as DOMRect;
+      fireEvent.pointerDown(redTrack, { clientX: 100, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(redTrack, { pointerId: 1 });
+
+      onChangeStart.mockClear();
+      onChangeEnd.mockClear();
+
+      rerender(
+        <RGBSliders
+          color={blueOklch}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
+        />,
+      );
+
+      fireEvent.pointerDown(redTrack, { clientX: 100, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(redTrack, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeStart.mock.calls[0][0]).toBe(blueOklch);
+    });
+  });
 });

@@ -73,6 +73,7 @@ const preview: Preview = {
   },
   parameters: {
     a11y: { test: 'error' },
+    actions: { argTypesRegex: '^on.*' },
     backgrounds: { disable: true },
     controls: {
       disableSaveFromUI: true,

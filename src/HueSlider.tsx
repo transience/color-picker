@@ -31,6 +31,17 @@ interface HueSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'
   mode: ColorMode;
   /** Called on every drag/keyboard change with the new hue in `[0, 360]`. */
   onChange: (hue: number) => void;
+  /**
+   * Called once when an interaction ends — pointer release, or 200 ms after
+   * the last keyboard step. Receives the final hue value.
+   */
+  onChangeEnd?: (hue: number) => void;
+  /**
+   * Called once when an interaction begins — `pointerdown` or first
+   * value-changing keydown after idle. Receives the hue value at the start of
+   * the interaction.
+   */
+  onChangeStart?: (hue: number) => void;
   /** Current hue in `[0, 360]`. */
   value: number;
 }
@@ -44,6 +55,8 @@ export default function HueSlider(props: HueSliderProps) {
     label,
     mode,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     value,
     ...rest
   } = props;
@@ -62,6 +75,8 @@ export default function HueSlider(props: HueSliderProps) {
       isDisabled={isDisabled}
       maxValue={360}
       onChange={onChange}
+      onChangeEnd={onChangeEnd}
+      onChangeStart={onChangeStart}
       startContent={label}
       value={value}
       {...rest}

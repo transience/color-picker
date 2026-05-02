@@ -1,5 +1,6 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { action } from 'storybook/actions';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import GradientSlider from '../src/components/GradientSlider';
@@ -14,8 +15,10 @@ export default {
   title: 'GradientSlider',
   component: GradientSlider,
   args: {
-    onChange: fn(),
     'aria-label': 'Test slider',
+    onChange: action('onChange'),
+    onChangeStart: action('onChangeStart'),
+    onChangeEnd: action('onChangeEnd'),
     gradient: 'linear-gradient(to right, black, white)',
     minValue: 0,
     maxValue: 100,
@@ -33,7 +36,7 @@ function GradientSliderWrapper(props: GradientSliderWrapperProps) {
         {...rest}
         onChange={next => {
           setValue(next);
-          onChange(next);
+          onChange?.(next);
         }}
         value={value}
       />
@@ -73,7 +76,7 @@ export const Customized: Story = {
  * them (jsdom approximates each of these).
  */
 export const KeyboardClampsAtBounds: Story = {
-  args: { value: 95, step: 5, minValue: 0, maxValue: 100 },
+  args: { maxValue: 100, minValue: 0, onChange: fn(), step: 5, value: 95 },
   tags: ['!dev'],
   render: props => <GradientSliderWrapper {...props} />,
   play: async ({ args, canvasElement }) => {

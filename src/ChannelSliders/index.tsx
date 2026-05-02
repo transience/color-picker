@@ -39,6 +39,16 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
   /** Called with an OKLCH CSS string whenever a slider changes. */
   onChange: (value: string) => void;
   /**
+   * Called once when an interaction on any channel slider ends. Receives the
+   * most recently emitted OKLCH CSS string.
+   */
+  onChangeEnd?: (value: string) => void;
+  /**
+   * Called once when an interaction on any channel slider begins. Receives
+   * the incoming `color`.
+   */
+  onChangeStart?: (value: string) => void;
+  /**
    * Render a `NumericInput` as each slider's `endContent`. Turn off for a
    * sliders-only layout (e.g. when a standalone inputs row is shown elsewhere).
    * @default true
@@ -56,6 +66,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     mode,
     numericInputClassNames,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     showInputs = true,
     ...rest
   } = props;
@@ -76,6 +88,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           labels={labels?.hslSliders}
           numericInputClassNames={numericInputClassNames}
           onChange={onChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
           showInputs={showInputs}
         />
       )}
@@ -87,6 +101,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           labels={labels?.rgbSliders}
           numericInputClassNames={numericInputClassNames}
           onChange={onChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
           showInputs={showInputs}
         />
       )}
@@ -98,6 +114,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           labels={labels?.oklchSliders}
           numericInputClassNames={numericInputClassNames}
           onChange={onChange}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
           showInputs={showInputs}
         />
       )}

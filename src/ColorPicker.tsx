@@ -32,6 +32,8 @@ export default function ColorPicker(props: ColorPickerProps) {
     handleChangeOutputFormat,
     handleChangeSaturationPanel,
     handleClickMode,
+    handleInteractionEnd,
+    handleInteractionStart,
     hsv,
     isOklch,
     mode,
@@ -71,12 +73,16 @@ export default function ColorPicker(props: ColorPickerProps) {
         hue={oklch.h}
         lightness={oklch.l}
         onChange={handleChangeOklchPanel}
+        onChangeEnd={handleInteractionEnd}
+        onChangeStart={handleInteractionStart}
       />
     ) : (
       <SaturationPanel
         classNames={classNames?.panel}
         hue={hsv.h}
         onChange={handleChangeSaturationPanel}
+        onChangeEnd={handleInteractionEnd}
+        onChangeStart={handleInteractionStart}
         saturation={hsv.s}
         value={hsv.v}
       />
@@ -116,6 +122,8 @@ export default function ColorPicker(props: ColorPickerProps) {
         color={solidColor}
         label={labels?.alphaSlider?.label}
         onChange={handleChangeAlpha}
+        onChangeEnd={handleInteractionEnd}
+        onChangeStart={handleInteractionStart}
         value={alpha}
       />
     );
@@ -130,6 +138,8 @@ export default function ColorPicker(props: ColorPickerProps) {
         label={labels?.hueSlider?.label}
         mode={mode}
         onChange={isOklch ? handleChangeOklchHue : handleChangeHsvHue}
+        onChangeEnd={handleInteractionEnd}
+        onChangeStart={handleInteractionStart}
         value={currentHue}
       />
     );
@@ -155,6 +165,8 @@ export default function ColorPicker(props: ColorPickerProps) {
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
         onChange={handleChangeColorInput}
+        onChangeEnd={handleInteractionEnd}
+        onChangeStart={handleInteractionStart}
         showInputs={showInputs}
       />
     );

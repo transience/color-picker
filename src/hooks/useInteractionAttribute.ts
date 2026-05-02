@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 
+import { KEYBOARD_IDLE_MS } from '~/constants';
+
 const ATTR = 'data-interacting';
-const KEYBOARD_IDLE_MS = 200;
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;

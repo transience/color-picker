@@ -128,6 +128,53 @@ describe('OKLCHPanel', () => {
     });
   });
 
+  describe('Lifecycle callbacks', () => {
+    it('pointerDown fires onChangeStart with the values before drag', () => {
+      const onChangeStart = vi.fn();
+
+      render(
+        <OKLCHPanel
+          chroma={0.1}
+          hue={30}
+          lightness={0.6}
+          onChange={mockOnChange}
+          onChangeStart={onChangeStart}
+        />,
+      );
+      const root = screen.getByTestId('OKLCHPanel');
+
+      mockRect(root, { left: 0, top: 0, width: 256, height: 128 });
+      fireEvent.pointerDown(root, { clientX: 50, clientY: 50, pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeStart).toHaveBeenCalledWith(0.6, 0.1);
+    });
+
+    it('lostPointerCapture fires onChangeEnd', () => {
+      const onChangeEnd = vi.fn();
+
+      render(
+        <OKLCHPanel
+          chroma={0.1}
+          hue={30}
+          lightness={0.6}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+        />,
+      );
+      const root = screen.getByTestId('OKLCHPanel');
+
+      mockRect(root, { left: 0, top: 0, width: 256, height: 128 });
+      firePointerDrag(root, [
+        { x: 50, y: 50 },
+        { x: 100, y: 60 },
+      ]);
+      fireEvent.lostPointerCapture(root, { pointerId: 1 });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('Native attribute forwarding', () => {
     it('forwards native HTML attrs to the root', () => {
       render(

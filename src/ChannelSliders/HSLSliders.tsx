@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatCSS, type HSL, parseCSS } from 'colorizr';
 
 import { resolveLabel } from '~/modules/helpers';
@@ -12,6 +12,8 @@ import type {
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
+
+import useChannelLifecycle from './useChannelLifecycle';
 
 interface HSLSlidersProps {
   /** Per-channel toggles for `h`, `s`, and `l` (`disabled`, `hidden`). */
@@ -27,6 +29,17 @@ interface HSLSlidersProps {
   /** Called with an OKLCH CSS string whenever any of H/S/L changes. */
   onChange: (value: string) => void;
   /**
+   * Called once when an interaction on any of H/S/L ends. Receives the most
+   * recently emitted OKLCH CSS string (or the incoming `color` if no value
+   * was emitted during the interaction).
+   */
+  onChangeEnd?: (value: string) => void;
+  /**
+   * Called once when an interaction on any of H/S/L begins. Receives the
+   * incoming `color` (the value before any change).
+   */
+  onChangeStart?: (value: string) => void;
+  /**
    * Render a `NumericInput` as each slider's `endContent`.
    * @default true
    */
@@ -41,10 +54,16 @@ export default function HSLSliders(props: HSLSlidersProps) {
     labels,
     numericInputClassNames,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     showInputs = true,
   } = props;
 
-  const lastEmittedRef = useRef<string>('');
+  const { handleEnd, handleStart, lastEmittedRef, recordEmit } = useChannelLifecycle(
+    color,
+    onChangeStart,
+    onChangeEnd,
+  );
   const [hsl, setHsl] = useState<HSL>(() => parseCSS(color, 'hsl'));
 
   // Re-derive HSL only from external changes (not our own round-trip)
@@ -52,7 +71,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
     if (color !== lastEmittedRef.current) {
       setHsl(parseCSS(color, 'hsl'));
     }
-  }, [color]);
+  }, [color, lastEmittedRef]);
 
   const { h, l, s } = hsl;
   const hueConfig = channels?.h;
@@ -88,7 +107,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
 
     const oklch = formatCSS(newHsl, { format: 'oklch' });
 
-    lastEmittedRef.current = oklch;
+    recordEmit(oklch);
     onChange(oklch);
   };
 
@@ -115,7 +134,9 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={hslHueGradient}
           isDisabled={hueConfig?.disabled}
           maxValue={359.9}
-          onChange={v => update({ h: v, s, l })}
+          onChange={(v: number) => update({ h: v, s, l })}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={hueSlot.label}
           step={1}
           value={h}
@@ -142,7 +163,9 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={saturationGradient}
           isDisabled={saturationConfig?.disabled}
           maxValue={100}
-          onChange={v => update({ h, s: v, l })}
+          onChange={(v: number) => update({ h, s: v, l })}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={saturationSlot.label}
           step={1}
           value={s}
@@ -169,7 +192,9 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={lightnessGradient}
           isDisabled={lightnessConfig?.disabled}
           maxValue={100}
-          onChange={v => update({ h, s, l: v })}
+          onChange={(v: number) => update({ h, s, l: v })}
+          onChangeEnd={handleEnd}
+          onChangeStart={handleStart}
           startContent={lightnessSlot.label}
           step={1}
           value={l}

@@ -28,6 +28,17 @@ interface AlphaSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' 
   label?: ReactNode;
   /** Called on every drag/keyboard change with the new alpha in `[0, 1]`. */
   onChange: (alpha: number) => void;
+  /**
+   * Called once when an interaction ends — pointer release, or 200 ms after
+   * the last keyboard step. Receives the final alpha value.
+   */
+  onChangeEnd?: (alpha: number) => void;
+  /**
+   * Called once when an interaction begins — `pointerdown` or first
+   * value-changing keydown after idle. Receives the alpha value at the start
+   * of the interaction.
+   */
+  onChangeStart?: (alpha: number) => void;
   /** Current alpha value as a float in `[0, 1]`. */
   value: number;
 }
@@ -40,6 +51,8 @@ export default function AlphaSlider(props: AlphaSliderProps) {
     isDisabled,
     label,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     value,
     ...rest
   } = props;
@@ -58,6 +71,8 @@ export default function AlphaSlider(props: AlphaSliderProps) {
       maxValue={1}
       minValue={0}
       onChange={onChange}
+      onChangeEnd={onChangeEnd}
+      onChangeStart={onChangeStart}
       startContent={label}
       step={0.01}
       value={value}

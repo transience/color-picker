@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '~/test-utils';
+import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
 
-import useInteractionAttribute from '../src/hooks/useInteractionAttribute';
+import useInteractionAttribute from '../../src/hooks/useInteractionAttribute';
 
 function Harness() {
   const ref = useInteractionAttribute();
