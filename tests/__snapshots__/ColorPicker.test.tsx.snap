@@ -60,7 +60,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
           aria-valuenow="344"
           class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
           role="slider"
-          style="left: calc(95.5821% - 19.1164212281189px);"
+          style="left: calc(95.582% - 19.116px);"
           tabindex="0"
         />
       </div>
@@ -276,7 +276,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
           aria-valuenow="0.63269"
           class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
           role="slider"
-          style="left: calc(63.269% - 12.6538px);"
+          style="left: calc(63.269% - 12.654px);"
           tabindex="0"
         />
       </div>
@@ -313,7 +313,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
           aria-valuenow="0.25404"
           class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
           role="slider"
-          style="left: calc(88.6918% - 17.7383653946863px);"
+          style="left: calc(88.692% - 17.738px);"
           tabindex="0"
         />
       </div>
@@ -351,7 +351,7 @@ exports[`ColorPicker > Render > renders OKLCH mode by default 1`] = `
           aria-valuenow="19.902"
           class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
           role="slider"
-          style="left: calc(5.52833% - 1.1056666666667px);"
+          style="left: calc(5.528% - 1.106px);"
           tabindex="0"
         />
       </div>
@@ -543,7 +543,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
           aria-valuenow="68"
           class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
           role="slider"
-          style="left: calc(26.6667% - 5.3333333333333px);"
+          style="left: calc(26.667% - 5.333px);"
           tabindex="0"
         />
       </div>

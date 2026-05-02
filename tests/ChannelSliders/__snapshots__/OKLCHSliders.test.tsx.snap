@@ -55,7 +55,7 @@ exports[`OKLCHSliders > Render > renders L, C, H sliders 1`] = `
         aria-valuenow="0.194"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(98.3125% - 19.6624942988902px);"
+        style="left: calc(98.312% - 19.662px);"
         tabindex="0"
       />
     </div>
@@ -93,7 +93,7 @@ exports[`OKLCHSliders > Render > renders L, C, H sliders 1`] = `
         aria-valuenow="250"
         class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
         role="slider"
-        style="left: calc(69.4444% - 13.8888888888889px);"
+        style="left: calc(69.444% - 13.889px);"
         tabindex="0"
       />
     </div>
