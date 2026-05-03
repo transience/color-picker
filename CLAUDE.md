@@ -41,11 +41,14 @@ Path alias `~/*` → `src/*`. Prefer it for intra-`src` imports.
 
 - `src/ColorPicker.tsx` — thin JSX wrapper around `useColorPicker`. Composes sub-components based on `show*` flags.
 - `src/hooks/useColorPicker.ts` — public state hook. Owns HSV + OKLCH state, alpha, format resolution, and the `onChange` emit pipeline. Returns `UseColorPickerReturn`.
+- `src/hooks/useEmitLifecycle.ts` — per-component pointer/keyboard mux that produces Start/Change/End for every interactive primitive (sliders, panels, NumericInput, ChannelSliders aggregation).
+- `src/hooks/useRafCommit.ts` — rAF coalescer used by pointer-driven surfaces to drop duplicate values inside the same frame.
 - `src/hooks/useInteractionAttribute.ts` — sets `data-interacting` on the root during drags/keys.
-- `src/modules/` — pure logic. `colorSpace.ts` (HSV ↔ RGB, OKLCH ↔ P3-HSV, gamut checks), `format.ts` (format resolution + `formatColor`), `oklchCanvas.ts` (OKLCH panel coordinate math), `helpers.ts` (`cn`, `clamp`, `quantize`, `relativePosition`).
+- `src/modules/` — pure logic. `colorSpace.ts` (HSV ↔ RGB, OKLCH ↔ P3-HSV, gamut checks), `format.ts` (format resolution + `formatColor`), `oklchCanvas.ts` (OKLCH panel coordinate math), `helpers.ts` (`cn`, `clamp`, `quantize`, `relativePosition`, `mergeProps`, `resolveLabel`).
 - `src/ChannelSliders/` — per-mode slider group (HSL / OKLCH / RGB), dispatched by `mode`.
-- `src/types.ts` — public types. `ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `ChannelsConfig`, `ColorPickerClassNames` slot map.
-- `src/constants.tsx` — `DEFAULT_COLOR` (`oklch(54% 0.194 250)`), `DEFAULT_MODES`, hue gradients.
+- `src/components/` — primitives. `GradientSlider` (1D slider), `NumericInput` (clamped text input with arrow-step + lifecycle), `Floater` (floating-UI primitive used by `SettingsMenu` + `GamutWarning`), `Button`, `RadioGroup`, plus inline SVG icons.
+- `src/types.ts` — public types. `ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `ChannelsConfig`, `ColorPickerClassNames`, `ColorPickerLabels`, `LabelSlot`.
+- `src/constants.tsx` — `DEFAULT_COLOR` (`oklch(54% 0.194 250)`), `DEFAULT_MODES`, `KEYBOARD_IDLE_MS` (600), hue gradients.
 
 All other component files are building blocks assembled by `ColorPicker` — open them as needed; they're small.
 
@@ -60,7 +63,7 @@ All other component files are building blocks assembled by `ColorPicker` — ope
 Two Vitest projects (`vitest.config.mts`):
 
 - `unit` — jsdom + globals. Setup: `tests/__setup__/vitest.setup.ts`. Files in `tests/` mirror `src/`.
-- `storybook` — runs `.stories.tsx` via `@storybook/addon-vitest` in headless Chromium (Playwright). Use for interaction + keyboard E2E.
+- `stories` — runs `.stories.tsx` via `@storybook/addon-vitest` in headless Chromium (Playwright). Use for interaction + keyboard E2E.
 
 Coverage: **90%** across statements, branches, functions, lines. Excluded: `src/index.ts`, `src/types.ts`, `src/images/*`.
 

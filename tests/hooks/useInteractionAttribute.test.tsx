@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
 
+import { KEYBOARD_IDLE_MS } from '../../src/constants';
 import useInteractionAttribute from '../../src/hooks/useInteractionAttribute';
 
 function Harness() {
@@ -98,7 +99,7 @@ describe('useInteractionAttribute', () => {
       expect(root).not.toHaveAttribute('data-interacting');
     });
 
-    it('holds flag during keyup and clears after 200ms idle', () => {
+    it('holds flag during keyup and clears after idle window', () => {
       render(<Harness />);
       const root = screen.getByTestId('root');
       const slider = screen.getByTestId('slider');
@@ -108,7 +109,7 @@ describe('useInteractionAttribute', () => {
 
       expect(root).toHaveAttribute('data-interacting', 'true');
 
-      vi.advanceTimersByTime(199);
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS - 1);
       expect(root).toHaveAttribute('data-interacting', 'true');
 
       vi.advanceTimersByTime(1);
@@ -123,16 +124,16 @@ describe('useInteractionAttribute', () => {
       fireEvent.keyDown(slider, { key: 'ArrowRight' });
       fireEvent.keyUp(slider, { key: 'ArrowRight' });
 
-      vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS - 50);
 
       fireEvent.keyDown(slider, { key: 'ArrowRight' });
       fireEvent.keyUp(slider, { key: 'ArrowRight' });
 
-      vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS - 50);
 
       expect(root).toHaveAttribute('data-interacting', 'true');
 
-      vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(50);
       expect(root).not.toHaveAttribute('data-interacting');
     });
   });

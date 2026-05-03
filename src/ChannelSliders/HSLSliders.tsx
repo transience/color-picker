@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatCSS, type HSL, parseCSS } from 'colorizr';
 
+import useEmitLifecycle from '~/hooks/useEmitLifecycle';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -12,8 +13,6 @@ import type {
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
-
-import useChannelLifecycle from './useChannelLifecycle';
 
 interface HSLSlidersProps {
   /** Per-channel toggles for `h`, `s`, and `l` (`disabled`, `hidden`). */
@@ -59,19 +58,26 @@ export default function HSLSliders(props: HSLSlidersProps) {
     showInputs = true,
   } = props;
 
-  const { handleEnd, handleStart, lastEmittedRef, recordEmit } = useChannelLifecycle(
-    color,
-    onChangeStart,
+  const { emit, notifyEnd, notifyStart } = useEmitLifecycle<string>({
+    onChange,
     onChangeEnd,
-  );
+    onChangeStart,
+    value: color,
+  });
+  // Skip re-derive when the [color] prop is our own echo — hex round-trip
+  // drops fractional precision and collapses hue at s=0%.
+  const selfEchoRef = useRef(false);
   const [hsl, setHsl] = useState<HSL>(() => parseCSS(color, 'hsl'));
 
-  // Re-derive HSL only from external changes (not our own round-trip)
   useEffect(() => {
-    if (color !== lastEmittedRef.current) {
-      setHsl(parseCSS(color, 'hsl'));
+    if (selfEchoRef.current) {
+      selfEchoRef.current = false;
+
+      return;
     }
-  }, [color, lastEmittedRef]);
+
+    setHsl(parseCSS(color, 'hsl'));
+  }, [color]);
 
   const { h, l, s } = hsl;
   const hueConfig = channels?.h;
@@ -104,11 +110,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
 
   const update = (newHsl: HSL) => {
     setHsl(newHsl);
-
-    const oklch = formatCSS(newHsl, { format: 'oklch' });
-
-    recordEmit(oklch);
-    onChange?.(oklch);
+    selfEchoRef.current = true;
+    emit(formatCSS(newHsl, { format: 'oklch' }));
   };
 
   return (
@@ -127,6 +130,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
                 max={360}
                 min={0}
                 onChange={v => update({ h: v, s, l })}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 suffix="°"
                 value={`${Math.round(h)}`}
               />
@@ -136,8 +141,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
           isDisabled={hueConfig?.disabled}
           maxValue={359.9}
           onChange={(v: number) => update({ h: v, s, l })}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={hueSlot.label}
           step={1}
           value={h}
@@ -157,6 +162,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
                 max={100}
                 min={0}
                 onChange={v => update({ h, s: v, l })}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 suffix="%"
                 value={`${Math.round(s)}`}
               />
@@ -166,8 +173,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
           isDisabled={saturationConfig?.disabled}
           maxValue={100}
           onChange={(v: number) => update({ h, s: v, l })}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={saturationSlot.label}
           step={1}
           value={s}
@@ -187,6 +194,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
                 max={100}
                 min={0}
                 onChange={v => update({ h, s, l: v })}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 suffix="%"
                 value={`${Math.round(l)}`}
               />
@@ -196,8 +205,8 @@ export default function HSLSliders(props: HSLSlidersProps) {
           isDisabled={lightnessConfig?.disabled}
           maxValue={100}
           onChange={(v: number) => update({ h, s, l: v })}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={lightnessSlot.label}
           step={1}
           value={l}

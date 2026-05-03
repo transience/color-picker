@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { formatCSS, getP3MaxChroma, type LCH, parseCSS } from 'colorizr';
 
+import useEmitLifecycle from '~/hooks/useEmitLifecycle';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -12,8 +13,6 @@ import type {
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
-
-import useChannelLifecycle from './useChannelLifecycle';
 
 interface OKLCHSlidersProps {
   /**
@@ -63,11 +62,12 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     showInputs = true,
   } = props;
 
-  const { handleEnd, handleStart, recordEmit } = useChannelLifecycle(
-    color,
-    onChangeStart,
+  const { emit, notifyEnd, notifyStart } = useEmitLifecycle<string>({
+    onChange,
     onChangeEnd,
-  );
+    onChangeStart,
+    value: color,
+  });
 
   const { c, h, l } = useMemo(() => parseCSS(color, 'oklch'), [color]);
   const lightnessConfig = channels?.l;
@@ -101,10 +101,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   );
 
   const update = (okLCH: LCH) => {
-    const oklch = formatCSS(okLCH, { format: 'oklch' });
-
-    recordEmit(oklch);
-    onChange?.(oklch);
+    emit(formatCSS(okLCH, { format: 'oklch' }));
   };
 
   const handleChangeLightness = (lightness: number) => {
@@ -141,6 +138,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
                 max={100}
                 min={0}
                 onChange={v => handleChangeLightness(v / 100)}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 step={0.1}
                 suffix="%"
                 value={(l * 100).toFixed(1)}
@@ -151,8 +150,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={lightnessConfig?.disabled}
           maxValue={1}
           onChange={handleChangeLightness}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={lightnessSlot.label}
           step={0.001}
           value={l}
@@ -172,6 +171,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
                 max={maxChroma}
                 min={0}
                 onChange={handleChangeChroma}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 step={0.001}
                 suffix=" "
                 value={c.toFixed(3)}
@@ -182,8 +183,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={chromaConfig?.disabled}
           maxValue={maxChroma}
           onChange={handleChangeChroma}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={chromaSlot.label}
           step={0.001}
           value={c}
@@ -203,6 +204,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
                 max={360}
                 min={0}
                 onChange={handleChangeHue}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 step={0.1}
                 suffix="°"
                 value={h.toFixed(1)}
@@ -213,8 +216,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
           isDisabled={hueConfig?.disabled}
           maxValue={360}
           onChange={handleChangeHue}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={hueSlot.label}
           step={0.01}
           value={h}

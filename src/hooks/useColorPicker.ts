@@ -184,6 +184,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
       const next = { ...hsvRef.current, h };
 
       setHsv(next);
+      hsvRef.current = next;
       emit(convertCSS(hsvToHex(next), 'oklch'));
     },
     [emit],
@@ -194,6 +195,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
       const next = { ...oklchRef.current, h };
 
       setOklch(next);
+      oklchRef.current = next;
       emit(formatCSS(next, 'oklch'));
     },
     [emit],
@@ -204,6 +206,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
       const next = { ...oklchRef.current, c, l };
 
       setOklch(next);
+      oklchRef.current = next;
       emit(formatCSS(next, 'oklch'));
     },
     [emit],
@@ -219,6 +222,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
       const next = { h: hsvRef.current.h, s, v };
 
       setHsv(next);
+      hsvRef.current = next;
       emit(convertCSS(hsvToHex(next), 'oklch'));
     },
     [emit],
@@ -243,7 +247,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   // Invariant: child sliders/panels call this BEFORE mutating their value, so
   // `formatCurrent()` here returns the pre-interaction color. Reordering a
-  // child to call `notifyPointerStart` after `handleMove` would silently break
+  // child to call `notifyStart` after `handleMove` would silently break
   // the public `onChangeStart`'s "value before any change" contract.
   const handleInteractionStart = useCallback(() => {
     if (!onChangeStartRef.current) return;

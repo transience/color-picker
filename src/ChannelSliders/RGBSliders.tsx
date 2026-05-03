@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { formatCSS, parseCSS, type RGB } from 'colorizr';
 
+import useEmitLifecycle from '~/hooks/useEmitLifecycle';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -12,8 +13,6 @@ import type {
   GradientSliderClassNames,
   NumericInputClassNames,
 } from '../types';
-
-import useChannelLifecycle from './useChannelLifecycle';
 
 interface RGBSlidersProps {
   /** Per-channel toggles for `r`, `g`, and `b` (`disabled`, `hidden`). */
@@ -59,19 +58,26 @@ export default function RGBSliders(props: RGBSlidersProps) {
     showInputs = true,
   } = props;
 
-  const { handleEnd, handleStart, lastEmittedRef, recordEmit } = useChannelLifecycle(
-    color,
-    onChangeStart,
+  const { emit, notifyEnd, notifyStart } = useEmitLifecycle<string>({
+    onChange,
     onChangeEnd,
-  );
+    onChangeStart,
+    value: color,
+  });
+  // Skip re-derive when the [color] prop is our own echo — keeps the slider
+  // pinned to user-input values across the parent's hex round-trip.
+  const selfEchoRef = useRef(false);
   const [rgb, setRgb] = useState<RGB>(() => parseCSS(color, 'rgb'));
 
-  // Re-derive RGB only from external changes (not our own round-trip)
   useEffect(() => {
-    if (color !== lastEmittedRef.current) {
-      setRgb(parseCSS(color, 'rgb'));
+    if (selfEchoRef.current) {
+      selfEchoRef.current = false;
+
+      return;
     }
-  }, [color, lastEmittedRef]);
+
+    setRgb(parseCSS(color, 'rgb'));
+  }, [color]);
 
   const { b, g, r } = rgb;
   const redConfig = channels?.r;
@@ -93,11 +99,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
 
   const update = (newRgb: RGB) => {
     setRgb(newRgb);
-
-    const oklch = formatCSS(newRgb, { format: 'oklch' });
-
-    recordEmit(oklch);
-    onChange?.(oklch);
+    selfEchoRef.current = true;
+    emit(formatCSS(newRgb, { format: 'oklch' }));
   };
 
   return (
@@ -116,6 +119,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
                 max={255}
                 min={0}
                 onChange={v => update({ r: v, g, b })}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 suffix=" "
                 value={`${Math.round(r)}`}
               />
@@ -125,8 +130,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
           isDisabled={redConfig?.disabled}
           maxValue={255}
           onChange={(v: number) => update({ r: v, g, b })}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={redSlot.label}
           step={1}
           value={r}
@@ -146,6 +151,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
                 max={255}
                 min={0}
                 onChange={v => update({ r, g: v, b })}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 suffix=" "
                 value={`${Math.round(g)}`}
               />
@@ -155,8 +162,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
           isDisabled={greenConfig?.disabled}
           maxValue={255}
           onChange={(v: number) => update({ r, g: v, b })}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={greenSlot.label}
           step={1}
           value={g}
@@ -176,6 +183,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
                 max={255}
                 min={0}
                 onChange={v => update({ r, g, b: v })}
+                onChangeEnd={notifyEnd}
+                onChangeStart={notifyStart}
                 suffix=" "
                 value={`${Math.round(b)}`}
               />
@@ -185,8 +194,8 @@ export default function RGBSliders(props: RGBSlidersProps) {
           isDisabled={blueConfig?.disabled}
           maxValue={255}
           onChange={(v: number) => update({ r, g, b: v })}
-          onChangeEnd={handleEnd}
-          onChangeStart={handleStart}
+          onChangeEnd={notifyEnd}
+          onChangeStart={notifyStart}
           startContent={blueSlot.label}
           step={1}
           value={b}

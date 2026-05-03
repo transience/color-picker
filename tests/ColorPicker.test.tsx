@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import ColorPicker from '~/ColorPicker';
+import { KEYBOARD_IDLE_MS } from '~/constants';
 import {
   act,
   fireEvent,
@@ -512,7 +513,8 @@ describe('ColorPicker', () => {
     it('emits without alpha when alpha is 1', () => {
       const onChange = vi.fn();
 
-      render(<ColorPicker color="#ff0044" onChange={onChange} showAlpha />);
+      // Start below 1 so `End` actually changes the value and triggers an emit.
+      render(<ColorPicker color="rgb(255 0 68 / 0.5)" onChange={onChange} showAlpha />);
       const slider = screen.getByRole('slider', { name: 'Alpha' });
 
       fireEvent.keyDown(slider, { key: 'End' });
@@ -829,6 +831,55 @@ describe('ColorPicker', () => {
       expect(onChangeEnd).toHaveBeenCalledTimes(1);
     });
 
+    it('onChangeEnd receives the same color as the last onChange after a panel drag', () => {
+      const onChange = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(<ColorPicker color="#ff0044" onChange={onChange} onChangeEnd={onChangeEnd} />);
+      const panel = screen.getByTestId('OKLCHPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      firePointerDrag(panel, [
+        { x: 25, y: 75 },
+        { x: 100, y: 50 },
+        { x: 175, y: 25 },
+      ]);
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      const lastChange = onChange.mock.calls.at(-1)?.[0];
+
+      expect(onChangeEnd.mock.calls[0][0]).toBe(lastChange);
+    });
+
+    it('onChangeEnd receives the same color as the last onChange after a SaturationPanel drag', () => {
+      const onChange = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <ColorPicker
+          color="#ff0044"
+          defaultMode="hsl"
+          onChange={onChange}
+          onChangeEnd={onChangeEnd}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      firePointerDrag(panel, [
+        { x: 25, y: 75 },
+        { x: 100, y: 50 },
+        { x: 175, y: 25 },
+      ]);
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      const lastChange = onChange.mock.calls.at(-1)?.[0];
+
+      expect(onChangeEnd.mock.calls[0][0]).toBe(lastChange);
+    });
+
     it('Start fires with the pre-drag color and End fires with the post-drag color', () => {
       const onChangeStart = vi.fn();
       const onChangeEnd = vi.fn();
@@ -854,7 +905,7 @@ describe('ColorPicker', () => {
       expect(startValue).not.toBe(endValue);
     });
 
-    it('keyboard fires onChangeStart immediately and onChangeEnd after 200 ms idle', () => {
+    it('keyboard fires onChangeStart immediately and onChangeEnd after 600 ms idle', () => {
       vi.useFakeTimers();
 
       try {
@@ -874,7 +925,7 @@ describe('ColorPicker', () => {
         expect(onChangeEnd).not.toHaveBeenCalled();
 
         act(() => {
-          vi.advanceTimersByTime(200);
+          vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
         });
 
         expect(onChangeEnd).toHaveBeenCalledTimes(1);

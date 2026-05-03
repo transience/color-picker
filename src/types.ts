@@ -221,26 +221,26 @@ export interface ColorPickerProps {
    */
   onChange?: (value: string) => void;
   /**
-   * Called once when the user finishes interacting with any slider or panel —
-   * pointer release, or 200 ms after the last keyboard step. Receives the
-   * final color formatted per the resolved `outputFormat`. Use to commit
-   * expensive side effects (URL sync, autosave) only on release.
+   * Called once when the user finishes interacting with any slider, panel, or
+   * channel input — pointer release, 600 ms after the last keystroke, or on
+   * input blur. Receives the final color
+   * formatted per the resolved `outputFormat`. Use to commit expensive side
+   * effects (URL sync, autosave) only on release.
    *
-   * Scope: sliders and panels only. `ColorInput`, `ChannelInputs`'s
-   * `NumericInput` commits, and `EyeDropper` emit only `onChange` — treat
-   * each as a complete commit (no Start/End pair).
+   * Scope: sliders, panels, and `ChannelInputs`. `ColorInput` and `EyeDropper`
+   * emit only `onChange` — treat each as a complete commit (no Start/End pair).
    */
   onChangeEnd?: (value: string) => void;
   /** Called when the user changes mode via the switcher. */
   onChangeMode?: (mode: ColorMode) => void;
   /**
-   * Called once when the user begins interacting with any slider or panel —
-   * `pointerdown` or first value-changing keydown after idle. Receives the
-   * color before any change, formatted per the resolved `outputFormat`.
+   * Called once when the user begins interacting with any slider, panel, or
+   * channel input — `pointerdown`, first value-changing keydown after idle,
+   * or first typed keystroke after idle. Receives the color before any change,
+   * formatted per the resolved `outputFormat`.
    *
-   * Scope: sliders and panels only. `ColorInput`, `ChannelInputs`'s
-   * `NumericInput` commits, and `EyeDropper` emit only `onChange` — treat
-   * each as a complete commit (no Start/End pair).
+   * Scope: sliders, panels, and `ChannelInputs`. `ColorInput` and `EyeDropper`
+   * emit only `onChange` — treat each as a complete commit (no Start/End pair).
    */
   onChangeStart?: (value: string) => void;
   /**

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { KEYBOARD_IDLE_MS } from '~/constants';
 import {
   act,
   fireEvent,
@@ -169,6 +170,36 @@ describe('GradientSlider', () => {
       fireEvent.pointerDown(track, { clientX: 1000, clientY: 6, pointerId: 1 });
 
       expect(mockOnChange).toHaveBeenLastCalledWith(100);
+    });
+
+    it('pointerDown at the current value still emits (discrete commit)', () => {
+      render(<Controlled initial={50} maxValue={100} minValue={0} />);
+      const track = screen.getByRole('slider').parentElement!;
+
+      mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+      // x=100 / 200 = 0.5 → 50 = current value.
+      fireEvent.pointerDown(track, { clientX: 100, clientY: 6, pointerId: 1 });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange).toHaveBeenCalledWith(50);
+    });
+
+    it('coalesces pointerMove duplicates within the same quantize bucket', () => {
+      render(<Controlled initial={0} maxValue={100} minValue={0} step={10} />);
+      const track = screen.getByRole('slider').parentElement!;
+
+      mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+
+      // All three coords map to 20 after quantize (raw 20, 22, 23 → step 10).
+      // First emit (pointerdown, 0 → 20) fires; subsequent moves are skipped.
+      firePointerDrag(track, [
+        { x: 40, y: 6 },
+        { x: 44, y: 6 },
+        { x: 46, y: 6 },
+      ]);
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange).toHaveBeenCalledWith(20);
     });
 
     it('quantizes values to step', () => {
@@ -351,7 +382,7 @@ describe('GradientSlider', () => {
         expect(onChangeEnd).not.toHaveBeenCalled();
 
         act(() => {
-          vi.advanceTimersByTime(200);
+          vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
         });
 
         expect(onChangeEnd).toHaveBeenCalledTimes(1);
@@ -381,7 +412,7 @@ describe('GradientSlider', () => {
         });
         fireEvent.keyDown(slider, { key: 'ArrowRight' });
         act(() => {
-          vi.advanceTimersByTime(199);
+          vi.advanceTimersByTime(KEYBOARD_IDLE_MS - 1);
         });
 
         expect(onChangeStart).toHaveBeenCalledTimes(1);
@@ -462,6 +493,74 @@ describe('GradientSlider', () => {
           vi.advanceTimersByTime(300);
         });
         expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not fire Start/End for no-op keys at minValue', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(
+          <Controlled
+            initial={0}
+            maxValue={100}
+            minValue={0}
+            onChangeEnd={onChangeEnd}
+            onChangeStart={onChangeStart}
+          />,
+        );
+        const slider = screen.getByRole('slider');
+
+        fireEvent.keyDown(slider, { key: 'ArrowLeft' });
+        fireEvent.keyDown(slider, { key: 'ArrowDown' });
+        fireEvent.keyDown(slider, { key: 'PageDown' });
+        fireEvent.keyDown(slider, { key: 'Home' });
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(onChangeStart).not.toHaveBeenCalled();
+        expect(onChangeEnd).not.toHaveBeenCalled();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not fire Start/End for no-op keys at maxValue', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(
+          <Controlled
+            initial={100}
+            maxValue={100}
+            minValue={0}
+            onChangeEnd={onChangeEnd}
+            onChangeStart={onChangeStart}
+          />,
+        );
+        const slider = screen.getByRole('slider');
+
+        fireEvent.keyDown(slider, { key: 'ArrowRight' });
+        fireEvent.keyDown(slider, { key: 'ArrowUp' });
+        fireEvent.keyDown(slider, { key: 'PageUp' });
+        fireEvent.keyDown(slider, { key: 'End' });
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(onChangeStart).not.toHaveBeenCalled();
+        expect(onChangeEnd).not.toHaveBeenCalled();
       } finally {
         vi.useRealTimers();
       }

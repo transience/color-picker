@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type ReactNode, useCallback, useMemo } from 'react';
+import { type HTMLAttributes, type ReactNode, useCallback, useMemo, useRef } from 'react';
 import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } from 'colorizr';
 
 import { cn, resolveLabel } from '~/modules/helpers';
@@ -52,6 +52,18 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
    */
   onChangeAlpha?: (alpha: number) => void;
   /**
+   * Called once when an interaction on any channel input ends. Receives the
+   * incoming `color` (the most recent value the row knows about). Fires 600 ms
+   * after the last keystroke, or on blur.
+   */
+  onChangeEnd?: (value: string) => void;
+  /**
+   * Called once when an interaction on any channel input begins. Receives the
+   * incoming `color` (the value before any change). Fires on the first
+   * value-changing keystroke or arrow.
+   */
+  onChangeStart?: (value: string) => void;
+  /**
    * Adds a 4th input labelled `A` for the alpha channel, stepped `0.01`.
    * @default false
    */
@@ -81,9 +93,31 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     numericInputClassNames,
     onChange,
     onChangeAlpha,
+    onChangeEnd,
+    onChangeStart,
     showAlpha,
     ...rest
   } = props;
+
+  const lastEmittedRef = useRef<string | null>(null);
+
+  const emitColor = useCallback(
+    (next: string) => {
+      lastEmittedRef.current = next;
+      onChange?.(next);
+    },
+    [onChange],
+  );
+
+  const handleStart = useCallback(() => {
+    lastEmittedRef.current = null;
+    onChangeStart?.(color);
+  }, [color, onChangeStart]);
+
+  const handleEnd = useCallback(
+    () => onChangeEnd?.(lastEmittedRef.current ?? color),
+    [color, onChangeEnd],
+  );
 
   const mergedNumericClassNames: NumericInputClassNames = {
     root: cn('justify-center', numericInputClassNames?.root),
@@ -106,7 +140,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
   const fields = useMemo<FieldDefinition[]>(() => {
     if (mode === 'rgb') {
       const rgb = parseCSS(color, 'rgb');
-      const emit = (next: RGB) => onChange?.(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: RGB) => emitColor(formatCSS(next, { format: 'oklch' }));
 
       return [
         {
@@ -139,7 +173,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     if (mode === 'oklch') {
       const lch = parseCSS(color, 'oklch');
       const maxC = getP3MaxChroma({ l: lch.l, c: 0, h: lch.h });
-      const emit = (next: LCH) => onChange?.(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: LCH) => emitColor(formatCSS(next, { format: 'oklch' }));
 
       return [
         {
@@ -175,7 +209,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     }
 
     const hsl = parseCSS(color, 'hsl');
-    const emit = (next: HSL) => onChange?.(formatCSS(next, { format: 'oklch' }));
+    const emit = (next: HSL) => emitColor(formatCSS(next, { format: 'oklch' }));
 
     return [
       {
@@ -206,7 +240,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.l)}`,
       },
     ];
-  }, [color, mode, slot, onChange]);
+  }, [color, mode, slot, emitColor]);
 
   const labelClassName = cn(
     'text-xs text-neutral-500 dark:text-neutral-400 leading-none',
@@ -227,6 +261,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
             max={field.max}
             min={field.min}
             onChange={field.onChange}
+            onChangeEnd={handleEnd}
+            onChangeStart={handleStart}
             step={field.step}
             suffix={field.suffix}
             value={field.value}
@@ -242,6 +278,8 @@ export default function ChannelInputs(props: ChannelInputsProps) {
             max={1}
             min={0}
             onChange={onChangeAlpha}
+            onChangeEnd={handleEnd}
+            onChangeStart={handleStart}
             step={0.01}
             value={alpha.toFixed(2)}
           />

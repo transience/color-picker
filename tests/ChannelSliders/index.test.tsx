@@ -1,4 +1,5 @@
 import ChannelSliders from 'src/ChannelSliders';
+import { KEYBOARD_IDLE_MS } from 'src/constants';
 import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
 
 const mockOnChange = vi.fn();
@@ -180,7 +181,7 @@ describe('ChannelSliders', () => {
       fireEvent.keyUp(hueSlider, { key: 'ArrowRight' });
       expect(root).toHaveAttribute('data-interacting', 'true');
 
-      vi.advanceTimersByTime(200);
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
       expect(root).not.toHaveAttribute('data-interacting');
     });
 

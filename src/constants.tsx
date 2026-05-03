@@ -55,7 +55,7 @@ export const DEFAULT_LABELS = {
   },
 } as const;
 
-export const KEYBOARD_IDLE_MS = 200;
+export const KEYBOARD_IDLE_MS = 600;
 
 export const panelClasses = {
   root: 'relative h-32 w-full cursor-crosshair overflow-hidden',

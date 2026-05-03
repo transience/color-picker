@@ -3,7 +3,7 @@ import { formatCSS, parseCSS } from 'colorizr';
 
 import HSLSliders from '~/ChannelSliders/HSLSliders';
 import { DEFAULT_COLOR } from '~/constants';
-import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
+import { fireEvent, mockRAFSync, mockRect, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
 
@@ -104,7 +104,8 @@ describe('HSLSliders', () => {
       render(<Controlled />);
       const sat = screen.getByRole('slider', { name: /saturation/i });
 
-      fireEvent.keyDown(sat, { key: 'ArrowRight' });
+      // DEFAULT_COLOR is fully saturated in HSL (s=100); step left to change.
+      fireEvent.keyDown(sat, { key: 'ArrowLeft' });
 
       expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
     });
@@ -169,7 +170,7 @@ describe('HSLSliders', () => {
       );
       const hueTrack = screen.getByRole('slider', { name: /hue/i }).parentElement!;
 
-      // First drag emits — populates lastEmittedRef.
+      // First drag emits a value into the session.
       hueTrack.getBoundingClientRect = () =>
         ({
           left: 0,
@@ -203,14 +204,58 @@ describe('HSLSliders', () => {
       // pointerCapture only on a non-track element. Instead — simulate the boundary
       // events directly to assert handleStart / handleEnd contract.
       // Here we just call the start/end via a fresh pointerDown at exact same x with
-      // no movement — handleMove will emit, but the post-Start reset means
-      // lastEmittedRef tracks only this interaction.
+      // no movement — handleMove will emit, and the post-Start reset clears any
+      // prior session state so this interaction is observed in isolation.
       fireEvent.pointerDown(hueTrack, { clientX: 100, clientY: 6, pointerId: 1 });
       fireEvent.lostPointerCapture(hueTrack, { pointerId: 1 });
 
       // Start should fire with the *current* color (blue), not the prior red.
       expect(onChangeStart).toHaveBeenCalledTimes(1);
       expect(onChangeStart.mock.calls[0][0]).toBe(blueOklch);
+    });
+
+    it('multi-channel sequence emits independent, non-overlapping Start/End pairs per touched channel', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      function Wrapper() {
+        const [color, setColor] = useState(DEFAULT_COLOR);
+
+        return (
+          <HSLSliders
+            color={color}
+            onChange={setColor}
+            onChangeEnd={onChangeEnd}
+            onChangeStart={onChangeStart}
+          />
+        );
+      }
+
+      render(<Wrapper />);
+
+      const hueTrack = screen.getByRole('slider', { name: /hue/i }).parentElement!;
+      const saturationTrack = screen.getByRole('slider', { name: /saturation/i }).parentElement!;
+
+      mockRect(hueTrack, { width: 200, height: 12 });
+      mockRect(saturationTrack, { width: 200, height: 12 });
+
+      fireEvent.pointerDown(hueTrack, { clientX: 60, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(hueTrack, { pointerId: 1 });
+
+      fireEvent.pointerDown(saturationTrack, { clientX: 140, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(saturationTrack, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(2);
+      expect(onChangeEnd).toHaveBeenCalledTimes(2);
+
+      const startOrder = onChangeStart.mock.invocationCallOrder;
+      const endOrder = onChangeEnd.mock.invocationCallOrder;
+
+      expect(startOrder[0]).toBeLessThan(endOrder[0]);
+      expect(endOrder[0]).toBeLessThan(startOrder[1]);
+      expect(startOrder[1]).toBeLessThan(endOrder[1]);
+
+      expect(onChangeStart.mock.calls[1][0]).toBe(onChangeEnd.mock.calls[0][0]);
     });
   });
 });

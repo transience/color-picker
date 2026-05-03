@@ -55,7 +55,7 @@ Pre-bound callbacks to pass to the corresponding controls. Each handler updates 
 - **`handleChangeColorInput(value)`** — for `<ColorInput onChange>` (accepts any CSS color string), the eye dropper, and `<ChannelSliders onChange>` / `<ChannelInputs onChange>`.
 - **`handleChangeDisplayFormat(format)`** / **`handleChangeOutputFormat(format)`** — for `<SettingsMenu>`.
 - **`handleClickMode(value)`** — for `<ModeSelector onClick>`.
-- **`handleInteractionStart()`** / **`handleInteractionEnd()`** — for the `onChangeStart` / `onChangeEnd` props on every slider and panel. The hook fans these in and emits the consumer's `onChangeStart` / `onChangeEnd` with the current color formatted per the resolved `outputFormat`. Use in custom layouts to gate URL sync, autosave, or any boundary-only side effect. **Scope:** sliders and panels emit Start/End around their interaction. `ColorInput`, `ChannelInputs`'s `NumericInput` commits, and `EyeDropper` emit only `onChange` — treat each as a complete commit (no Start/End pair).
+- **`handleInteractionStart()`** / **`handleInteractionEnd()`** — for the `onChangeStart` / `onChangeEnd` props on every slider, panel, and `ChannelInputs`. The hook fans these in and emits the consumer's `onChangeStart` / `onChangeEnd` with the current color formatted per the resolved `outputFormat`. Use in custom layouts to gate URL sync, autosave, or any boundary-only side effect. **Scope:** sliders, panels, and `ChannelInputs` emit Start/End around their interaction (pointer drag, keyboard idle, or input blur). `ColorInput` and `EyeDropper` emit only `onChange` — treat each as a complete commit (no Start/End pair).
 
 ### Derived
 
