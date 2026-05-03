@@ -1,7 +1,8 @@
 import { type HTMLAttributes, type PointerEvent, useRef } from 'react';
 
 import { DEFAULT_COLOR, panelClasses } from './constants';
-import useInteractionLifecycle from './hooks/useInteractionLifecycle';
+import useEmitLifecycle from './hooks/useEmitLifecycle';
+import useRafCommit from './hooks/useRafCommit';
 import { colorToHsv } from './modules/colorSpace';
 import { cn, relativePosition } from './modules/helpers';
 import type { PanelClassNames } from './types';
@@ -43,6 +44,13 @@ interface SaturationPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
   value?: number;
 }
 
+interface SV {
+  s: number;
+  v: number;
+}
+
+const equalsSV = (a: SV, b: SV) => a.s === b.s && a.v === b.v;
+
 export default function SaturationPanel(props: SaturationPanelProps) {
   const {
     className,
@@ -57,15 +65,15 @@ export default function SaturationPanel(props: SaturationPanelProps) {
     ...rest
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef(0);
-  const valuesRef = useRef({ s: saturation, v: value });
 
-  valuesRef.current = { s: saturation, v: value };
-
-  const lifecycle = useInteractionLifecycle({
-    onStart: () => onChangeStart?.(valuesRef.current.s, valuesRef.current.v),
-    onEnd: () => onChangeEnd?.(valuesRef.current.s, valuesRef.current.v),
+  const { emit, notifyEnd, notifyStart } = useEmitLifecycle<SV>({
+    equals: equalsSV,
+    onChange: next => onChange?.(next.s, next.v),
+    onChangeEnd: next => onChangeEnd?.(next.s, next.v),
+    onChangeStart: next => onChangeStart?.(next.s, next.v),
+    value: { s: saturation, v: value },
   });
+  const { flush, schedule } = useRafCommit<SV>(emit);
 
   const handleMove = (event: PointerEvent) => {
     if (!containerRef.current) return;
@@ -73,16 +81,13 @@ export default function SaturationPanel(props: SaturationPanelProps) {
     const rect = containerRef.current.getBoundingClientRect();
     const { x, y } = relativePosition(event, rect);
 
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      onChange?.(x, 1 - y);
-    });
+    schedule({ s: x, v: 1 - y });
   };
 
   const handlePointerDown = (event: PointerEvent) => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    lifecycle.notifyPointerStart();
+    notifyStart();
     handleMove(event);
   };
 
@@ -93,8 +98,8 @@ export default function SaturationPanel(props: SaturationPanelProps) {
   };
 
   const handleLostPointerCapture = () => {
-    cancelAnimationFrame(rafRef.current);
-    lifecycle.notifyPointerEnd();
+    flush();
+    notifyEnd();
   };
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { KEYBOARD_IDLE_MS } from '~/constants';
 import { fireEvent, render, screen } from '~/test-utils';
 
 import NumericInput from '~/components/NumericInput';
@@ -309,6 +310,167 @@ describe('NumericInput', () => {
       fireEvent.focus(screen.getByDisplayValue('200'));
 
       expect(screen.getByDisplayValue('200')).toBeInTheDocument();
+    });
+  });
+
+  describe('Lifecycle', () => {
+    const mockOnChangeStart = vi.fn();
+    const mockOnChangeEnd = vi.fn();
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      mockOnChangeStart.mockClear();
+      mockOnChangeEnd.mockClear();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    function renderControlled(initial: string) {
+      function Wrapper() {
+        const [current, setCurrent] = useState(initial);
+
+        return (
+          <NumericInput
+            max={360}
+            min={0}
+            onChange={next => {
+              mockOnChange(next);
+              setCurrent(String(next));
+            }}
+            onChangeEnd={mockOnChangeEnd}
+            onChangeStart={mockOnChangeStart}
+            step={1}
+            value={current}
+          />
+        );
+      }
+
+      return render(<Wrapper />);
+    }
+
+    it('typing burst fires Start once, Change per key, End once after typing-idle', () => {
+      renderControlled('1');
+
+      const input = screen.getByDisplayValue('1');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '15' } });
+      fireEvent.change(input, { target: { value: '150' } });
+
+      expect(mockOnChangeStart).toHaveBeenCalledTimes(1);
+      expect(mockOnChangeStart).toHaveBeenCalledWith(1);
+      expect(mockOnChange.mock.calls.map(c => c[0])).toEqual([15, 150]);
+      expect(mockOnChangeEnd).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+
+      expect(mockOnChangeEnd).toHaveBeenCalledTimes(1);
+      expect(mockOnChangeEnd).toHaveBeenCalledWith(150);
+    });
+
+    it('typing pause longer than typing-idle produces two Start/End pairs', () => {
+      renderControlled('1');
+
+      const input = screen.getByDisplayValue('1');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '15' } });
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS + 50);
+
+      fireEvent.change(input, { target: { value: '150' } });
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+
+      expect(mockOnChangeStart).toHaveBeenCalledTimes(2);
+      expect(mockOnChangeEnd).toHaveBeenCalledTimes(2);
+    });
+
+    it('blur fires End immediately with the last emitted value', () => {
+      renderControlled('1');
+
+      const input = screen.getByDisplayValue('1');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '42' } });
+      fireEvent.blur(input);
+
+      expect(mockOnChangeEnd).toHaveBeenCalledTimes(1);
+      expect(mockOnChangeEnd).toHaveBeenCalledWith(42);
+    });
+
+    it('blur after a trailing-dot edit commits the parsed value via End', () => {
+      renderControlled('1');
+
+      const input = screen.getByDisplayValue('1');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '7.' } });
+
+      // Trailing dot suppresses mid-typing emit.
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(mockOnChangeStart).not.toHaveBeenCalled();
+
+      fireEvent.blur(input);
+
+      expect(mockOnChangeStart).toHaveBeenCalledWith(1);
+      expect(mockOnChange).toHaveBeenCalledWith(7);
+      expect(mockOnChangeEnd).toHaveBeenCalledWith(7);
+    });
+
+    it('arrow burst fires one Start/End pair after key-idle', () => {
+      renderControlled('180');
+
+      const input = screen.getByDisplayValue('180');
+
+      fireEvent.keyDown(input, { key: 'ArrowUp' });
+      fireEvent.keyDown(input, { key: 'ArrowUp' });
+      fireEvent.keyDown(input, { key: 'ArrowUp' });
+
+      expect(mockOnChangeStart).toHaveBeenCalledTimes(1);
+      expect(mockOnChangeStart).toHaveBeenCalledWith(180);
+      expect(mockOnChangeEnd).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+
+      expect(mockOnChangeEnd).toHaveBeenCalledTimes(1);
+      expect(mockOnChangeEnd).toHaveBeenCalledWith(183);
+    });
+
+    it('focus + blur with no edits fires no lifecycle callbacks', () => {
+      renderControlled('100');
+
+      const input = screen.getByDisplayValue('100');
+
+      fireEvent.focus(input);
+      fireEvent.blur(input);
+
+      expect(mockOnChangeStart).not.toHaveBeenCalled();
+      expect(mockOnChangeEnd).not.toHaveBeenCalled();
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('isDisabled suppresses Start/End even when emit would otherwise fire', () => {
+      render(
+        <NumericInput
+          isDisabled
+          max={360}
+          min={0}
+          onChange={mockOnChange}
+          onChangeEnd={mockOnChangeEnd}
+          onChangeStart={mockOnChangeStart}
+          value="100"
+        />,
+      );
+
+      const input = screen.getByDisplayValue('100');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '200' } });
+      vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+
+      expect(mockOnChangeStart).not.toHaveBeenCalled();
+      expect(mockOnChangeEnd).not.toHaveBeenCalled();
     });
   });
 });

@@ -8,7 +8,8 @@ import {
   useState,
 } from 'react';
 
-import useInteractionLifecycle from '../hooks/useInteractionLifecycle';
+import useEmitLifecycle from '../hooks/useEmitLifecycle';
+import useRafCommit from '../hooks/useRafCommit';
 import { clamp, cn, quantize, relativePosition } from '../modules/helpers';
 import type { GradientSliderClassNames } from '../types';
 
@@ -55,7 +56,7 @@ interface GradientSliderProps extends Omit<
    */
   onChange?: (value: number) => void;
   /**
-   * Called once when an interaction ends — pointer release, or 200 ms after the
+   * Called once when an interaction ends — pointer release, or 600 ms after the
    * last keyboard step (whichever applies). Receives the final value. Use to
    * commit expensive side effects (URL sync, autosave) only on release.
    */
@@ -117,23 +118,21 @@ export default function GradientSlider(props: GradientSliderProps) {
 
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef(0);
-  const valueRef = useRef(value);
   const [isDragging, setIsDragging] = useState(false);
   // Width of the thumb in pixels, divided by 100. Drives the inset-thumb math
   // in the `left` style below so the thumb stays inside the track at both ends
   // regardless of the consumer's size override.
   const [thumbOffset, setThumbOffset] = useState(0.2);
 
-  valueRef.current = value;
-
-  const lifecycle = useInteractionLifecycle({
-    isDisabled,
-    onStart: () => onChangeStart?.(valueRef.current),
-    onEnd: () => onChangeEnd?.(valueRef.current),
-  });
-
-  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+  const { emit, notifyBlur, notifyEnd, notifyKeyboardActivity, notifyStart } =
+    useEmitLifecycle<number>({
+      isDisabled,
+      onChange,
+      onChangeEnd,
+      onChangeStart,
+      value,
+    });
+  const { flush, schedule } = useRafCommit<number>(emit);
 
   useEffect(() => {
     const thumb = thumbRef.current;
@@ -164,14 +163,10 @@ export default function GradientSlider(props: GradientSliderProps) {
 
     const rect = trackRef.current.getBoundingClientRect();
     const { x } = relativePosition(event, rect);
+    const raw = minValue + x * (maxValue - minValue);
+    const next = clamp(quantize(raw, step, minValue), minValue, maxValue);
 
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      const raw = minValue + x * (maxValue - minValue);
-      const next = quantize(raw, step, minValue);
-
-      onChange?.(clamp(next, minValue, maxValue));
-    });
+    schedule(next);
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -179,7 +174,7 @@ export default function GradientSlider(props: GradientSliderProps) {
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    lifecycle.notifyPointerStart();
+    notifyStart();
     setIsDragging(true);
     handleMove(event);
   };
@@ -192,12 +187,12 @@ export default function GradientSlider(props: GradientSliderProps) {
 
   const handleLostPointerCapture = () => {
     setIsDragging(false);
-    cancelAnimationFrame(rafRef.current);
-    lifecycle.notifyPointerEnd();
+    flush();
+    notifyEnd();
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (isDisabled) return;
+    if (isDisabled || isDragging) return;
 
     const large = step * 10;
     let next: number | null = null;
@@ -228,12 +223,17 @@ export default function GradientSlider(props: GradientSliderProps) {
     }
 
     event.preventDefault();
-    lifecycle.notifyKeyboardActivity();
-    onChange?.(clamp(quantize(next, step), minValue, maxValue));
+
+    const clamped = clamp(quantize(next, step), minValue, maxValue);
+
+    if (clamped === value) return;
+
+    notifyKeyboardActivity();
+    emit(clamped);
   };
 
   const handleBlur = () => {
-    lifecycle.notifyBlur();
+    notifyBlur();
   };
 
   const percentage = clamp(((value - minValue) / (maxValue - minValue)) * 100, 0, 100);

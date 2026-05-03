@@ -3,7 +3,7 @@ import { formatCSS, parseCSS } from 'colorizr';
 
 import RGBSliders from '~/ChannelSliders/RGBSliders';
 import { DEFAULT_COLOR } from '~/constants';
-import { fireEvent, mockRAFSync, render, screen } from '~/test-utils';
+import { fireEvent, mockRAFSync, mockRect, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
 
@@ -191,6 +191,50 @@ describe('RGBSliders', () => {
 
       expect(onChangeStart).toHaveBeenCalledTimes(1);
       expect(onChangeStart.mock.calls[0][0]).toBe(blueOklch);
+    });
+
+    it('multi-channel sequence emits independent, non-overlapping Start/End pairs per touched channel', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      function Wrapper() {
+        const [color, setColor] = useState(DEFAULT_COLOR);
+
+        return (
+          <RGBSliders
+            color={color}
+            onChange={setColor}
+            onChangeEnd={onChangeEnd}
+            onChangeStart={onChangeStart}
+          />
+        );
+      }
+
+      render(<Wrapper />);
+
+      const redTrack = screen.getByRole('slider', { name: /red/i }).parentElement!;
+      const greenTrack = screen.getByRole('slider', { name: /green/i }).parentElement!;
+
+      mockRect(redTrack, { width: 200, height: 12 });
+      mockRect(greenTrack, { width: 200, height: 12 });
+
+      fireEvent.pointerDown(redTrack, { clientX: 60, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(redTrack, { pointerId: 1 });
+
+      fireEvent.pointerDown(greenTrack, { clientX: 140, clientY: 6, pointerId: 1 });
+      fireEvent.lostPointerCapture(greenTrack, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(2);
+      expect(onChangeEnd).toHaveBeenCalledTimes(2);
+
+      const startOrder = onChangeStart.mock.invocationCallOrder;
+      const endOrder = onChangeEnd.mock.invocationCallOrder;
+
+      expect(startOrder[0]).toBeLessThan(endOrder[0]);
+      expect(endOrder[0]).toBeLessThan(startOrder[1]);
+      expect(startOrder[1]).toBeLessThan(endOrder[1]);
+
+      expect(onChangeStart.mock.calls[1][0]).toBe(onChangeEnd.mock.calls[0][0]);
     });
   });
 });

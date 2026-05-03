@@ -198,6 +198,53 @@ describe('ChannelInputs', () => {
       expect(onChangeAlpha).toHaveBeenLastCalledWith(1);
     });
 
+    it('fires onChangeStart with the pre-interaction color', () => {
+      const onChangeStart = vi.fn();
+
+      render(
+        <ChannelInputs
+          alpha={1}
+          color="hsl(0 100% 50%)"
+          mode="hsl"
+          onChangeStart={onChangeStart}
+        />,
+      );
+
+      const hueInput = screen.getAllByRole('textbox')[0];
+
+      fireEvent.focus(hueInput);
+      fireEvent.change(hueInput, { target: { value: '180' } });
+
+      expect(onChangeStart).toHaveBeenCalledWith('hsl(0 100% 50%)');
+    });
+
+    it('fires onChangeEnd with the value just emitted via onChange (not the prop)', () => {
+      const onChange = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <ChannelInputs
+          alpha={1}
+          color="hsl(0 100% 50%)"
+          mode="hsl"
+          onChange={onChange}
+          onChangeEnd={onChangeEnd}
+        />,
+      );
+
+      const hueInput = screen.getAllByRole('textbox')[0];
+
+      fireEvent.focus(hueInput);
+      fireEvent.change(hueInput, { target: { value: '180' } });
+      fireEvent.blur(hueInput);
+
+      expect(onChange).toHaveBeenCalled();
+      const lastEmitted = onChange.mock.calls.at(-1)?.[0];
+
+      expect(onChangeEnd).toHaveBeenCalledWith(lastEmitted);
+      expect(onChangeEnd).not.toHaveBeenCalledWith('hsl(0 100% 50%)');
+    });
+
     it('filters non-numeric characters instead of emitting', () => {
       const onChange = vi.fn();
 

@@ -33,7 +33,7 @@ interface AlphaSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' 
    */
   onChange?: (alpha: number) => void;
   /**
-   * Called once when an interaction ends — pointer release, or 200 ms after
+   * Called once when an interaction ends — pointer release, or 600 ms after
    * the last keyboard step. Receives the final alpha value.
    */
   onChangeEnd?: (alpha: number) => void;

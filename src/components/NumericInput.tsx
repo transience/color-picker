@@ -1,5 +1,6 @@
 import { type KeyboardEvent, useState } from 'react';
 
+import useEmitLifecycle from '../hooks/useEmitLifecycle';
 import { cn, quantize } from '../modules/helpers';
 import type { NumericInputClassNames } from '../types';
 
@@ -20,6 +21,18 @@ interface NumericInputProps {
    * Called with the committed numeric value on typing, arrow keys, and blur.
    * */
   onChange?: (value: number) => void;
+  /**
+   * Called once when an interaction ends. Receives the most recently emitted
+   * numeric value (or the current `value` prop if no value was emitted during
+   * the interaction). Fires 600 ms after the last keystroke, or immediately on
+   * blur.
+   */
+  onChangeEnd?: (value: number) => void;
+  /**
+   * Called once when an interaction begins. Receives the parsed `value` prop
+   * before any change. Fires on the first value-changing keystroke or arrow.
+   */
+  onChangeStart?: (value: number) => void;
   /**
    * Increment used by `ArrowUp` / `ArrowDown` (and `10x` with `Shift`). Also
    * determines the decimal precision when quantizing keyboard steps.
@@ -43,6 +56,8 @@ export default function NumericInput(props: NumericInputProps) {
     max,
     min,
     onChange,
+    onChangeEnd,
+    onChangeStart,
     step = 1,
     suffix,
     value,
@@ -50,19 +65,17 @@ export default function NumericInput(props: NumericInputProps) {
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
+  const { emit, notifyBlur, notifyKeyboardActivity } = useEmitLifecycle<number>({
+    isDisabled,
+    onChange,
+    onChangeEnd,
+    onChangeStart,
+    value: Number.parseFloat(value),
+  });
+
   const displayValue = isEditing ? editValue : value;
 
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
-
-  const commit = (raw: string) => {
-    if (raw.endsWith('.') || raw.endsWith(',')) return;
-
-    const parsed = Number.parseFloat(raw.replace(',', '.'));
-
-    if (!Number.isNaN(parsed)) {
-      onChange?.(clamp(parsed));
-    }
-  };
 
   const handleFocus = () => {
     setIsEditing(true);
@@ -73,16 +86,26 @@ export default function NumericInput(props: NumericInputProps) {
     const filtered = newValue.replace(/[^\d,.]/g, '').replace(',', '.');
 
     setEditValue(filtered);
-    commit(filtered);
+
+    if (filtered.endsWith('.') || filtered.endsWith(',')) return;
+
+    const parsed = Number.parseFloat(filtered);
+
+    if (Number.isNaN(parsed)) return;
+
+    notifyKeyboardActivity();
+    emit(clamp(parsed));
   };
 
   const handleBlur = () => {
     const parsed = Number.parseFloat(editValue.replace(',', '.'));
 
     if (!Number.isNaN(parsed) && clamp(parsed) !== Number.parseFloat(value)) {
-      onChange?.(clamp(parsed));
+      notifyKeyboardActivity();
+      emit(clamp(parsed));
     }
 
+    notifyBlur();
     setIsEditing(false);
   };
 
@@ -96,7 +119,8 @@ export default function NumericInput(props: NumericInputProps) {
       const next = clamp(quantize(raw, step));
 
       setEditValue(String(next));
-      onChange?.(next);
+      notifyKeyboardActivity();
+      emit(next);
     }
   };
 

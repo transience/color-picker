@@ -181,6 +181,8 @@ export default function ColorPicker(props: ColorPickerProps) {
         numericInputClassNames={classNames?.numericInput}
         onChange={handleChangeColorInput}
         onChangeAlpha={handleChangeAlpha}
+        onChangeEnd={handleInteractionEnd}
+        onChangeStart={handleInteractionStart}
         showAlpha={showAlpha}
       />
     );

@@ -1,7 +1,35 @@
+import { useState } from 'react';
+
 import SaturationPanel from '~/SaturationPanel';
 import { fireEvent, firePointerDrag, mockRAFSync, mockRect, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
+
+function Controlled(props: {
+  initialSaturation?: number;
+  initialValue?: number;
+  onChangeEnd?: (s: number, v: number) => void;
+  onChangeStart?: (s: number, v: number) => void;
+}) {
+  const { initialSaturation = 0.5, initialValue = 0.5, onChangeEnd, onChangeStart } = props;
+  const [saturation, setSaturation] = useState(initialSaturation);
+  const [value, setValue] = useState(initialValue);
+
+  return (
+    <SaturationPanel
+      hue={0}
+      onChange={(s, v) => {
+        mockOnChange(s, v);
+        setSaturation(s);
+        setValue(v);
+      }}
+      onChangeEnd={onChangeEnd}
+      onChangeStart={onChangeStart}
+      saturation={saturation}
+      value={value}
+    />
+  );
+}
 
 describe('SaturationPanel', () => {
   let restoreRAF: () => void;
@@ -106,7 +134,7 @@ describe('SaturationPanel', () => {
       expect(onChangeStart).toHaveBeenCalledWith(0.3, 0.7);
     });
 
-    it('lostPointerCapture fires onChangeEnd', () => {
+    it('lostPointerCapture fires onChangeEnd with the final dragged position', () => {
       const onChangeEnd = vi.fn();
 
       render(
@@ -128,6 +156,81 @@ describe('SaturationPanel', () => {
       fireEvent.lostPointerCapture(panel, { pointerId: 1 });
 
       expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      expect(onChangeEnd).toHaveBeenCalledWith(150 / 200, 1 - 80 / 100);
+    });
+
+    it('onChangeEnd receives the click position when pointerDown is followed by immediate release', () => {
+      const onChangeEnd = vi.fn();
+
+      render(
+        <SaturationPanel
+          hue={0}
+          onChange={mockOnChange}
+          onChangeEnd={onChangeEnd}
+          saturation={0.5}
+          value={0.5}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      fireEvent.pointerDown(panel, { clientX: 40, clientY: 90, pointerId: 1 });
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+      expect(onChangeEnd).toHaveBeenCalledWith(40 / 200, 1 - 90 / 100);
+    });
+  });
+
+  describe('Controlled flow', () => {
+    it('drag fires Start with pre-mutation values, Change per move, End with last value', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <Controlled
+          initialSaturation={0.3}
+          initialValue={0.7}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      firePointerDrag(panel, [
+        { x: 50, y: 50 },
+        { x: 150, y: 80 },
+      ]);
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledWith(0.3, 0.7);
+      expect(onChangeEnd).toHaveBeenCalledWith(150 / 200, 1 - 80 / 100);
+      expect(mockOnChange).toHaveBeenCalled();
+    });
+
+    it('click on current thumb position fires Start + Change + End with same value', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+
+      render(
+        <Controlled
+          initialSaturation={0.5}
+          initialValue={0.5}
+          onChangeEnd={onChangeEnd}
+          onChangeStart={onChangeStart}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      mockRect(panel, { left: 0, top: 0, width: 200, height: 100 });
+      // x=100/200=0.5, y=50/100=0.5 → (0.5, 0.5) = current
+      fireEvent.pointerDown(panel, { clientX: 100, clientY: 50, pointerId: 1 });
+      fireEvent.lostPointerCapture(panel, { pointerId: 1 });
+
+      expect(onChangeStart).toHaveBeenCalledWith(0.5, 0.5);
+      expect(mockOnChange).toHaveBeenCalledWith(0.5, 0.5);
+      expect(onChangeEnd).toHaveBeenCalledWith(0.5, 0.5);
     });
   });
 

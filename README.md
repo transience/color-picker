@@ -27,7 +27,23 @@ A modern, OKLCH-first React/Tailwind color picker.
 npm i @transience/color-picker
 ```
 
-Styled with Tailwind CSS utilities - no stylesheet ships.\
+## Usage
+
+```tsx
+import { ColorPicker } from '@transience/color-picker';
+import { useState } from 'react';
+
+export function Example() {
+  const [color, setColor] = useState('oklch(0.7 0.15 250)');
+
+  return <ColorPicker color={color} onChange={setColor} />;
+}
+```
+
+`color` accepts any CSS color string (`#ff0044`, `rgb(...)`, `hsl(...)`, `oklch(...)`, named colors, etc.) — parsed via `colorizr`.
+
+### Styles
+
 Your app's Tailwind build must scan the package's compiled source so the utilities are included in the generated CSS.
 
 **Tailwind v4** (CSS-first):
@@ -57,22 +73,7 @@ If you are using pnpm, you need to add the following line to your .npmrc file to
 public-hoist-pattern[]=*@transience/color-picker/*
 ```
 
-After modifying the .npmrc file, you need to run pnpm install again to ensure that the dependencies are installed correctly.
-
-## Usage
-
-```tsx
-import { ColorPicker } from '@transience/color-picker';
-import { useState } from 'react';
-
-export function Example() {
-  const [color, setColor] = useState('oklch(0.7 0.15 250)');
-
-  return <ColorPicker color={color} onChange={setColor} />;
-}
-```
-
-`color` accepts any CSS color string (`#ff0044`, `rgb(...)`, `hsl(...)`, `oklch(...)`, named colors, etc.) — parsed via `colorizr`.
+After modifying the .npmrc file, run `pnpm install` again to ensure the dependencies are installed correctly.
 
 See the [Storybook demo](https://transience.github.io/color-picker/) for layout variants and every prop combination.
 
@@ -84,12 +85,12 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 | **classNames**<br />Slot-based className overrides for every internal part. See [Styling](#styling).                                           | `ColorPickerClassNames` | — |
 | **labels**<br />Slot-based text/aria overrides per component. Each rendered component reads only its own slot.                                 | `ColorPickerLabels` | — |
 | **color**<br />Controlled color value. Any CSS color string.<br />Falls back to the internal default when `undefined`.                         | `string` | `'oklch(54% 0.194 250)'` |
-| **defaultMode**<br />Initial mode for the 2D panel and channel controls.                                                                       | `'oklch' \| 'hsl' \| 'rgb'` | `'oklch'` |
+| **defaultMode**<br />Initial mode for the 2D panel and channel controls.                                                                       | `'oklch'` \| `'hsl'` \| `'rgb'` | `'oklch'` |
 | **displayFormat**<br />Initial text format for the `ColorInput`. `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.                             | `ColorFormat` | `'auto'` |
 | **modes**<br />Modes shown in the mode switcher.                                                                                               | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
 | **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`.                                                    | `(value: string) => void` | — |
-| **onChangeStart**<br />Fires once when the user begins interacting with any slider or panel — `pointerdown` or first value-changing keydown after idle. | `(value: string) => void` | — |
-| **onChangeEnd**<br />Fires once when the user finishes interacting — pointer release, or 200 ms after the last keyboard step. | `(value: string) => void` | — |
+| **onChangeStart**<br />Fires once when the user begins interacting with any slider, panel, or `ChannelInputs` field — `pointerdown` or first value-changing keystroke after idle. `ColorInput` and `EyeDropper` emit only `onChange`. | `(value: string) => void` | — |
+| **onChangeEnd**<br />Fires once when the user finishes interacting — pointer release, 600 ms after the last keystroke, or numeric-input blur. | `(value: string) => void` | — |
 | **onChangeMode**<br />Called when the user flips the mode via the switcher.                                                                    | `(mode: ColorMode) => void` | — |
 | **outputFormat**<br />Initial format `onChange` emits. `'auto'` follows the resolved `displayFormat`.                                          | `ColorFormat` | `'auto'` |
 | **precision**<br />Decimal digits for non-hex output. Ignored for `hex`.                                                                       | `number` | `5` |

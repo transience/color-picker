@@ -18,7 +18,7 @@ Key choices:
 - **Color math is delegated.** Every matrix, gamut check, and format conversion comes from [`colorizr`](https://github.com/gilbarbara/colorizr). This package owns UI, layout, and the coordinate transforms needed to render/interact with the OKLCH panel — nothing else.
 - **Peer React 16.8 – 19.** Hooks-only, no legacy class components.
 - **Tailwind v4 styling, no shipped stylesheet.** Consumers bring their own Tailwind setup. Internals use `cn()` (`clsx` + `tailwind-merge`) so slot overrides actually win.
-- **ESM + CJS, size-limited** (25 kB ESM / 30 kB CJS). Runtime deps are `clsx`, `colorizr`, `tailwind-merge` only.
+- **ESM + CJS, size-limited** (30 kB ESM / 35 kB CJS). Runtime deps are `clsx`, `colorizr`, `tailwind-merge` only.
 - **OKLCH-first UX.** The default mode is OKLCH; the 2D panel renders a P3-HSV canvas at the current hue with an sRGB gamut overlay.
 
 ---
@@ -45,8 +45,11 @@ src/
   constants.tsx            DEFAULT_COLOR, DEFAULT_MODES, hue gradients
   types.ts                 Public types and slot maps
   hooks/
-    useColorPicker.ts      Public state hook — the engine behind ColorPicker
+    useColorPicker.ts           Public state hook — the engine behind ColorPicker
+    useEmitLifecycle.ts         Per-component pointer/keyboard mux for Start/Change/End
+    useRafCommit.ts             rAF coalescer for high-frequency pointer values
     useInteractionAttribute.ts  Sets data-interacting on the root during drags/keys
+    useId.ts                    React 16/17-compatible useId polyfill
   ChannelSliders/
     index.tsx              Dispatches by mode
     HSLSliders.tsx
@@ -55,6 +58,7 @@ src/
   components/              Low-level primitives
     GradientSlider.tsx       1D slider (hue, alpha, every channel)
     NumericInput.tsx         Clamped numeric field with arrow/shift stepping
+    Floater.tsx              Floating-UI primitive used by SettingsMenu / GamutWarning
     Button.tsx               Shared icon / segmented button shell
     GamutWarning.tsx         Popover-anchored gamut warning icon
     RadioGroup.tsx           Settings-menu format picker
@@ -117,7 +121,7 @@ When the controlled `color` prop changes, an effect re-derives both `hsv` and `o
 
 ### Refs shadow state
 
-Every piece of state has a matching `*Ref` (`hsvRef`, `oklchRef`, `alphaRef`, `displayFormatRef`, `outputFormatRef`, `modeRef`, `precisionRef`, `showAlphaRef`, `onChangeRef`, `onChangeModeRef`) — updated on every render. This lets the pointer/keyboard callbacks passed to panels and sliders keep an empty dependency array and still read current values without stale closures. Without this, every drag move would tear down and rebuild the handlers.
+Every piece of state has a matching `*Ref` (`hsvRef`, `oklchRef`, `alphaRef`, `displayFormatRef`, `outputFormatRef`, `modeRef`, `precisionRef`, `showAlphaRef`, `onChangeRef`, `onChangeStartRef`, `onChangeEndRef`, `onChangeModeRef`) — updated on every render. This lets the pointer/keyboard callbacks passed to panels and sliders keep an empty dependency array and still read current values without stale closures. Without this, every drag move would tear down and rebuild the handlers.
 
 ### The emit pipeline
 
@@ -226,10 +230,16 @@ onPointerMove  → hasPointerCapture(pointerId) ? handle : skip
 The `handle` step:
 
 1. `relativePosition(event, rect)` → `{ x, y }` in 0–1.
-2. `cancelAnimationFrame(rafRef.current)`; schedule the value compute + `onChange` in a fresh rAF. This collapses multiple pointer moves per frame into one commit and keeps `onChange` rate-bounded.
-3. Sliders additionally `quantize` to `step` before emitting.
+2. Compute the next value (sliders also `quantize` to `step`).
+3. Hand it to `useRafCommit.schedule(next)` — see below.
 
-`GradientSlider` adds an `onLostPointerCapture` handler that clears `isDragging` and cancels any pending rAF — this is why the slider thumb has a pressed-outline state. The 2D panels (`SaturationPanel`, `OKLCHPanel`) don't install it; the last scheduled rAF still runs once after release (harmless — its output matches the final move) and the panels therefore don't track a dragging visual state.
+### `useRafCommit` (rAF coalescer)
+
+`src/hooks/useRafCommit.ts` owns a single `rafRef` + `pendingRef`. `schedule(next)` buffers the value and arms one rAF; subsequent calls within the same frame replace the buffer, so only the most recent value commits. `flush()` cancels the pending rAF and commits any buffered value synchronously — every pointer-driven surface calls it from `onLostPointerCapture` so a release happening in the same frame as the last move doesn't drop the final value.
+
+Used by `GradientSlider`, `SaturationPanel`, and `OKLCHPanel`. Channel sliders (`HSLSliders`, `OKLCHSliders`, `RGBSliders`) skip it — they receive already-coalesced values from inner `GradientSlider`s.
+
+`GradientSlider` also tracks `isDragging` for a pressed-outline thumb state. The panels don't.
 
 **Keyboard nav is a `GradientSlider`-only feature.** Its thumb has `role="slider"`, ARIA `min` / `max` / `now`, and supports:
 
@@ -244,21 +254,27 @@ The 2D panel thumbs are pointer-only — no role, no ARIA, no key handling. Keyb
 `src/hooks/useInteractionAttribute.ts` — sets `data-interacting="true"` on the root element while the user is actively interacting. Pointer and keyboard are tracked independently:
 
 - Pointer: explicit `pointerdown` → begin, `pointerup`/`pointercancel` → end.
-- Keyboard: matches `[role="slider"], input` targets; `keydown` begins, `keyup` schedules a 200 ms idle timer; `focusout` (out of the picker) cancels immediately.
+- Keyboard: matches `[role="slider"], input` targets; `keydown` begins, `keyup` schedules a 600 ms idle timer; `focusout` (out of the picker) cancels immediately.
 
 **This is the picker's stable cross-package interop channel.** Host apps (e.g. color-lab) attach a `MutationObserver` on the root to pause URL sync, autosave, or any downstream recompute while `data-interacting` is `true`, then flush once on release.
 
 This replaced an older, fragile convention: `data-slot="thumb"` + `dataset.dragging` toggled inside each slider's pointer handlers, with the host app running a `MutationObserver` on `document.body` to catch attribute changes. The convention coupled a magic string to the slider's internal DOM — a rename (or a typo like `data-slot="track"` vs `"thumb"`) silently broke the signal, and drags started getting "stuck" after 10–20 pixels with no obvious cause. The current event-delegation model lives entirely inside the picker and exposes a single documented attribute on the root.
 
-### `useInteractionLifecycle` and `onChangeStart` / `onChangeEnd`
+### `useEmitLifecycle` and `onChangeStart` / `onChangeEnd`
 
-`src/hooks/useInteractionLifecycle.ts` is the per-component counterpart to `useInteractionAttribute`. Where the attribute hook only toggles a DOM flag, the lifecycle hook calls value-bearing callbacks at the boundaries of an interaction. It backs the new `onChangeStart` / `onChangeEnd` props on `GradientSlider`, `OKLCHPanel`, `SaturationPanel`, and (forwarded) every wrapper up to `ColorPicker`.
+`src/hooks/useEmitLifecycle.ts` is the per-component counterpart to `useInteractionAttribute`. It owns the pointer/keyboard mux (600 ms keyboard idle timer) plus the value-tracking refs in one place — `propRef` (synced from the `value` prop each render), `lastEmittedRef` (written synchronously inside `emit`), `sessionEmittedRef` (first-emit-always-fires guard), and the lifecycle flags. Exposes `emit(next)` plus `notifyStart`/`notifyEnd`/`notifyKeyboardActivity`/`notifyBlur`.
+
+`onChangeStart` reads `propRef` (pre-mutation). `onChangeEnd` reads `lastEmittedRef` and falls back to `propRef` when no `emit` ran during the session. The first emit of a session always fires (treating `pointerdown` as a discrete commit even on click-at-current-value); subsequent emits dedup against the last-known value via the configurable `equals` predicate.
 
 Timing rules mirror `useInteractionAttribute`:
 
 - Pointer: `pointerdown` → start, `lostpointercapture` → end.
-- Keyboard: first value-changing keydown after idle → start, 200 ms after the last keydown (or `blur` outside the slider) → end.
+- Keyboard: first value-changing keydown after idle → start, 600 ms after the last keydown (or `blur` outside the slider) → end.
 - Pointer takes precedence — starting a pointer drag mid-keyboard interaction fires the keyboard's pending end before the pointer's start.
+
+`GradientSlider`, `SaturationPanel`, `OKLCHPanel`, and `NumericInput` consume `useEmitLifecycle` directly with the appropriate `<V>`. `NumericInput` is text-input only — no pointer surface — so it drives Start/End purely from `notifyKeyboardActivity` (first value-changing keystroke after idle → start, 600 ms after the last keystroke → end) and `notifyBlur` (focus leaves the field → fire end immediately).
+
+Channel sliders (`HSLSliders`, `OKLCHSliders`, `RGBSliders`) consume `useEmitLifecycle<string>` and aggregate Start/Change/End across their three child sliders by wiring child `onChangeStart`/`onChangeEnd` to the parent's `notifyStart`/`notifyEnd` and channeling each child `onChange` through the parent's `emit`. `ChannelInputs` aggregates the same way without `useEmitLifecycle` — a single `lastEmittedRef` plus inline `handleStart`/`handleEnd` that wrap each `NumericInput`'s lifecycle callbacks and forward the parent's `onChangeStart`/`onChangeEnd` (`src/ChannelInputs.tsx:112-118`).
 
 Use `onChangeStart` / `onChangeEnd` for value-bearing logic (e.g. snapshotting at start, persisting to a URL only at end). Use `data-interacting` for purely visual/CSS reactions or when an external host needs a single signal across the whole picker.
 
@@ -271,7 +287,7 @@ Use `onChangeStart` / `onChangeEnd` for value-bearing logic (e.g. snapshotting a
 Notable details:
 
 - **OKLCH sliders** (`OKLCHSliders.tsx`) — chroma's `maxValue` is dynamic: `getP3MaxChroma({ l, c: 0, h })`. When lightness or hue changes, the handler preserves *relative* chroma (`c / oldMaxChroma * newMaxChroma`), which keeps the slider thumb's visual position intuitive across mode/L/H changes. The L/C/H gradients are regenerated on every value change; the hue gradient is a static constant (`oklchHueGradient`).
-- **HSL / RGB sliders** keep a local `useState` mirror plus a `lastEmittedRef` so their derived channel values survive the OKLCH round-trip the outer `ColorPicker` runs for every emission.
+- **HSL / RGB sliders** keep a local `useState` mirror plus a small `lastEmittedRef` so their derived channel values survive the OKLCH round-trip the outer `ColorPicker` runs for every emission. (Start/Change/End plumbing lives in `useEmitLifecycle<string>` — see §7.)
 - **Gradient tracks** use the CSS `background` shorthand directly — `AlphaSlider` layers a gradient with a checkerboard tile via a comma-separated value.
 
 ---

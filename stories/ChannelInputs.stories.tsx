@@ -17,8 +17,10 @@ export default {
     className: 'bg-white dark:bg-black',
   },
   args: {
+    alpha: 1,
     color: DEFAULT_COLOR,
     mode: 'oklch',
+    showAlpha: false,
   },
   argTypes: {
     mode: {
