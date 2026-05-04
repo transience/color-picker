@@ -2,9 +2,13 @@
 
 exports[`OKLCHPanel > Render > renders correctly 1`] = `
 <div
-  class="relative h-32 w-full cursor-crosshair overflow-hidden"
+  aria-label="OKLCH color panel"
+  aria-valuetext="Lightness 54%, Chroma 0.194"
+  class="group relative h-32 w-full cursor-crosshair overflow-hidden focus-visible:outline-none"
   data-testid="OKLCHPanel"
+  role="slider"
   style="touch-action: none;"
+  tabindex="0"
 >
   <canvas
     class="absolute inset-0 size-full"
@@ -33,7 +37,7 @@ exports[`OKLCHPanel > Render > renders correctly 1`] = `
     sRGB
   </span>
   <div
-    class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20"
+    class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20 transition-transform group-focus-visible:scale-125"
     style="left: 96.75463209037362%; top: 17.871790794999498%;"
   />
 </div>

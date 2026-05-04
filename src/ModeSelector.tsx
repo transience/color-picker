@@ -53,6 +53,7 @@ export default function ModeSelector(props: ModeSelectorProps) {
             key={m}
             activeClassName={classNames?.activeButton}
             aria-label={ariaLabel}
+            aria-pressed={mode === m}
             className={classNames?.button}
             isActive={mode === m}
             onClick={() => onClick?.(m)}

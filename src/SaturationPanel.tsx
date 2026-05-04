@@ -1,15 +1,29 @@
-import { type HTMLAttributes, type PointerEvent, useRef } from 'react';
+import { type HTMLAttributes, type KeyboardEvent, type PointerEvent, useRef } from 'react';
 
-import { DEFAULT_COLOR, panelClasses } from './constants';
+import {
+  DEFAULT_COLOR,
+  DEFAULT_LABELS,
+  KEYBOARD_LARGE_STEP,
+  KEYBOARD_STEP,
+  panelClasses,
+} from './constants';
 import useEmitLifecycle from './hooks/useEmitLifecycle';
 import useRafCommit from './hooks/useRafCommit';
 import { colorToHsv } from './modules/colorSpace';
-import { cn, relativePosition } from './modules/helpers';
+import { clamp, cn, relativePosition } from './modules/helpers';
 import type { PanelClassNames } from './types';
 
 const DEFAULTS = colorToHsv(DEFAULT_COLOR);
 
-interface SaturationPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+interface SaturationPanelProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'aria-label' | 'onChange'
+> {
+  /**
+   * Accessible name for the panel. Announced by screen readers when focused.
+   * @default 'Saturation and value panel'
+   */
+  'aria-label'?: string;
   /** Per-part className overrides (`root`, `thumb`). */
   classNames?: PanelClassNames;
   /**
@@ -42,6 +56,11 @@ interface SaturationPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
    * @default DEFAULT_COLOR's HSV value
    */
   value?: number;
+  /**
+   * Live announcement for keyboard nudges. Receives current saturation and value.
+   * @default `Saturation ${sPct}%, Value ${vPct}%`
+   */
+  valueText?: (saturation: number, value: number) => string;
 }
 
 interface SV {
@@ -53,6 +72,7 @@ const equalsSV = (a: SV, b: SV) => a.s === b.s && a.v === b.v;
 
 export default function SaturationPanel(props: SaturationPanelProps) {
   const {
+    'aria-label': ariaLabel = DEFAULT_LABELS.saturationPanel.ariaLabel,
     className,
     classNames,
     hue = DEFAULTS.h,
@@ -62,11 +82,12 @@ export default function SaturationPanel(props: SaturationPanelProps) {
     saturation = DEFAULTS.s,
     style,
     value = DEFAULTS.v,
+    valueText = DEFAULT_LABELS.saturationPanel.valueText,
     ...rest
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { emit, notifyEnd, notifyStart } = useEmitLifecycle<SV>({
+  const { emit, notifyEnd, notifyKeyboardActivity, notifyStart } = useEmitLifecycle<SV>({
     equals: equalsSV,
     onChange: next => onChange?.(next.s, next.v),
     onChangeEnd: next => onChangeEnd?.(next.s, next.v),
@@ -102,19 +123,60 @@ export default function SaturationPanel(props: SaturationPanelProps) {
     notifyEnd();
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const step = event.shiftKey ? KEYBOARD_LARGE_STEP : KEYBOARD_STEP;
+    let nextS = saturation;
+    let nextV = value;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        nextS = clamp(saturation - step, 0, 1);
+        break;
+      case 'ArrowRight':
+        nextS = clamp(saturation + step, 0, 1);
+        break;
+      case 'ArrowDown':
+        nextV = clamp(value - step, 0, 1);
+        break;
+      case 'ArrowUp':
+        nextV = clamp(value + step, 0, 1);
+        break;
+      case 'Home':
+        nextS = 0;
+        break;
+      case 'End':
+        nextS = 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    notifyKeyboardActivity();
+    emit({ s: nextS, v: nextV });
+  };
+
+  // 2D control: aria-valuenow can only describe one axis. We omit it and let
+  // aria-valuetext announce both. Same shape react-colorful ships.
+  /* eslint-disable jsx-a11y/role-has-required-aria-props */
   return (
     <div
       ref={containerRef}
+      aria-label={ariaLabel}
+      aria-valuetext={valueText(saturation, value)}
       className={cn(panelClasses.root, className, classNames?.root)}
       data-testid="SaturationPanel"
+      onKeyDown={handleKeyDown}
       onLostPointerCapture={handleLostPointerCapture}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
+      role="slider"
       style={{
         background: `linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, transparent), hsl(${hue}, 100%, 50%)`,
         ...style,
         touchAction: 'none',
       }}
+      tabIndex={0}
       {...rest}
     >
       <div

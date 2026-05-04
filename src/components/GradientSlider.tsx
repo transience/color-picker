@@ -260,6 +260,7 @@ export default function GradientSlider(props: GradientSliderProps) {
           ref={thumbRef}
           aria-disabled={isDisabled || undefined}
           aria-label={ariaLabel}
+          aria-orientation="horizontal"
           aria-valuemax={maxValue}
           aria-valuemin={minValue}
           aria-valuenow={value}

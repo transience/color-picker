@@ -129,10 +129,24 @@ export interface ColorPickerLabels {
    * (visible) and `Switch to {MODE}` (aria).
    */
   modeSelector?: Partial<Record<ColorMode, LabelSlot>>;
+  /** OKLCH 2D panel — accessible name and live value description for keyboard nav. */
+  oklchPanel?: {
+    /** @default 'OKLCH color panel' */
+    ariaLabel?: string;
+    /** @default `Lightness ${lPct}%, Chroma ${cFixed}` */
+    valueText?: (lightness: number, chroma: number) => string;
+  };
   /** Inline OKLCH sliders. */
   oklchSliders?: Partial<Record<'l' | 'c' | 'h', LabelSlot>>;
   /** Inline RGB sliders (slider + numeric input share the slot). */
   rgbSliders?: Partial<Record<'r' | 'g' | 'b', LabelSlot>>;
+  /** Saturation/Value 2D panel — accessible name and live value description for keyboard nav. */
+  saturationPanel?: {
+    /** @default 'Saturation and value panel' */
+    ariaLabel?: string;
+    /** @default `Saturation ${sPct}%, Value ${vPct}%` */
+    valueText?: (saturation: number, value: number) => string;
+  };
   /** SettingsMenu chrome strings. */
   settingsMenu?: {
     /**

@@ -38,6 +38,23 @@ describe('ModeSelector', () => {
     expect(hsl).not.toHaveClass('bg-black/20');
   });
 
+  it('exposes aria-pressed reflecting the current mode', () => {
+    render(<ModeSelector mode="rgb" onClick={mockOnClick} />);
+
+    expect(screen.getByRole('button', { name: 'Switch to RGB' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Switch to HSL' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(screen.getByRole('button', { name: 'Switch to OKLCH' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
   it('forwards native HTML attrs to the root', () => {
     render(<ModeSelector data-foo="bar" id="custom-mode" mode="oklch" onClick={mockOnClick} />);
     const root = screen.getByTestId('ModeSelector');

@@ -308,11 +308,11 @@ describe('ColorPicker', () => {
         .getByText('Output format')
         .closest('[data-testid="RadioGroup"]') as HTMLElement;
 
-      fireEvent.click(within(displayGroup).getByRole('button', { name: 'Hex' }));
+      fireEvent.click(within(displayGroup).getByRole('radio', { name: 'Hex' }));
       expect(screen.getByLabelText('Color value')).toHaveValue('#ff0044');
 
       mockOnChange.mockClear();
-      fireEvent.click(within(outputGroup).getByRole('button', { name: 'RGB' }));
+      fireEvent.click(within(outputGroup).getByRole('radio', { name: 'RGB' }));
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
 
       expect(mockOnChange.mock.calls[0][0]).toMatch(/^rgb\(/);
@@ -818,7 +818,7 @@ describe('ColorPicker', () => {
       render(
         <ColorPicker color="#ff0044" onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />,
       );
-      const lightnessTrack = screen.getAllByRole('slider')[0].parentElement!;
+      const lightnessTrack = screen.getByRole('slider', { name: 'Lightness' }).parentElement!;
 
       mockRect(lightnessTrack, { left: 0, top: 0, width: 200, height: 12 });
       firePointerDrag(lightnessTrack, [

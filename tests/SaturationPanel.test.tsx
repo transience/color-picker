@@ -234,6 +234,124 @@ describe('SaturationPanel', () => {
     });
   });
 
+  describe('Keyboard interaction', () => {
+    it('exposes role=slider, tabIndex=0, ariaLabel, ariaValueText', () => {
+      render(<SaturationPanel hue={0} saturation={0.5} value={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      expect(panel).toHaveAttribute('role', 'slider');
+      expect(panel).toHaveAttribute('tabindex', '0');
+      expect(panel).toHaveAttribute('aria-label', 'Saturation and value panel');
+      expect(panel).toHaveAttribute('aria-valuetext', 'Saturation 50%, Value 50%');
+    });
+
+    it('uses custom ariaLabel and valueText when provided', () => {
+      render(
+        <SaturationPanel
+          aria-label="Custom"
+          hue={0}
+          saturation={0.4}
+          value={0.6}
+          valueText={(s, v) => `s=${s} v=${v}`}
+        />,
+      );
+      const panel = screen.getByTestId('SaturationPanel');
+
+      expect(panel).toHaveAttribute('aria-label', 'Custom');
+      expect(panel).toHaveAttribute('aria-valuetext', 's=0.4 v=0.6');
+    });
+
+    it('ArrowRight nudges saturation up by KEYBOARD_STEP', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowRight' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.51, 0.5);
+    });
+
+    it('ArrowLeft nudges saturation down by KEYBOARD_STEP', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowLeft' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.49, 0.5);
+    });
+
+    it('ArrowUp nudges value up by KEYBOARD_STEP', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowUp' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.5, 0.51);
+    });
+
+    it('ArrowDown nudges value down by KEYBOARD_STEP', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowDown' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.5, 0.49);
+    });
+
+    it('Shift+arrow uses KEYBOARD_LARGE_STEP', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowRight', shiftKey: true });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.6, 0.5);
+    });
+
+    it('Home snaps saturation to 0', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.7} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'Home' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0, 0.7);
+    });
+
+    it('End snaps saturation to 1', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.7} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'End' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(1, 0.7);
+    });
+
+    it('clamps saturation to [0, 1] at the lower bound', () => {
+      render(<Controlled initialSaturation={0} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowLeft' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0, 0.5);
+    });
+
+    it('clamps value to [0, 1] at the upper bound', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={1} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'ArrowUp' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.5, 1);
+    });
+
+    it('ignores unrelated keys', () => {
+      render(<Controlled initialSaturation={0.5} initialValue={0.5} />);
+      const panel = screen.getByTestId('SaturationPanel');
+
+      fireEvent.keyDown(panel, { key: 'a' });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Native attribute forwarding', () => {
     it('forwards native HTML attrs to the root', () => {
       render(

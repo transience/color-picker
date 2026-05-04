@@ -38,10 +38,20 @@ export const DEFAULT_LABELS = {
     s: { label: 'S', ariaLabel: 'Saturation' },
     l: { label: 'L', ariaLabel: 'Lightness' },
   },
+  oklchPanel: {
+    ariaLabel: 'OKLCH color panel',
+    valueText: (l: number, c: number) =>
+      `Lightness ${Math.round(l * 100)}%, Chroma ${c.toFixed(3)}`,
+  },
   oklchSliders: {
     l: { label: 'L', ariaLabel: 'Lightness' },
     c: { label: 'C', ariaLabel: 'Chroma' },
     h: { label: 'H', ariaLabel: 'Hue' },
+  },
+  saturationPanel: {
+    ariaLabel: 'Saturation and value panel',
+    valueText: (s: number, v: number) =>
+      `Saturation ${Math.round(s * 100)}%, Value ${Math.round(v * 100)}%`,
   },
   channelInputs: {
     r: { label: 'R', ariaLabel: 'Red' },
@@ -57,10 +67,13 @@ export const DEFAULT_LABELS = {
 
 export const KEYBOARD_IDLE_MS = 600;
 
+export const KEYBOARD_STEP = 0.01;
+export const KEYBOARD_LARGE_STEP = 0.1;
+
 export const panelClasses = {
-  root: 'relative h-32 w-full cursor-crosshair overflow-hidden',
+  root: 'group relative h-32 w-full cursor-crosshair overflow-hidden focus-visible:outline-none',
   thumb:
-    'pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20',
+    'pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20 transition-transform group-focus-visible:scale-125',
 } as const;
 
 export const hslHueGradient =

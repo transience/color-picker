@@ -2,12 +2,16 @@
 
 exports[`SaturationPanel > Render > renders correctly 1`] = `
 <div
-  class="relative h-32 w-full cursor-crosshair overflow-hidden"
+  aria-label="Saturation and value panel"
+  aria-valuetext="Saturation 100%, Value 85%"
+  class="group relative h-32 w-full cursor-crosshair overflow-hidden focus-visible:outline-none"
   data-testid="SaturationPanel"
+  role="slider"
   style="background: linear-gradient(transparent, rgb(0, 0, 0)), linear-gradient(to right, rgb(255, 255, 255), transparent), rgb(0, 129, 255); touch-action: none;"
+  tabindex="0"
 >
   <div
-    class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20"
+    class="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-black ring-2 ring-white/20 transition-transform group-focus-visible:scale-125"
     style="left: 100%; top: 14.901960784313728%;"
   />
 </div>

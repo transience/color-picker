@@ -68,6 +68,7 @@ export default function ColorPicker(props: ColorPickerProps) {
   if (showPanel) {
     content.panel = isOklch ? (
       <OKLCHPanel
+        aria-label={labels?.oklchPanel?.ariaLabel}
         chroma={oklch.c}
         classNames={classNames?.panel}
         hue={oklch.h}
@@ -75,9 +76,11 @@ export default function ColorPicker(props: ColorPickerProps) {
         onChange={handleChangeOklchPanel}
         onChangeEnd={handleInteractionEnd}
         onChangeStart={handleInteractionStart}
+        valueText={labels?.oklchPanel?.valueText}
       />
     ) : (
       <SaturationPanel
+        aria-label={labels?.saturationPanel?.ariaLabel}
         classNames={classNames?.panel}
         hue={hsv.h}
         onChange={handleChangeSaturationPanel}
@@ -85,6 +88,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         onChangeStart={handleInteractionStart}
         saturation={hsv.s}
         value={hsv.v}
+        valueText={labels?.saturationPanel?.valueText}
       />
     );
   }

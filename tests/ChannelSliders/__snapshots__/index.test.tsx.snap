@@ -16,6 +16,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
     >
       <div
         aria-label="Hue"
+        aria-orientation="horizontal"
         aria-valuemax="359.9"
         aria-valuemin="0"
         aria-valuenow="209.59"
@@ -53,6 +54,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
     >
       <div
         aria-label="Saturation"
+        aria-orientation="horizontal"
         aria-valuemax="100"
         aria-valuemin="0"
         aria-valuenow="100"
@@ -90,6 +92,7 @@ exports[`ChannelSliders > HSL mode > renders correctly 1`] = `
     >
       <div
         aria-label="Lightness"
+        aria-orientation="horizontal"
         aria-valuemax="100"
         aria-valuemin="0"
         aria-valuenow="42.55"
@@ -135,6 +138,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
     >
       <div
         aria-label="Lightness"
+        aria-orientation="horizontal"
         aria-valuemax="1"
         aria-valuemin="0"
         aria-valuenow="0.54"
@@ -172,6 +176,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
     >
       <div
         aria-label="Chroma"
+        aria-orientation="horizontal"
         aria-valuemax="0.19733"
         aria-valuemin="0"
         aria-valuenow="0.194"
@@ -210,6 +215,7 @@ exports[`ChannelSliders > OKLCH mode > renders correctly 1`] = `
     >
       <div
         aria-label="Hue"
+        aria-orientation="horizontal"
         aria-valuemax="360"
         aria-valuemin="0"
         aria-valuenow="250"
@@ -255,6 +261,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
     >
       <div
         aria-label="Red"
+        aria-orientation="horizontal"
         aria-valuemax="255"
         aria-valuemin="0"
         aria-valuenow="0"
@@ -293,6 +300,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
     >
       <div
         aria-label="Green"
+        aria-orientation="horizontal"
         aria-valuemax="255"
         aria-valuemin="0"
         aria-valuenow="110"
@@ -331,6 +339,7 @@ exports[`ChannelSliders > RGB mode > renders correctly 1`] = `
     >
       <div
         aria-label="Blue"
+        aria-orientation="horizontal"
         aria-valuemax="255"
         aria-valuemin="0"
         aria-valuenow="217"
