@@ -125,6 +125,80 @@ describe('colorSpace', () => {
     });
   });
 
+  describe('round-trip edge cases', () => {
+    it('round-trips with chroma=0 (achromatic) — hue is arbitrary, l preserved', () => {
+      const l = 0.5;
+      const hsv = oklchToP3Hsv(l, 0, 200);
+
+      expect(hsv.s).toBeCloseTo(0, 3);
+
+      const oklch = p3HsvToOKLCH(hsv.h, hsv.s, hsv.v);
+
+      expect(oklch.l).toBeCloseTo(l, 3);
+      expect(oklch.c).toBeCloseTo(0, 3);
+    });
+
+    it.each([0, 1])('round-trips at l=%d (gamut endpoints) with c=0', l => {
+      const hsv = oklchToP3Hsv(l, 0, 0);
+      const oklch = p3HsvToOKLCH(hsv.h, hsv.s, hsv.v);
+
+      expect(oklch.l).toBeCloseTo(l, 3);
+      expect(oklch.c).toBeCloseTo(0, 3);
+    });
+
+    it('treats negative oklch hue equivalently to its positive complement', () => {
+      const negative = oklchToP3Hsv(0.6, 0.1, -10);
+      const positive = oklchToP3Hsv(0.6, 0.1, 350);
+
+      expect(negative.h).toBeCloseTo(positive.h, 1);
+      expect(negative.s).toBeCloseTo(positive.s, 3);
+      expect(negative.v).toBeCloseTo(positive.v, 3);
+    });
+
+    it('treats hue > 360 equivalently to the wrapped value', () => {
+      const wrapped = oklchToP3Hsv(0.6, 0.1, 90);
+      const overflow = oklchToP3Hsv(0.6, 0.1, 450);
+
+      expect(overflow.h).toBeCloseTo(wrapped.h, 1);
+      expect(overflow.s).toBeCloseTo(wrapped.s, 3);
+      expect(overflow.v).toBeCloseTo(wrapped.v, 3);
+    });
+
+    it('p3HsvToOKLCH always returns hue in [0, 360)', () => {
+      const grey = p3HsvToOKLCH(123, 0, 0.5);
+      const red = p3HsvToOKLCH(0, 1, 1);
+
+      expect(grey.h).toBeGreaterThanOrEqual(0);
+      expect(grey.h).toBeLessThan(360);
+      expect(red.h).toBeGreaterThanOrEqual(0);
+      expect(red.h).toBeLessThan(360);
+    });
+
+    it('hsvToRgb / rgbToHsv round-trip preserves greyscale (s=0)', () => {
+      const original = hsvToHex({ h: 200, s: 0, v: 0.5 });
+      const back = colorToHsv(original);
+
+      expect(back.s).toBeCloseTo(0, 3);
+      expect(back.v).toBeCloseTo(0.5, 2);
+    });
+  });
+
+  describe('isOklchInSRGB edge cases', () => {
+    it('returns true for achromatic colors at any lightness (c=0)', () => {
+      expect(isOklchInSRGB(0.25, 0, 0)).toBe(true);
+      expect(isOklchInSRGB(0.5, 0, 90)).toBe(true);
+      expect(isOklchInSRGB(0.75, 0, 270)).toBe(true);
+    });
+
+    it('returns false for a wide-gamut color outside sRGB', () => {
+      expect(isOklchInSRGB(0.7, 0.25, 250)).toBe(false);
+    });
+
+    it('returns true for a low-chroma color near grey', () => {
+      expect(isOklchInSRGB(0.5, 0.01, 180)).toBe(true);
+    });
+  });
+
   describe('oklchHueToHsvHue', () => {
     it('returns a value in [0, 360)', () => {
       for (const hue of testHues) {

@@ -276,6 +276,72 @@ describe('useEmitLifecycle', () => {
     });
   });
 
+  describe('keyboard idle race edges', () => {
+    it('resets idle timer when activity arrives just before expiry', () => {
+      const onChangeEnd = vi.fn();
+      const { result } = setup({ onChangeEnd, value: 50 });
+
+      act(() => result.current.notifyKeyboardActivity());
+      act(() => {
+        vi.advanceTimersByTime(KEYBOARD_IDLE_MS - 1);
+      });
+      expect(onChangeEnd).not.toHaveBeenCalled();
+
+      act(() => result.current.notifyKeyboardActivity());
+      act(() => {
+        vi.advanceTimersByTime(KEYBOARD_IDLE_MS - 1);
+      });
+      expect(onChangeEnd).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+    });
+
+    it('keyboard activity during active pointer session is suppressed', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+      const { result } = setup({ onChangeEnd, onChangeStart, value: 50 });
+
+      act(() => result.current.notifyStart());
+      onChangeStart.mockClear();
+
+      act(() => result.current.notifyKeyboardActivity());
+
+      expect(onChangeStart).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(KEYBOARD_IDLE_MS * 2);
+      });
+      expect(onChangeEnd).not.toHaveBeenCalled();
+    });
+
+    it('starts a fresh keyboard session after idle expiry', () => {
+      const onChangeStart = vi.fn();
+      const onChangeEnd = vi.fn();
+      const { result } = setup({ onChangeEnd, onChangeStart, value: 50 });
+
+      act(() => result.current.notifyKeyboardActivity());
+      act(() => {
+        vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+      });
+
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeEnd).toHaveBeenCalledTimes(1);
+
+      act(() => result.current.notifyKeyboardActivity());
+
+      expect(onChangeStart).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+      });
+
+      expect(onChangeEnd).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('cleanup', () => {
     it('clears pending idle timer on unmount', () => {
       const onChangeEnd = vi.fn();
