@@ -89,10 +89,11 @@ export default function SettingsMenu(props: SettingsMenuProps) {
     labels?.outputFormat,
   );
 
-  // Returning focus to the trigger keeps ancestor focus-within popovers
-  // (HeroUI / React Aria hosts) from treating an option click as focus
-  // leaving the picker.
-  const refocusTrigger = () => {
+  // Returning focus to the trigger when the panel closes keeps ancestor
+  // focus-within popovers (HeroUI / React Aria hosts) from treating the
+  // dismissal as focus leaving the picker.
+  const closePanel = () => {
+    setIsOpen(false);
     triggerRef.current?.focus();
   };
 
@@ -106,7 +107,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
           <button
             aria-label={closeLabel}
             className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
-            onClick={() => setIsOpen(false)}
+            onClick={closePanel}
             type="button"
           >
             {doneLabel}
@@ -123,14 +124,12 @@ export default function SettingsMenu(props: SettingsMenuProps) {
         <div className="flex flex-row justify-center flex-1 gap-6">
           <RadioGroup
             onChange={onChangeDisplayFormat}
-            onInteractionEnd={refocusTrigger}
             options={OPTIONS}
             title={displayFormatLabel}
             value={displayFormat}
           />
           <RadioGroup
             onChange={onChangeOutputFormat}
-            onInteractionEnd={refocusTrigger}
             options={OPTIONS}
             title={outputFormatLabel}
             value={outputFormat}
@@ -145,7 +144,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
       <Floater
         content={panel}
         eventType="click"
-        onOpenChange={setIsOpen}
+        onOpenChange={open => (open ? setIsOpen(true) : closePanel())}
         open={isOpen}
         placement={placement}
       >

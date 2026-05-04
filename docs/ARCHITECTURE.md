@@ -127,7 +127,7 @@ Every piece of state has a matching `*Ref` (`hsvRef`, `oklchRef`, `alphaRef`, `d
 
 One function, `emit(oklchValue)`:
 
-1. `resolveOutputFormat(outputFormat, displayFormat, mode)` → concrete format (no `'auto'`).
+1. `resolveOutputFormat(outputFormat, mode)` → concrete format (no `'auto'`). Display format is intentionally not consulted — display is visual only.
 2. Compute `alphaForOutput` (only when `showAlpha && alpha < 1`).
 3. `formatColor(oklchValue, resolved, alphaForOutput, precision)` — final CSS string.
 4. Store in `lastEmittedRef` so the `color` prop effect can skip this value.
@@ -166,7 +166,7 @@ Each slot's classes merge with the component defaults via `cn()` in `src/modules
 
 ### Formats
 
-`ColorFormat = 'auto' | 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb'`. Used for both `displayFormat` (what the text input shows) and `outputFormat` (what `onChange` emits). `'auto'` resolves against the current mode in `src/modules/format.ts` — `resolveDisplayFormat` (OKLCH mode → `'oklch'`, else → `'hex'`) and `resolveOutputFormat` (default: follow the resolved display format).
+`ColorFormat = 'auto' | 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb'`. Used for both `displayFormat` (what the text input shows) and `outputFormat` (what `onChange` emits). `'auto'` resolves against the current mode in `src/modules/format.ts` — both `resolveDisplayFormat` and `resolveOutputFormat` apply the same rule (OKLCH mode → `'oklch'`, else → `'hex'`). The two are intentionally independent: `outputFormat` resolution does not consult `displayFormat`.
 
 `isNarrowFormat` flags the three sRGB-bound formats (`hex`, `hsl`, `rgb`). `GamutWarning` shows when OKLCH mode is active and a narrow format can't losslessly represent the current color.
 
@@ -241,13 +241,14 @@ Used by `GradientSlider`, `SaturationPanel`, and `OKLCHPanel`. Channel sliders (
 
 `GradientSlider` also tracks `isDragging` for a pressed-outline thumb state. The panels don't.
 
-**Keyboard nav is a `GradientSlider`-only feature.** Its thumb has `role="slider"`, ARIA `min` / `max` / `now`, and supports:
+**Every interactive surface implements WAI-ARIA slider semantics.** `GradientSlider`, `OKLCHPanel`, and `SaturationPanel` carry `role="slider"`, `tabIndex={0}`, `aria-label`, and `aria-valuetext`.
 
-- `ArrowLeft/Down` / `ArrowRight/Up` — step by `step` (×10 with `Shift`).
-- `PageUp` / `PageDown` — step by `step * 10`.
-- `Home` / `End` — jump to `minValue` / `maxValue`.
+`GradientSlider` (1D) also exposes `aria-valuemin` / `aria-valuemax` / `aria-valuenow`. The 2D panels do **not** — `aria-valuenow` models a single value, and choosing one axis to expose lies about the other. The panels rely on `aria-valuetext` (e.g. `Lightness 54%, Chroma 0.194`) to announce both axes; this matches `react-colorful`'s shape and is what screen readers actually announce on every keystroke.
 
-The 2D panel thumbs are pointer-only — no role, no ARIA, no key handling. Keyboard-only users adjust L/C/H (or H/S/V) via the channel sliders or the color input.
+Keys:
+
+- `GradientSlider` — Arrow (step), Shift+Arrow (×10), PageUp / PageDown (×10), Home / End.
+- 2D panels — Arrow Left/Right steps the X axis (chroma / saturation), Arrow Up/Down steps the Y axis (lightness / value), Shift switches between `KEYBOARD_STEP` and `KEYBOARD_LARGE_STEP`, Home / End jumps the X axis. OKLCH chroma step is relative to `getP3MaxChroma(hue, lightness)` so a keystroke feels equally responsive across hues.
 
 ### `useInteractionAttribute`
 
@@ -300,7 +301,9 @@ SettingsMenu uses Floater in click-controlled mode. Default placement is `bottom
 
 Layout: always two `RadioGroup`s side-by-side. Panel sized by `min-w-70` (≈ 280 px) with intrinsic content driving the final width — no JS measurement, no `ResizeObserver`.
 
-State: SettingsMenu owns `isOpen` and passes it through Floater (`open` / `onOpenChange`). The **Done** button calls `setIsOpen(false)` directly. RadioGroup interactions refocus the gear trigger so ancestor focus-within popovers (HeroUI / React Aria hosts) don't treat the selection as focus leaving the picker.
+State: SettingsMenu owns `isOpen` and passes it through Floater (`open` / `onOpenChange`). Explicit dismiss (the **Done** button or `Escape`) closes the menu and returns focus to the gear trigger. Passive dismiss (outside click) does not refocus — restoring focus would steal it from the element the user just clicked.
+
+Host-popover compatibility: when the picker is rendered inside a host's popover, that host's outside-click detection runs on capture-phase document `pointerdown` and would dismiss when the user clicks our portaled menu. The Floater's portal root carries `data-color-picker-portal` so consumers can opt out via their popover's `shouldCloseOnInteractOutside` hook (or equivalent). RadioGroup focus management does not participate — the host gates on pointer location, not focus.
 
 Dismissal: outside `mousedown` / `touchstart`, `Escape`, or the **Done** button.
 

@@ -1,5 +1,6 @@
 import {
   type HTMLAttributes,
+  type KeyboardEvent,
   type PointerEvent,
   useEffect,
   useLayoutEffect,
@@ -7,9 +8,15 @@ import {
   useRef,
   useState,
 } from 'react';
-import { parseCSS } from 'colorizr';
+import { getP3MaxChroma, parseCSS } from 'colorizr';
 
-import { DEFAULT_COLOR, panelClasses } from './constants';
+import {
+  DEFAULT_COLOR,
+  DEFAULT_LABELS,
+  KEYBOARD_LARGE_STEP,
+  KEYBOARD_STEP,
+  panelClasses,
+} from './constants';
 import useEmitLifecycle from './hooks/useEmitLifecycle';
 import useRafCommit from './hooks/useRafCommit';
 import { clamp, cn, relativePosition } from './modules/helpers';
@@ -32,7 +39,12 @@ interface LC {
   l: number;
 }
 
-interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'aria-label' | 'onChange'> {
+  /**
+   * Accessible name for the panel. Announced by screen readers when focused.
+   * @default 'OKLCH color panel'
+   */
+  'aria-label'?: string;
   /**
    * OKLCH chroma as an absolute value (typical sRGB range: `[0, ~0.4]`).
    * @default DEFAULT_COLOR's OKLCH chroma
@@ -65,12 +77,18 @@ interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
    * lightness and chroma at the start of the interaction.
    */
   onChangeStart?: (l: number, c: number) => void;
+  /**
+   * Live announcement for keyboard nudges. Receives current lightness and chroma.
+   * @default `Lightness ${lPct}%, Chroma ${cFixed}`
+   */
+  valueText?: (lightness: number, chroma: number) => string;
 }
 
 const equalsLC = (a: LC, b: LC) => a.l === b.l && a.c === b.c;
 
 export default function OKLCHPanel(props: OKLCHPanelProps) {
   const {
+    'aria-label': ariaLabel = DEFAULT_LABELS.oklchPanel.ariaLabel,
     chroma = DEFAULTS.c,
     className,
     classNames,
@@ -80,6 +98,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     onChangeEnd,
     onChangeStart,
     style,
+    valueText = DEFAULT_LABELS.oklchPanel.valueText,
     ...rest
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -139,7 +158,10 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     return anchor;
   }, [canvasResult]);
 
-  const { emit, notifyEnd, notifyStart } = useEmitLifecycle<{ c: number; l: number }>({
+  const { emit, notifyEnd, notifyKeyboardActivity, notifyStart } = useEmitLifecycle<{
+    c: number;
+    l: number;
+  }>({
     equals: equalsLC,
     onChange: next => onChange?.(next.l, next.c),
     onChangeEnd: next => onChangeEnd?.(next.l, next.c),
@@ -176,17 +198,69 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     notifyEnd();
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const lStep = event.shiftKey ? KEYBOARD_LARGE_STEP : KEYBOARD_STEP;
+    const maxC = getP3MaxChroma({ l: lightness, c: 0, h: hue });
+    // Chroma range varies with hue+lightness — use a percentage of maxC so a
+    // keystroke feels equally responsive regardless of the available range.
+    const cStep = maxC * lStep;
+    let nextC = chroma;
+    let nextL = lightness;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        nextC = clamp(chroma - cStep, 0, maxC);
+        break;
+      case 'ArrowRight':
+        nextC = clamp(chroma + cStep, 0, maxC);
+        break;
+      case 'ArrowDown':
+        nextL = clamp(lightness - lStep, 0, 1);
+        break;
+      case 'ArrowUp':
+        nextL = clamp(lightness + lStep, 0, 1);
+        break;
+      case 'Home':
+        nextC = 0;
+        break;
+      case 'End':
+        nextC = maxC;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    notifyKeyboardActivity();
+
+    if (nextL !== lightness) {
+      const nextMaxC = getP3MaxChroma({ l: nextL, c: 0, h: hue });
+
+      nextC = clamp(nextC, 0, nextMaxC);
+    }
+
+    emit({ c: nextC, l: nextL });
+  };
+
   const thumb = lcToPointer(hue, lightness, chroma);
 
+  // 2D control: aria-valuenow can only describe one axis. We omit it and let
+  // aria-valuetext announce both. Same shape react-colorful ships.
+  /* eslint-disable jsx-a11y/role-has-required-aria-props */
   return (
     <div
       ref={containerRef}
+      aria-label={ariaLabel}
+      aria-valuetext={valueText(lightness, chroma)}
       className={cn(panelClasses.root, className, classNames?.root)}
       data-testid="OKLCHPanel"
+      onKeyDown={handleKeyDown}
       onLostPointerCapture={handleLostPointerCapture}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
+      role="slider"
       style={{ ...style, touchAction: 'none' }}
+      tabIndex={0}
       {...rest}
     >
       <canvas

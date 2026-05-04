@@ -1,6 +1,20 @@
 import SettingsMenu from '~/SettingsMenu';
 import { fireEvent, render, screen, within } from '~/test-utils';
 
+let mockIdCounter = 0;
+
+vi.mock('~/hooks/useId', () => ({
+  default: (prefix: string) => {
+    mockIdCounter += 1;
+
+    return `${prefix}-${mockIdCounter}`;
+  },
+}));
+
+beforeEach(() => {
+  mockIdCounter = 0;
+});
+
 type Props = Parameters<typeof SettingsMenu>[0];
 
 function getGroup(title: 'Display format' | 'Output format'): HTMLElement {
@@ -39,7 +53,7 @@ describe('SettingsMenu', () => {
     renderMenu({ onChangeDisplayFormat });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
-    fireEvent.click(within(getGroup('Display format')).getByRole('button', { name: 'Hex' }));
+    fireEvent.click(within(getGroup('Display format')).getByRole('radio', { name: 'Hex' }));
 
     expect(onChangeDisplayFormat).toHaveBeenCalledWith('hex');
   });
@@ -50,7 +64,7 @@ describe('SettingsMenu', () => {
     renderMenu({ onChangeOutputFormat });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
-    fireEvent.click(within(getGroup('Output format')).getByRole('button', { name: 'RGB' }));
+    fireEvent.click(within(getGroup('Output format')).getByRole('radio', { name: 'RGB' }));
 
     expect(onChangeOutputFormat).toHaveBeenCalledWith('rgb');
   });
@@ -62,24 +76,37 @@ describe('SettingsMenu', () => {
     renderMenu({ onChangeDisplayFormat, onChangeOutputFormat });
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
-    fireEvent.click(within(getGroup('Output format')).getByRole('button', { name: 'Hex' }));
+    fireEvent.click(within(getGroup('Output format')).getByRole('radio', { name: 'Hex' }));
 
     expect(onChangeOutputFormat).toHaveBeenCalledWith('hex');
     expect(onChangeDisplayFormat).not.toHaveBeenCalled();
   });
 
-  it('returns focus to the trigger after a selection', () => {
+  it('keeps focus on the clicked radio (does not steal focus to trigger)', () => {
     renderMenu();
 
     const trigger = screen.getByTestId('SettingsTrigger');
 
     fireEvent.click(trigger);
-    fireEvent.click(within(getGroup('Display format')).getByRole('button', { name: 'Hex' }));
+    const hexRadio = within(getGroup('Display format')).getByRole('radio', { name: 'Hex' });
+
+    fireEvent.click(hexRadio);
+
+    expect(trigger).not.toHaveFocus();
+  });
+
+  it('returns focus to the trigger when the Done button closes the panel', () => {
+    renderMenu();
+
+    const trigger = screen.getByTestId('SettingsTrigger');
+
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole('button', { name: 'Close settings' }));
 
     expect(trigger).toHaveFocus();
   });
 
-  it('closes on Escape', () => {
+  it('closes on Escape and returns focus to the trigger', () => {
     renderMenu();
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
@@ -89,6 +116,7 @@ describe('SettingsMenu', () => {
 
     expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
     expect(screen.getByTestId('SettingsTrigger')).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('SettingsTrigger')).toHaveFocus();
   });
 
   it('closes on outside mousedown', () => {
@@ -132,9 +160,9 @@ describe('SettingsMenu', () => {
 
     fireEvent.click(screen.getByTestId('SettingsTrigger'));
 
-    const displayHex = within(getGroup('Display format')).getByRole('button', { name: 'Hex' });
-    const outputRgb = within(getGroup('Output format')).getByRole('button', { name: 'RGB' });
-    const outputHex = within(getGroup('Output format')).getByRole('button', { name: 'Hex' });
+    const displayHex = within(getGroup('Display format')).getByRole('radio', { name: 'Hex' });
+    const outputRgb = within(getGroup('Output format')).getByRole('radio', { name: 'RGB' });
+    const outputHex = within(getGroup('Output format')).getByRole('radio', { name: 'Hex' });
 
     expect(displayHex).toHaveClass(/text-neutral-900|text-neutral-50/);
     expect(outputRgb).toHaveClass(/text-neutral-900|text-neutral-50/);

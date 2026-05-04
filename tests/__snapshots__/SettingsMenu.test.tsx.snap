@@ -28,16 +28,22 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
       class="flex flex-row justify-center flex-1 gap-6"
     >
       <div
+        aria-labelledby="radiogroup-title-3"
         class="flex flex-col flex-1"
         data-testid="RadioGroup"
+        role="radiogroup"
       >
         <div
           class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500"
+          id="radiogroup-title-3"
         >
           Display format
         </div>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
+          aria-checked="true"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded text-neutral-900 dark:text-neutral-50"
+          role="radio"
+          tabindex="0"
           type="button"
         >
           <span>
@@ -49,7 +55,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -61,7 +70,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -73,7 +85,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -85,7 +100,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -97,7 +115,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -110,16 +131,22 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
         </button>
       </div>
       <div
+        aria-labelledby="radiogroup-title-4"
         class="flex flex-col flex-1"
         data-testid="RadioGroup"
+        role="radiogroup"
       >
         <div
           class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500"
+          id="radiogroup-title-4"
         >
           Output format
         </div>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 text-neutral-900 dark:text-neutral-50"
+          aria-checked="true"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded text-neutral-900 dark:text-neutral-50"
+          role="radio"
+          tabindex="0"
           type="button"
         >
           <span>
@@ -131,7 +158,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -143,7 +173,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -155,7 +188,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -167,7 +203,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
@@ -179,7 +218,10 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
           />
         </button>
         <button
-          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50"
+          aria-checked="false"
+          class="flex items-center justify-between h-6 text-sm text-left leading-none text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded"
+          role="radio"
+          tabindex="-1"
           type="button"
         >
           <span>
