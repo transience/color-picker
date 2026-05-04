@@ -232,6 +232,10 @@ export interface ColorPickerProps {
    *
    * Format follows the resolved `outputFormat`. Alpha is appended when
    * `showAlpha` is on and the current alpha is `< 1`.
+   *
+   * Also fires when the resolved output format itself changes — i.e. when the
+   * user picks a new `outputFormat` in the settings menu, or when `mode`
+   * changes while `outputFormat` is `'auto'`.
    */
   onChange?: (value: string) => void;
   /**
@@ -258,9 +262,12 @@ export interface ColorPickerProps {
    */
   onChangeStart?: (value: string) => void;
   /**
-   * Initial format `onChange` emits.
+   * Format `onChange` emits in.
    *
-   * `'auto'` follows the resolved `displayFormat`.
+   * `'auto'` follows the current `mode` (`'oklch'` → `'oklch'`,
+   * otherwise `'hex'`). Independent of `displayFormat`, which is visual only.
+   *
+   * Changing this at runtime re-emits the current color via `onChange`.
    * @default 'auto'
    */
   outputFormat?: ColorFormat;
