@@ -110,6 +110,35 @@ describe('useRafCommit', () => {
     expect(commit).toHaveBeenCalledTimes(1);
   });
 
+  it('schedule after rAF fired commits the new value on next frame', () => {
+    const commit = vi.fn();
+    const { result } = renderHook(() => useRafCommit<number>(commit));
+
+    act(() => result.current.schedule(1));
+    act(() => raf.flushAll());
+
+    expect(commit).toHaveBeenLastCalledWith(1);
+
+    act(() => result.current.schedule(2));
+    act(() => raf.flushAll());
+
+    expect(commit).toHaveBeenCalledTimes(2);
+    expect(commit).toHaveBeenLastCalledWith(2);
+  });
+
+  it('schedule then flush then schedule then flush emits both values in order', () => {
+    const commit = vi.fn();
+    const { result } = renderHook(() => useRafCommit<number>(commit));
+
+    act(() => result.current.schedule(11));
+    act(() => result.current.flush());
+
+    act(() => result.current.schedule(22));
+    act(() => result.current.flush());
+
+    expect(commit.mock.calls).toEqual([[11], [22]]);
+  });
+
   it('cancels pending rAF on unmount', () => {
     const commit = vi.fn();
     const { result, unmount } = renderHook(() => useRafCommit<number>(commit));

@@ -28,6 +28,17 @@ describe('helpers', () => {
       expect(clamp(0.55, 0, 1)).toBe(0.55);
       expect(clamp(1.5, 0, 1)).toBe(1);
     });
+
+    it('returns max when min > max regardless of value', () => {
+      expect(clamp(0, 10, 5)).toBe(5);
+      expect(clamp(7, 10, 5)).toBe(5);
+      expect(clamp(20, 10, 5)).toBe(5);
+    });
+
+    it('returns NaN when bounds are NaN', () => {
+      expect(clamp(5, Number.NaN, 10)).toBeNaN();
+      expect(clamp(5, 0, Number.NaN)).toBeNaN();
+    });
   });
 
   describe('quantize', () => {
@@ -50,6 +61,14 @@ describe('helpers', () => {
 
     it('snaps to integer step', () => {
       expect(quantize(179.7, 1)).toBe(180);
+    });
+
+    it('returns value unchanged for negative step (treated like zero/no-op)', () => {
+      expect(quantize(1.23456, -0.5)).toBe(1.23456);
+    });
+
+    it('snaps to origin when step is much larger than the value', () => {
+      expect(quantize(5, 1e6, 0)).toBe(0);
     });
   });
 
@@ -77,6 +96,31 @@ describe('helpers', () => {
 
     it('clamps values beyond the rect to 1', () => {
       expect(relativePosition(buildEvent(1000, 1000), rect)).toEqual({ x: 1, y: 1 });
+    });
+
+    it('clamps to 1 for zero-width rect when point is past origin', () => {
+      const flat = { left: 10, top: 20, width: 0, height: 0 } as DOMRect;
+      const result = relativePosition(buildEvent(50, 60), flat);
+
+      expect(result.x).toBe(1);
+      expect(result.y).toBe(1);
+    });
+
+    it('returns NaN for zero-width rect at origin (division by zero)', () => {
+      const flat = { left: 10, top: 20, width: 0, height: 0 } as DOMRect;
+      const result = relativePosition(buildEvent(10, 20), flat);
+
+      expect(result.x).toBeNaN();
+      expect(result.y).toBeNaN();
+    });
+
+    it('returns 1 at the exact bottom-right boundary', () => {
+      const result = relativePosition(
+        buildEvent(rect.left + rect.width, rect.top + rect.height),
+        rect,
+      );
+
+      expect(result).toEqual({ x: 1, y: 1 });
     });
   });
 });
