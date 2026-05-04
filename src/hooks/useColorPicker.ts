@@ -117,11 +117,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   }, [color]);
 
   const renderOutput = useCallback((oklchValue: string) => {
-    const resolved = resolveOutputFormat(
-      outputFormatRef.current,
-      displayFormatRef.current,
-      modeRef.current,
-    );
+    const resolved = resolveOutputFormat(outputFormatRef.current, modeRef.current);
     const alphaForOutput =
       showAlphaRef.current && alphaRef.current < 1 ? alphaRef.current : undefined;
 
@@ -139,6 +135,23 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     },
     [renderOutput],
   );
+
+  const formatCurrent = useCallback(() => {
+    const oklchValue =
+      modeRef.current === 'oklch'
+        ? formatCSS(oklchRef.current, 'oklch')
+        : convertCSS(hsvToHex(hsvRef.current), 'oklch');
+
+    return renderOutput(oklchValue);
+  }, [renderOutput]);
+
+  const reemitIfChanged = useCallback(() => {
+    const final = formatCurrent();
+
+    if (final === lastEmittedRef.current) return;
+    lastEmittedRef.current = final;
+    onChangeRef.current?.(final);
+  }, [formatCurrent]);
 
   const handleChangeAlpha = useCallback(
     (next: number) => {
@@ -212,10 +225,14 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     [emit],
   );
 
-  const handleChangeOutputFormat = useCallback((format: ColorFormat) => {
-    setOutputFormat(format);
-    outputFormatRef.current = format;
-  }, []);
+  const handleChangeOutputFormat = useCallback(
+    (format: ColorFormat) => {
+      setOutputFormat(format);
+      outputFormatRef.current = format;
+      reemitIfChanged();
+    },
+    [reemitIfChanged],
+  );
 
   const handleChangeSaturationPanel = useCallback(
     (s: number, v: number) => {
@@ -228,22 +245,17 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     [emit],
   );
 
-  const handleClickMode = useCallback((value: ColorMode) => {
-    if (value === modeRef.current) return;
+  const handleClickMode = useCallback(
+    (value: ColorMode) => {
+      if (value === modeRef.current) return;
 
-    setMode(value);
-    modeRef.current = value;
-    onChangeModeRef.current?.(value);
-  }, []);
-
-  const formatCurrent = useCallback(() => {
-    const oklchValue =
-      modeRef.current === 'oklch'
-        ? formatCSS(oklchRef.current, 'oklch')
-        : convertCSS(hsvToHex(hsvRef.current), 'oklch');
-
-    return renderOutput(oklchValue);
-  }, [renderOutput]);
+      setMode(value);
+      modeRef.current = value;
+      onChangeModeRef.current?.(value);
+      reemitIfChanged();
+    },
+    [reemitIfChanged],
+  );
 
   // Invariant: child sliders/panels call this BEFORE mutating their value, so
   // `formatCurrent()` here returns the pre-interaction color. Reordering a

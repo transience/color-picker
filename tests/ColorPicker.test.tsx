@@ -310,12 +310,39 @@ describe('ColorPicker', () => {
 
       fireEvent.click(within(displayGroup).getByRole('radio', { name: 'Hex' }));
       expect(screen.getByLabelText('Color value')).toHaveValue('#ff0044');
+      expect(mockOnChange).not.toHaveBeenCalled();
+
+      fireEvent.click(within(outputGroup).getByRole('radio', { name: 'RGB' }));
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^rgb\(/);
+    });
+
+    it('re-emits when mode changes while outputFormat is "auto"', () => {
+      render(
+        <ColorPicker color="oklch(0.5 0.1 120)" defaultMode="oklch" onChange={mockOnChange} />,
+      );
 
       mockOnChange.mockClear();
-      fireEvent.click(within(outputGroup).getByRole('radio', { name: 'RGB' }));
-      fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
+      fireEvent.click(screen.getByRole('button', { name: 'Switch to HSL' }));
 
-      expect(mockOnChange.mock.calls[0][0]).toMatch(/^rgb\(/);
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^#[\da-f]{6}$/i);
+    });
+
+    it('does not re-emit when switching between modes that share representation and outputFormat is fixed', () => {
+      render(
+        <ColorPicker
+          color="#5c6b21"
+          defaultMode="hsl"
+          onChange={mockOnChange}
+          outputFormat="hex"
+        />,
+      );
+
+      mockOnChange.mockClear();
+      fireEvent.click(screen.getByRole('button', { name: 'Switch to RGB' }));
+
+      expect(mockOnChange).not.toHaveBeenCalled();
     });
 
     it('applies settingsMenu slots when the menu opens', () => {

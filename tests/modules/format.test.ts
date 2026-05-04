@@ -136,20 +136,19 @@ describe('format', () => {
   });
 
   describe('resolveOutputFormat', () => {
-    it('passes through explicit outputFormat regardless of displayFormat or mode', () => {
-      expect(resolveOutputFormat('rgb', 'hex', 'oklch')).toBe('rgb');
-      expect(resolveOutputFormat('oklab', 'auto', 'hsl')).toBe('oklab');
+    it('passes through explicit outputFormat regardless of mode', () => {
+      expect(resolveOutputFormat('rgb', 'oklch')).toBe('rgb');
+      expect(resolveOutputFormat('oklab', 'hsl')).toBe('oklab');
+      expect(resolveOutputFormat('hex', 'oklch')).toBe('hex');
     });
 
-    it('falls back to resolved displayFormat when outputFormat is "auto"', () => {
-      expect(resolveOutputFormat('auto', 'hex', 'oklch')).toBe('hex');
-      expect(resolveOutputFormat('auto', 'oklch', 'oklch')).toBe('oklch');
+    it('resolves "auto" to "oklch" in oklch mode', () => {
+      expect(resolveOutputFormat('auto', 'oklch')).toBe('oklch');
     });
 
-    it('chains "auto" through to mode-driven default when displayFormat is also "auto"', () => {
-      expect(resolveOutputFormat('auto', 'auto', 'oklch')).toBe('oklch');
-      expect(resolveOutputFormat('auto', 'auto', 'hsl')).toBe('hex');
-      expect(resolveOutputFormat('auto', 'auto', 'rgb')).toBe('hex');
+    it('resolves "auto" to "hex" in hsl and rgb modes', () => {
+      expect(resolveOutputFormat('auto', 'hsl')).toBe('hex');
+      expect(resolveOutputFormat('auto', 'rgb')).toBe('hex');
     });
   });
 });

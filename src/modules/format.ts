@@ -56,16 +56,17 @@ export function resolveDisplayFormat(
 }
 
 /**
- * Resolve an `outputFormat` of `'auto'` to follow the resolved display format.
+ * Resolve an `outputFormat` of `'auto'` against the current `mode`
+ * (`'oklch'` → `'oklch'`, otherwise `'hex'`). Display format is
+ * intentionally not consulted — display is visual only.
  */
 export function resolveOutputFormat(
   outputFormat: ColorFormat,
-  displayFormat: ColorFormat,
   mode: ColorMode,
 ): Exclude<ColorFormat, 'auto'> {
   if (outputFormat !== 'auto') {
     return outputFormat;
   }
 
-  return resolveDisplayFormat(displayFormat, mode);
+  return mode === 'oklch' ? 'oklch' : 'hex';
 }
