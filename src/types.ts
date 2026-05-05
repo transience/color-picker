@@ -327,6 +327,7 @@ export interface ColorPickerProps {
   showPanel?: boolean;
   /**
    * Adds a settings menu exposing display and output format controls.
+   * Opens in a portal with the `data-color-picker-portal` attribute.
    * @default false
    */
   showSettings?: boolean;
