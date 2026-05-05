@@ -40,6 +40,12 @@ export const defaultProps = {
 } satisfies Partial<ColorPickerProps>;
 
 export default function useColorPicker(props: ColorPickerProps): UseColorPickerReturn {
+  // Detect controlled-ness from raw props (before mergeProps fills defaults).
+  // When a format prop is passed, it owns the value; the settings radio is
+  // disabled and internal state is ignored.
+  const isOutputFormatControlled = props.outputFormat !== undefined;
+  const isDisplayFormatControlled = props.displayFormat !== undefined;
+
   // `merged` is a new object every render because React hands the component a
   // fresh `props` ref per render. Wrapping in useMemo with [props] would invalidate
   // every render — fake stability. Derived memos below depend on primitives extracted
@@ -61,15 +67,19 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   const initialColor = color ?? DEFAULT_COLOR;
 
   const [alpha, setAlpha] = useState<number>(() => (showAlpha ? opacity(initialColor) : 1));
-  const [displayFormat, setDisplayFormat] = useState<ColorFormat>(displayFormatProp);
+  const [displayFormatState, setDisplayFormatState] = useState<ColorFormat>(displayFormatProp);
   const [hsv, setHsv] = useState<HSV>(() => colorToHsv(initialColor));
   const [mode, setMode] = useState<ColorMode>(defaultMode);
   const [oklch, setOklch] = useState<OklchColor>(() => parseCSS(initialColor, 'oklch'));
-  const [outputFormat, setOutputFormat] = useState<ColorFormat>(outputFormatProp);
+  const [outputFormatState, setOutputFormatState] = useState<ColorFormat>(outputFormatProp);
   const interactionRef = useInteractionAttribute();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const displayFormat = isDisplayFormatControlled ? displayFormatProp : displayFormatState;
+  const outputFormat = isOutputFormatControlled ? outputFormatProp : outputFormatState;
+
   const lastEmittedRef = useRef(initialColor);
+  const mountedRef = useRef(false);
 
   const alphaRef = useRef(alpha);
   const displayFormatRef = useRef(displayFormat);
@@ -153,6 +163,25 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     onChangeRef.current?.(final);
   }, [formatCurrent]);
 
+  useEffect(() => {
+    if (!isOutputFormatControlled || !mountedRef.current) return;
+    reemitIfChanged();
+  }, [outputFormatProp, isOutputFormatControlled, reemitIfChanged]);
+
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    reemitIfChanged();
+  }, [precision, reemitIfChanged]);
+
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    reemitIfChanged();
+  }, [showAlpha, reemitIfChanged]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+  }, []);
+
   const handleChangeAlpha = useCallback(
     (next: number) => {
       setAlpha(next);
@@ -187,10 +216,14 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     [emit],
   );
 
-  const handleChangeDisplayFormat = useCallback((format: ColorFormat) => {
-    setDisplayFormat(format);
-    displayFormatRef.current = format;
-  }, []);
+  const handleChangeDisplayFormat = useCallback(
+    (format: ColorFormat) => {
+      if (isDisplayFormatControlled) return;
+      setDisplayFormatState(format);
+      displayFormatRef.current = format;
+    },
+    [isDisplayFormatControlled],
+  );
 
   const handleChangeHsvHue = useCallback(
     (h: number) => {
@@ -227,11 +260,12 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const handleChangeOutputFormat = useCallback(
     (format: ColorFormat) => {
-      setOutputFormat(format);
+      if (isOutputFormatControlled) return;
+      setOutputFormatState(format);
       outputFormatRef.current = format;
       reemitIfChanged();
     },
-    [reemitIfChanged],
+    [isOutputFormatControlled, reemitIfChanged],
   );
 
   const handleChangeSaturationPanel = useCallback(

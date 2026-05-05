@@ -209,9 +209,13 @@ export interface ColorPickerProps {
    */
   defaultMode?: ColorMode;
   /**
-   * Initial text format for the `ColorInput`.
+   * Text format for the `ColorInput`. Visual only — does not affect `onChange`.
    *
    * `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.
+   *
+   * When set, becomes the source of truth: the settings-menu radio reflects the
+   * prop and is disabled. When omitted, the picker manages it internally and the
+   * radio is interactive.
    * @default 'auto'
    */
   displayFormat?: ColorFormat;
@@ -233,9 +237,9 @@ export interface ColorPickerProps {
    * Format follows the resolved `outputFormat`. Alpha is appended when
    * `showAlpha` is on and the current alpha is `< 1`.
    *
-   * Also fires when the resolved output format itself changes — i.e. when the
-   * user picks a new `outputFormat` in the settings menu, or when `mode`
-   * changes while `outputFormat` is `'auto'`.
+   * Also fires whenever any input that shapes the emitted string changes:
+   * `outputFormat` (radio click or runtime prop change), `mode` (when
+   * `outputFormat='auto'`), `precision`, or `showAlpha`.
    */
   onChange?: (value: string) => void;
   /**
@@ -267,7 +271,9 @@ export interface ColorPickerProps {
    * `'auto'` follows the current `mode` (`'oklch'` → `'oklch'`,
    * otherwise `'hex'`). Independent of `displayFormat`, which is visual only.
    *
-   * Changing this at runtime re-emits the current color via `onChange`.
+   * When set, becomes the source of truth: the settings-menu radio reflects the
+   * prop and is disabled. When omitted, the picker manages it internally and the
+   * radio is interactive. Runtime prop changes re-emit the current color via `onChange`.
    * @default 'auto'
    */
   outputFormat?: ColorFormat;

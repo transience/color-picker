@@ -137,6 +137,31 @@ describe('SettingsMenu', () => {
     expect(screen.queryByTestId('SettingsMenu')).not.toBeInTheDocument();
   });
 
+  it('does not steal focus to the trigger when dismissed by clicking another control', () => {
+    render(
+      <>
+        <button data-testid="outside" type="button">
+          outside
+        </button>
+        <SettingsMenu />
+      </>,
+    );
+
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+    expect(screen.getByTestId('SettingsMenu')).toBeInTheDocument();
+
+    const outside = screen.getByTestId('outside');
+
+    // mouseDown closes the menu (Floater outside-handler); the subsequent
+    // click moves focus to the outside button. Pre-fix code restored focus
+    // to the trigger on dismiss, stealing it back.
+    fireEvent.mouseDown(outside);
+    outside.focus();
+
+    expect(outside).toHaveFocus();
+    expect(screen.getByTestId('SettingsTrigger')).not.toHaveFocus();
+  });
+
   it('closes when the Done button is clicked', () => {
     renderMenu();
 
