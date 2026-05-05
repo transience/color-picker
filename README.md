@@ -86,13 +86,13 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 | **labels**<br />Slot-based text/aria overrides per component. Each rendered component reads only its own slot.                                 | `ColorPickerLabels` | — |
 | **color**<br />Controlled color value. Any CSS color string.<br />Falls back to the internal default when `undefined`.                         | `string` | `'oklch(54% 0.194 250)'` |
 | **defaultMode**<br />Initial mode for the 2D panel and channel controls.                                                                       | `'oklch'` \| `'hsl'` \| `'rgb'` | `'oklch'` |
-| **displayFormat**<br />Initial text format for the `ColorInput`. `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`.                             | `ColorFormat` | `'auto'` |
+| **displayFormat**<br />Text format for the `ColorInput` (visual only — does not affect `onChange`). `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`. When set, source of truth (settings radio disabled). | `ColorFormat` | `'auto'` |
 | **modes**<br />Modes shown in the mode switcher.                                                                                               | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
 | **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`.                                                    | `(value: string) => void` | — |
 | **onChangeStart**<br />Fires once when the user begins interacting with any slider, panel, or `ChannelInputs` field — `pointerdown` or first value-changing keystroke after idle. `ColorInput` and `EyeDropper` emit only `onChange`. | `(value: string) => void` | — |
 | **onChangeEnd**<br />Fires once when the user finishes interacting — pointer release, 600 ms after the last keystroke, or numeric-input blur. | `(value: string) => void` | — |
 | **onChangeMode**<br />Called when the user flips the mode via the switcher.                                                                    | `(mode: ColorMode) => void` | — |
-| **outputFormat**<br />Initial format `onChange` emits. `'auto'` follows the resolved `displayFormat`.                                          | `ColorFormat` | `'auto'` |
+| **outputFormat**<br />Format `onChange` emits in. `'auto'` follows `mode` (`'oklch'` → `'oklch'`, else `'hex'`). When set, source of truth (settings radio disabled); runtime change re-emits via `onChange`. | `ColorFormat` | `'auto'` |
 | **precision**<br />Decimal digits for non-hex output. Ignored for `hex`.                                                                       | `number` | `5` |
 | **showAlpha**<br />Renders an alpha slider and appends alpha to emitted values when `< 1`.                                                     | `boolean` | `false` |
 | **showColorInput**<br />Shows the text color input with the current value formatted per `displayFormat`.                                       | `boolean` | `true` |

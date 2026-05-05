@@ -6,6 +6,7 @@ import { cn } from '~/modules/helpers';
 import type { ColorFormat, SettingsOption } from '~/types';
 
 interface RadioGroupProps {
+  disabled?: boolean;
   onChange?: (format: ColorFormat) => void;
   options: SettingsOption[];
   title: ReactNode;
@@ -13,7 +14,7 @@ interface RadioGroupProps {
 }
 
 export default function RadioGroup(props: RadioGroupProps) {
-  const { onChange, options, title, value } = props;
+  const { disabled = false, onChange, options, title, value } = props;
   const titleId = useId('radiogroup-title');
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -29,6 +30,7 @@ export default function RadioGroup(props: RadioGroupProps) {
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
     const last = options.length - 1;
     const current = selectedIndex === -1 ? 0 : selectedIndex;
 
@@ -61,8 +63,9 @@ export default function RadioGroup(props: RadioGroupProps) {
     // tabindex on the radio children per WAI-ARIA radio-group pattern.
     // eslint-disable-next-line jsx-a11y/interactive-supports-focus
     <div
+      aria-disabled={disabled || undefined}
       aria-labelledby={titleId}
-      className="flex flex-col flex-1"
+      className={cn('flex flex-col flex-1', disabled && 'opacity-50')}
       data-testid="RadioGroup"
       onKeyDown={handleKeyDown}
       role="radiogroup"
@@ -86,15 +89,17 @@ export default function RadioGroup(props: RadioGroupProps) {
             className={cn(
               'flex items-center justify-between h-6 text-sm text-left leading-none',
               'text-neutral-700 dark:text-neutral-300',
-              'hover:text-neutral-900 dark:hover:text-neutral-50',
               'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/40 dark:focus-visible:ring-white/40 rounded',
               {
                 'text-neutral-900 dark:text-neutral-50': isSelected,
+                'hover:text-neutral-900 dark:hover:text-neutral-50': !disabled,
+                'cursor-not-allowed': disabled,
               },
             )}
+            disabled={disabled}
             onClick={() => onChange?.(option.value)}
             role="radio"
-            tabIndex={index === tabStopIndex ? 0 : -1}
+            tabIndex={!disabled && index === tabStopIndex ? 0 : -1}
             type="button"
           >
             <span>{option.label}</span>

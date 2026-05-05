@@ -345,6 +345,134 @@ describe('ColorPicker', () => {
       expect(mockOnChange).not.toHaveBeenCalled();
     });
 
+    it('disables the output-format radio when outputFormat prop is set (controlled)', () => {
+      render(
+        <ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="rgb" showSettings />,
+      );
+
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+      const outputGroup = screen
+        .getByText('Output format')
+        .closest('[data-testid="RadioGroup"]') as HTMLElement;
+
+      expect(outputGroup).toHaveAttribute('aria-disabled', 'true');
+
+      mockOnChange.mockClear();
+      fireEvent.click(within(outputGroup).getByRole('radio', { name: 'Hex' }));
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('disables the display-format radio when displayFormat prop is set (controlled)', () => {
+      render(<ColorPicker color="#ff0044" displayFormat="hex" showSettings />);
+
+      fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+      const displayGroup = screen
+        .getByText('Display format')
+        .closest('[data-testid="RadioGroup"]') as HTMLElement;
+
+      expect(displayGroup).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('re-emits when outputFormat prop changes (controlled)', () => {
+      const { rerender } = render(
+        <ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="hex" />,
+      );
+
+      mockOnChange.mockClear();
+      rerender(<ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="rgb" />);
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^rgb\(/);
+    });
+
+    it('updates visible value when displayFormat prop changes; does not call onChange', () => {
+      const { rerender } = render(
+        <ColorPicker
+          color="oklch(0.5 0.1 120)"
+          displayFormat="hex"
+          onChange={mockOnChange}
+          showColorInput
+        />,
+      );
+
+      mockOnChange.mockClear();
+      rerender(
+        <ColorPicker
+          color="oklch(0.5 0.1 120)"
+          displayFormat="oklch"
+          onChange={mockOnChange}
+          showColorInput
+        />,
+      );
+
+      expect((screen.getByLabelText('Color value') as HTMLInputElement).value).toMatch(/^oklch\(/);
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('re-emits when precision prop changes', () => {
+      const { rerender } = render(
+        <ColorPicker
+          color="oklch(0.5 0.1 120)"
+          onChange={mockOnChange}
+          outputFormat="oklch"
+          precision={5}
+        />,
+      );
+
+      mockOnChange.mockClear();
+      rerender(
+        <ColorPicker
+          color="oklch(0.5 0.1 120)"
+          onChange={mockOnChange}
+          outputFormat="oklch"
+          precision={1}
+        />,
+      );
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange.mock.calls[0][0]).toMatch(/^oklch\(/);
+    });
+
+    it('does not re-emit on precision change when output is hex', () => {
+      const { rerender } = render(
+        <ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="hex" precision={5} />,
+      );
+
+      mockOnChange.mockClear();
+      rerender(
+        <ColorPicker color="#ff0044" onChange={mockOnChange} outputFormat="hex" precision={2} />,
+      );
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('re-emits when showAlpha prop toggles off and current alpha is < 1', () => {
+      const { rerender } = render(
+        <ColorPicker
+          color="rgba(255, 0, 68, 0.5)"
+          onChange={mockOnChange}
+          outputFormat="rgb"
+          showAlpha
+        />,
+      );
+
+      mockOnChange.mockClear();
+      rerender(
+        <ColorPicker
+          color="rgba(255, 0, 68, 0.5)"
+          onChange={mockOnChange}
+          outputFormat="rgb"
+          showAlpha={false}
+        />,
+      );
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange.mock.calls[0][0]).not.toMatch(/\//);
+    });
+
     it('applies settingsMenu slots when the menu opens', () => {
       render(
         <ColorPicker

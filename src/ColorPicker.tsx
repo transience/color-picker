@@ -17,6 +17,7 @@ import Swatch from './Swatch';
 import type { ColorPickerProps } from './types';
 
 export default function ColorPicker(props: ColorPickerProps) {
+  const { displayFormat: displayFormatProp, outputFormat: outputFormatProp } = props;
   const picker = useColorPicker(props);
   const {
     alpha,
@@ -222,10 +223,12 @@ export default function ColorPicker(props: ColorPickerProps) {
         key="settings"
         classNames={classNames?.settingsMenu}
         displayFormat={displayFormat}
+        displayFormatDisabled={displayFormatProp !== undefined || !showColorInput}
         labels={labels?.settingsMenu}
         onChangeDisplayFormat={handleChangeDisplayFormat}
         onChangeOutputFormat={handleChangeOutputFormat}
         outputFormat={outputFormat}
+        outputFormatDisabled={outputFormatProp !== undefined}
       />
     );
   }

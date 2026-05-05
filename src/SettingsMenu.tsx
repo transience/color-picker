@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, useRef, useState } from 'react';
+import { type ButtonHTMLAttributes, useEffect, useRef, useState } from 'react';
 
 import { cn, resolveLabel } from '~/modules/helpers';
 
@@ -23,6 +23,10 @@ interface SettingsMenuProps {
    * @default 'auto'
    */
   displayFormat?: ColorFormat;
+  /**
+   * Disables the display-format radio (set when `displayFormat` is consumer-controlled).
+   */
+  displayFormatDisabled?: boolean;
   /** Label/aria overrides. */
   labels?: ColorPickerLabels['settingsMenu'];
   /**
@@ -38,6 +42,10 @@ interface SettingsMenuProps {
    * @default 'auto'
    */
   outputFormat?: ColorFormat;
+  /**
+   * Disables the output-format radio (set when `outputFormat` is consumer-controlled).
+   */
+  outputFormatDisabled?: boolean;
   /**
    * Floater placement relative to the trigger.
    * @default 'bottom-end'
@@ -66,10 +74,12 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   const {
     classNames,
     displayFormat = 'auto',
+    displayFormatDisabled = false,
     labels,
     onChangeDisplayFormat,
     onChangeOutputFormat,
     outputFormat = 'auto',
+    outputFormatDisabled = false,
     placement = 'bottom-end',
     triggerProps,
   } = props;
@@ -89,13 +99,29 @@ export default function SettingsMenu(props: SettingsMenuProps) {
     labels?.outputFormat,
   );
 
-  // Returning focus to the trigger when the panel closes keeps ancestor
-  // focus-within popovers (HeroUI / React Aria hosts) from treating the
-  // dismissal as focus leaving the picker.
-  const closePanel = () => {
+  // Explicit dismiss (Done button, Esc) restores focus to the trigger so
+  // ancestor focus-within popovers (HeroUI / React Aria hosts) keep treating
+  // the picker as focused, and to satisfy the WAI-ARIA menu pattern. Passive
+  // dismiss (outside click) leaves focus where the user moved it —
+  // restoring would steal focus from the element they just clicked.
+  const closeAndReturnFocus = () => {
     setIsOpen(false);
     triggerRef.current?.focus();
   };
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   let header = null;
 
@@ -107,7 +133,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
           <button
             aria-label={closeLabel}
             className="px-2 py-1 rounded-sm text-sm leading-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
-            onClick={closePanel}
+            onClick={closeAndReturnFocus}
             type="button"
           >
             {doneLabel}
@@ -123,12 +149,14 @@ export default function SettingsMenu(props: SettingsMenuProps) {
         {header}
         <div className="flex flex-row justify-center flex-1 gap-6">
           <RadioGroup
+            disabled={displayFormatDisabled}
             onChange={onChangeDisplayFormat}
             options={OPTIONS}
             title={displayFormatLabel}
             value={displayFormat}
           />
           <RadioGroup
+            disabled={outputFormatDisabled}
             onChange={onChangeOutputFormat}
             options={OPTIONS}
             title={outputFormatLabel}
@@ -144,7 +172,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
       <Floater
         content={panel}
         eventType="click"
-        onOpenChange={open => (open ? setIsOpen(true) : closePanel())}
+        onOpenChange={setIsOpen}
         open={isOpen}
         placement={placement}
       >
