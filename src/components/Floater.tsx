@@ -307,6 +307,7 @@ export default function Floater(props: FloaterProps) {
               coords && isVisible ? 'opacity-100' : 'opacity-0',
               contentClassName,
             )}
+            data-color-picker-portal={id}
             data-state={coords && isVisible ? 'open' : 'closed'}
             data-testid="Floater"
             id={id}
