@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 
 import ColorPicker from '~/ColorPicker';
 import { KEYBOARD_IDLE_MS } from '~/constants';
@@ -57,6 +57,22 @@ describe('ColorPicker', () => {
       render(<Controlled />);
 
       expect(screen.getByTestId('ColorPicker')).toMatchSnapshot();
+    });
+
+    it('forwards ref to the root element', () => {
+      const ref = createRef<HTMLDivElement>();
+
+      render(<ColorPicker ref={ref} color="#ff0044" />);
+
+      expect(ref.current).toBe(screen.getByTestId('ColorPicker'));
+    });
+
+    it('forwards callback ref to the root element', () => {
+      const ref = vi.fn();
+
+      render(<ColorPicker ref={ref} color="#ff0044" />);
+
+      expect(ref).toHaveBeenCalledWith(screen.getByTestId('ColorPicker'));
     });
 
     it('renders HSL mode when defaultMode is "hsl"', () => {

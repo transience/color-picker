@@ -72,8 +72,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   const [mode, setMode] = useState<ColorMode>(defaultMode);
   const [oklch, setOklch] = useState<OklchColor>(() => parseCSS(initialColor, 'oklch'));
   const [outputFormatState, setOutputFormatState] = useState<ColorFormat>(outputFormatProp);
-  const interactionRef = useInteractionAttribute();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useInteractionAttribute();
 
   const displayFormat = isDisplayFormatControlled ? displayFormatProp : displayFormatState;
   const outputFormat = isOutputFormatControlled ? outputFormatProp : outputFormatState;
@@ -106,14 +105,6 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   outputFormatRef.current = outputFormat;
   precisionRef.current = precision;
   showAlphaRef.current = showAlpha;
-
-  const rootRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      containerRef.current = node;
-      interactionRef(node);
-    },
-    [interactionRef],
-  );
 
   useEffect(() => {
     if (color !== undefined && color !== lastEmittedRef.current) {
@@ -336,7 +327,6 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   return {
     rootRef,
-    containerRef,
     alpha,
     currentHue,
     displayFormat,

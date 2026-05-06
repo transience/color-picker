@@ -1,6 +1,20 @@
-import type { ComponentType } from 'react';
-
 import * as exports from '../src';
+
+function getComponentName(value: unknown): string | undefined {
+  if (typeof value === 'function') {
+    const fn = value as { displayName?: string; name: string };
+
+    return fn.displayName ?? fn.name;
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    const ref = value as { displayName?: string; render?: { name?: string } };
+
+    return ref.displayName ?? ref.render?.name;
+  }
+
+  return undefined;
+}
 
 const components = [
   'AlphaSlider',
@@ -44,11 +58,8 @@ describe('Exports', () => {
     `);
   });
 
-  it.each(components)('%s is a named function component', name => {
-    const fn = exports[name] as ComponentType;
-
-    expect(fn).toEqual(expect.any(Function));
-    expect(fn.displayName ?? fn.name).toBe(name);
+  it.each(components)('%s is a named component', name => {
+    expect(getComponentName(exports[name])).toBe(name);
   });
 
   it('useColorPicker is a named hook', () => {
