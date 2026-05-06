@@ -86,7 +86,7 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     <div
       {...rest}
       ref={rootRef}
-      className={cn('flex flex-col gap-3', className)}
+      className={cn('flex flex-col gap-2', className)}
       data-testid="ChannelSliders"
     >
       {mode === 'hsl' && (

@@ -139,9 +139,12 @@ describe('ColorPicker', () => {
     it('passes showInputs through to ChannelSliders when showSliders is true', () => {
       render(<ColorPicker color="#ff0044" defaultMode="hsl" />);
 
-      expect(screen.getByDisplayValue('100')).toBeInTheDocument();
+      const channelSliders = screen.getByTestId('ChannelSliders');
 
-      expect(within(screen.getByTestId('ChannelSliders')).getAllByRole('textbox')).toHaveLength(3);
+      expect(within(channelSliders).getAllByRole('textbox')).toHaveLength(3);
+      expect(within(channelSliders).getByRole('textbox', { name: 'Saturation' })).toHaveValue(
+        '100',
+      );
     });
 
     it('renders ChannelInputs when showInputs is true and showSliders is false', () => {
@@ -261,7 +264,9 @@ describe('ColorPicker', () => {
       expect(screen.getByTestId('ColorInput').querySelector('input')).toHaveClass(
         'slot-colorinput-input',
       );
-      expect(screen.getByRole('slider', { name: 'GlobalHue' })).toHaveClass('slot-hue-thumb');
+      expect(
+        within(screen.getByTestId('GlobalHueSlider')).getByTestId('GradientSliderThumb'),
+      ).toHaveClass('slot-hue-thumb');
       expect(screen.getByTestId('ModeSelector')).toHaveClass('slot-mode-selector');
 
       expect(screen.getByTestId('OKLCHPanel')).toHaveClass('slot-panel-root');

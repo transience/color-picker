@@ -15,14 +15,9 @@ export default {
   title: 'GradientSlider',
   component: GradientSlider,
   args: {
-    'aria-label': 'Test slider',
     onChange: action('onChange'),
     onChangeStart: action('onChangeStart'),
     onChangeEnd: action('onChangeEnd'),
-    gradient: 'linear-gradient(to right, black, white)',
-    minValue: 0,
-    maxValue: 100,
-    step: 1,
   },
 } satisfies Meta<typeof GradientSlider>;
 
@@ -76,7 +71,14 @@ export const Customized: Story = {
  * them (jsdom approximates each of these).
  */
 export const KeyboardClampsAtBounds: Story = {
-  args: { maxValue: 100, minValue: 0, onChange: fn(), step: 5, value: 95 },
+  args: {
+    'aria-label': 'Test slider',
+    maxValue: 100,
+    minValue: 0,
+    onChange: fn(),
+    step: 5,
+    value: 95,
+  },
   tags: ['!dev'],
   render: props => <GradientSliderWrapper {...props} />,
   play: async ({ args, canvasElement }) => {

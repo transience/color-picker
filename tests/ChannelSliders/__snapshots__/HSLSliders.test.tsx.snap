@@ -8,20 +8,33 @@ exports[`HSLSliders > Render > renders H, S, L sliders 1`] = `
   >
     H
     <div
-      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0)); touch-action: none;"
+      class="flex-1 py-1"
     >
       <div
-        aria-label="Hue"
-        aria-orientation="horizontal"
-        aria-valuemax="359.9"
-        aria-valuemin="0"
-        aria-valuenow="209.59"
-        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
-        role="slider"
-        style="left: calc(58.236% - 11.647px);"
-        tabindex="0"
-      />
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0)); touch-action: none;"
+      >
+        <input
+          aria-label="Hue"
+          aria-orientation="horizontal"
+          aria-valuemax="359.9"
+          aria-valuemin="0"
+          aria-valuenow="209.59"
+          class="peer absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 m-[-1px] [clip:rect(0,0,0,0)]"
+          max="359.9"
+          min="0"
+          step="1"
+          tabindex="0"
+          type="range"
+          value="209.59"
+        />
+        <div
+          aria-hidden="true"
+          class="absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform cursor-grab peer-disabled:cursor-not-allowed peer-focus-visible:ring-1 peer-focus-visible:ring-black dark:peer-focus-visible:ring-white before:content-[''] before:absolute before:-inset-2 before:rounded-full"
+          data-testid="GradientSliderThumb"
+          style="left: calc(58.236% - 11.647px);"
+        />
+      </div>
     </div>
     <div
       class="flex items-center"
@@ -46,20 +59,33 @@ exports[`HSLSliders > Render > renders H, S, L sliders 1`] = `
   >
     S
     <div
-      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, rgb(109, 109, 109), rgb(0, 110, 217)); touch-action: none;"
+      class="flex-1 py-1"
     >
       <div
-        aria-label="Saturation"
-        aria-orientation="horizontal"
-        aria-valuemax="100"
-        aria-valuemin="0"
-        aria-valuenow="100"
-        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
-        role="slider"
-        style="left: calc(100% - 20px);"
-        tabindex="0"
-      />
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(109, 109, 109), rgb(0, 110, 217)); touch-action: none;"
+      >
+        <input
+          aria-label="Saturation"
+          aria-orientation="horizontal"
+          aria-valuemax="100"
+          aria-valuemin="0"
+          aria-valuenow="100"
+          class="peer absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 m-[-1px] [clip:rect(0,0,0,0)]"
+          max="100"
+          min="0"
+          step="1"
+          tabindex="0"
+          type="range"
+          value="100"
+        />
+        <div
+          aria-hidden="true"
+          class="absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform cursor-grab peer-disabled:cursor-not-allowed peer-focus-visible:ring-1 peer-focus-visible:ring-black dark:peer-focus-visible:ring-white before:content-[''] before:absolute before:-inset-2 before:rounded-full"
+          data-testid="GradientSliderThumb"
+          style="left: calc(100% - 20px);"
+        />
+      </div>
     </div>
     <div
       class="flex items-center"
@@ -84,20 +110,33 @@ exports[`HSLSliders > Render > renders H, S, L sliders 1`] = `
   >
     L
     <div
-      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 129, 255), rgb(255, 255, 255)); touch-action: none;"
+      class="flex-1 py-1"
     >
       <div
-        aria-label="Lightness"
-        aria-orientation="horizontal"
-        aria-valuemax="100"
-        aria-valuemin="0"
-        aria-valuenow="42.55"
-        class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
-        role="slider"
-        style="left: calc(42.55% - 8.51px);"
-        tabindex="0"
-      />
+        class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+        style="background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 129, 255), rgb(255, 255, 255)); touch-action: none;"
+      >
+        <input
+          aria-label="Lightness"
+          aria-orientation="horizontal"
+          aria-valuemax="100"
+          aria-valuemin="0"
+          aria-valuenow="42.55"
+          class="peer absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 m-[-1px] [clip:rect(0,0,0,0)]"
+          max="100"
+          min="0"
+          step="1"
+          tabindex="0"
+          type="range"
+          value="42.55"
+        />
+        <div
+          aria-hidden="true"
+          class="absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform cursor-grab peer-disabled:cursor-not-allowed peer-focus-visible:ring-1 peer-focus-visible:ring-black dark:peer-focus-visible:ring-white before:content-[''] before:absolute before:-inset-2 before:rounded-full"
+          data-testid="GradientSliderThumb"
+          style="left: calc(42.55% - 8.51px);"
+        />
+      </div>
     </div>
     <div
       class="flex items-center"

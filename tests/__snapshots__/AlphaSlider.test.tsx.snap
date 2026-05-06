@@ -6,20 +6,33 @@ exports[`AlphaSlider > Render > renders correctly 1`] = `
   data-testid="AlphaSlider"
 >
   <div
-    class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-    style="background: linear-gradient(to right, transparent, oklch(0.54 0.194 250)), url("/src/images/transparent-bg.gif"); touch-action: none;"
+    class="flex-1 py-1"
   >
     <div
-      aria-label="Alpha"
-      aria-orientation="horizontal"
-      aria-valuemax="1"
-      aria-valuemin="0"
-      aria-valuenow="1"
-      class="pointer-events-none absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white"
-      role="slider"
-      style="left: calc(100% - 20px);"
-      tabindex="0"
-    />
+      class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+      style="background: linear-gradient(to right, transparent, oklch(0.54 0.194 250)), url("/src/images/transparent-bg.gif"); touch-action: none;"
+    >
+      <input
+        aria-label="Alpha"
+        aria-orientation="horizontal"
+        aria-valuemax="1"
+        aria-valuemin="0"
+        aria-valuenow="1"
+        class="peer absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 m-[-1px] [clip:rect(0,0,0,0)]"
+        max="1"
+        min="0"
+        step="0.01"
+        tabindex="0"
+        type="range"
+        value="1"
+      />
+      <div
+        aria-hidden="true"
+        class="absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md transition-transform cursor-grab peer-disabled:cursor-not-allowed peer-focus-visible:ring-1 peer-focus-visible:ring-black dark:peer-focus-visible:ring-white before:content-[''] before:absolute before:-inset-2 before:rounded-full"
+        data-testid="GradientSliderThumb"
+        style="left: calc(100% - 20px);"
+      />
+    </div>
   </div>
 </div>
 `;
