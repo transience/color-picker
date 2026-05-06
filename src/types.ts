@@ -345,9 +345,14 @@ export interface ColorPickerProps {
 }
 
 export interface GradientSliderClassNames {
+  /** Outer flex row holding `startContent`, the wrapper, and `endContent`. */
   root?: string;
+  /** Draggable handle. */
   thumb?: string;
+  /** Gradient track. */
   track?: string;
+  /** Padded container around the track. Sized so the thumb stays inside the row's vertical bounds. */
+  wrapper?: string;
 }
 
 export interface HSV {

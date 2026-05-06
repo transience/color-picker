@@ -1,4 +1,5 @@
 import {
+  type ChangeEvent,
   type HTMLAttributes,
   type KeyboardEvent,
   type PointerEvent,
@@ -51,8 +52,12 @@ interface GradientSliderProps extends Omit<
    */
   minValue?: number;
   /**
+   * Forwarded to the visually-hidden `<input type="range">` so the slider can
+   * be used in forms.
+   */
+  name?: string;
+  /**
    * Called with the new value on drag, click, or keyboard step.
-   * @default noop
    */
   onChange?: (value: number) => void;
   /**
@@ -87,14 +92,22 @@ const trackClassName = cn(
   'aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
 );
 
-const thumbClassName = cn(
-  'pointer-events-none absolute top-1/2 size-5 -translate-y-1/2',
-  'rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md',
-  'transition-transform',
-  'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black dark:focus-visible:ring-white',
+// 'peer' must precede thumb in DOM for peer-focus-visible:ring-1.
+const inputClassName = cn(
+  'peer absolute',
+  'h-px w-px overflow-hidden whitespace-nowrap border-0 p-0',
+  'm-[-1px] [clip:rect(0,0,0,0)]',
 );
 
-const thumbPressedClassName = 'ring-1 ring-black dark:ring-white';
+const thumbClassName = cn(
+  'absolute top-1/2 size-5 -translate-y-1/2',
+  'rounded-full border-2 border-black dark:border-white bg-white dark:bg-black shadow-md',
+  'transition-transform cursor-grab peer-disabled:cursor-not-allowed',
+  'peer-focus-visible:ring-1 peer-focus-visible:ring-black dark:peer-focus-visible:ring-white',
+  "before:content-[''] before:absolute before:-inset-2 before:rounded-full",
+);
+
+const thumbPressedClassName = 'cursor-grabbing ring-1 ring-black dark:ring-white';
 
 export default function GradientSlider(props: GradientSliderProps) {
   const {
@@ -106,6 +119,7 @@ export default function GradientSlider(props: GradientSliderProps) {
     isDisabled,
     maxValue = 100,
     minValue = 0,
+    name,
     onChange,
     onChangeEnd,
     onChangeStart,
@@ -118,6 +132,7 @@ export default function GradientSlider(props: GradientSliderProps) {
 
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   // Width of the thumb in pixels, divided by 100. Drives the inset-thumb math
   // in the `left` style below so the thumb stays inside the track at both ends
@@ -174,8 +189,14 @@ export default function GradientSlider(props: GradientSliderProps) {
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+    inputRef.current?.focus();
     notifyStart();
     setIsDragging(true);
+
+    // Track click → snap thumb to cursor. Thumb click (incl. ::before hit zone)
+    // → grab without snap; drag continues via handlePointerMove.
+    if (thumbRef.current?.contains(event.target as Node)) return;
+
     handleMove(event);
   };
 
@@ -191,7 +212,22 @@ export default function GradientSlider(props: GradientSliderProps) {
     notifyEnd();
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (isDisabled || isDragging) return;
+
+    const raw = Number(event.target.value);
+
+    if (Number.isNaN(raw)) return;
+
+    const next = clamp(quantize(raw, step, minValue), minValue, maxValue);
+
+    if (next === value) return;
+
+    notifyKeyboardActivity();
+    emit(next);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (isDisabled || isDragging) return;
 
     const large = step * 10;
@@ -224,7 +260,7 @@ export default function GradientSlider(props: GradientSliderProps) {
 
     event.preventDefault();
 
-    const clamped = clamp(quantize(next, step), minValue, maxValue);
+    const clamped = clamp(quantize(next, step, minValue), minValue, maxValue);
 
     if (clamped === value) return;
 
@@ -247,30 +283,45 @@ export default function GradientSlider(props: GradientSliderProps) {
       {...rest}
     >
       {startContent}
-      <div
-        ref={trackRef}
-        aria-disabled={isDisabled || undefined}
-        className={cn(trackClassName, classNames?.track)}
-        onLostPointerCapture={handleLostPointerCapture}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        style={{ background: gradient, touchAction: 'none' }}
-      >
+      <div className={cn('flex-1 py-1', classNames?.wrapper)}>
         <div
-          ref={thumbRef}
+          ref={trackRef}
           aria-disabled={isDisabled || undefined}
-          aria-label={ariaLabel}
-          aria-orientation="horizontal"
-          aria-valuemax={maxValue}
-          aria-valuemin={minValue}
-          aria-valuenow={value}
-          className={cn(thumbClassName, isDragging && thumbPressedClassName, classNames?.thumb)}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          role="slider"
-          style={{ left }}
-          tabIndex={isDisabled ? -1 : 0}
-        />
+          className={cn(trackClassName, isDragging && 'cursor-grabbing', classNames?.track)}
+          onLostPointerCapture={handleLostPointerCapture}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          style={{ background: gradient, touchAction: 'none' }}
+        >
+          <input
+            ref={inputRef}
+            aria-disabled={isDisabled || undefined}
+            aria-label={ariaLabel}
+            aria-orientation="horizontal"
+            aria-valuemax={maxValue}
+            aria-valuemin={minValue}
+            aria-valuenow={value}
+            className={inputClassName}
+            disabled={isDisabled}
+            max={maxValue}
+            min={minValue}
+            name={name}
+            onBlur={handleBlur}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            step={step}
+            tabIndex={isDisabled ? -1 : 0}
+            type="range"
+            value={value}
+          />
+          <div
+            ref={thumbRef}
+            aria-hidden="true"
+            className={cn(thumbClassName, isDragging && thumbPressedClassName, classNames?.thumb)}
+            data-testid="GradientSliderThumb"
+            style={{ left }}
+          />
+        </div>
       </div>
       {endContent}
     </div>

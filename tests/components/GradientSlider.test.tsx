@@ -100,6 +100,115 @@ describe('GradientSlider', () => {
       expect(slider).toHaveAttribute('aria-valuemin', '0');
       expect(slider).toHaveAttribute('aria-valuemax', '360');
     });
+
+    it('renders a hidden range input with current value', () => {
+      render(
+        <GradientSlider
+          aria-label="Hue"
+          gradient={GRADIENT}
+          maxValue={360}
+          minValue={0}
+          onChange={mockOnChange}
+          step={1}
+          value={120}
+        />,
+      );
+      const slider = screen.getByRole('slider', { name: /hue/i });
+
+      expect(slider.tagName).toBe('INPUT');
+      expect(slider).toHaveAttribute('type', 'range');
+      expect(slider).toHaveValue('120');
+      expect(slider).toHaveAttribute('min', '0');
+      expect(slider).toHaveAttribute('max', '360');
+      expect(slider).toHaveAttribute('step', '1');
+    });
+
+    it('forwards name prop to the hidden input', () => {
+      render(
+        <GradientSlider
+          aria-label="Hue"
+          gradient={GRADIENT}
+          name="hue"
+          onChange={mockOnChange}
+          value={50}
+        />,
+      );
+      const slider = screen.getByRole('slider', { name: /hue/i });
+
+      expect(slider).toHaveAttribute('name', 'hue');
+    });
+
+    it('omits name attribute when prop not passed', () => {
+      render(<GradientSlider aria-label="Test" gradient={GRADIENT} value={50} />);
+      const slider = screen.getByRole('slider');
+
+      expect(slider).not.toHaveAttribute('name');
+    });
+  });
+
+  describe('Programmatic input change (Playwright fill)', () => {
+    it('input change event emits new value through onChange', () => {
+      render(<Controlled initial={50} maxValue={100} minValue={0} />);
+      const slider = screen.getByRole('slider') as HTMLInputElement;
+
+      fireEvent.change(slider, { target: { value: '75' } });
+
+      expect(mockOnChange).toHaveBeenCalledWith(75);
+    });
+
+    it('input change clamps to bounds', () => {
+      render(<Controlled initial={50} maxValue={100} minValue={0} />);
+      const slider = screen.getByRole('slider') as HTMLInputElement;
+
+      fireEvent.change(slider, { target: { value: '999' } });
+
+      expect(mockOnChange).toHaveBeenLastCalledWith(100);
+    });
+
+    it('input change quantizes to step', () => {
+      render(<Controlled initial={0} maxValue={100} minValue={0} step={10} />);
+      const slider = screen.getByRole('slider') as HTMLInputElement;
+
+      fireEvent.change(slider, { target: { value: '47' } });
+
+      expect(mockOnChange).toHaveBeenLastCalledWith(50);
+    });
+
+    it('input change fires onChangeStart immediately and onChangeEnd after idle', () => {
+      vi.useFakeTimers();
+
+      try {
+        const onChangeStart = vi.fn();
+        const onChangeEnd = vi.fn();
+
+        render(<Controlled initial={50} onChangeEnd={onChangeEnd} onChangeStart={onChangeStart} />);
+        const slider = screen.getByRole('slider') as HTMLInputElement;
+
+        fireEvent.change(slider, { target: { value: '75' } });
+
+        expect(onChangeStart).toHaveBeenCalledTimes(1);
+        expect(onChangeStart).toHaveBeenCalledWith(50);
+        expect(onChangeEnd).not.toHaveBeenCalled();
+
+        act(() => {
+          vi.advanceTimersByTime(KEYBOARD_IDLE_MS);
+        });
+
+        expect(onChangeEnd).toHaveBeenCalledTimes(1);
+        expect(onChangeEnd).toHaveBeenCalledWith(75);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('input change is ignored when disabled', () => {
+      render(<Controlled initial={50} isDisabled />);
+      const slider = screen.getByRole('slider') as HTMLInputElement;
+
+      fireEvent.change(slider, { target: { value: '75' } });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
   });
 
   describe('Pointer interaction', () => {
@@ -211,6 +320,41 @@ describe('GradientSlider', () => {
 
       // 47/200 = 23.5 → quantize to step 10 → 20
       expect(mockOnChange).toHaveBeenLastCalledWith(20);
+    });
+
+    it('toggles cursor-grabbing on the thumb during drag', () => {
+      render(<Controlled initial={50} />);
+      const thumb = screen.getByTestId('GradientSliderThumb');
+      const track = thumb.parentElement!;
+
+      expect(thumb.className).not.toContain('cursor-grabbing');
+
+      mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+      fireEvent.pointerDown(track, { clientX: 100, clientY: 6, pointerId: 1 });
+
+      expect(thumb.className).toContain('cursor-grabbing');
+
+      fireEvent.lostPointerCapture(track, { pointerId: 1 });
+
+      expect(thumb.className).not.toContain('cursor-grabbing');
+    });
+
+    it('pointerdown on the thumb grabs without snapping the value', () => {
+      const onChangeStart = vi.fn();
+
+      render(<Controlled initial={50} maxValue={100} minValue={0} onChangeStart={onChangeStart} />);
+      const thumb = screen.getByTestId('GradientSliderThumb');
+      const track = thumb.parentElement!;
+
+      mockRect(track, { left: 0, top: 0, width: 200, height: 12 });
+      // Pointerdown bubbles from thumb to the track listener; with the fix the
+      // value must not snap to cursor.x — the click only initiates the drag.
+      fireEvent.pointerDown(thumb, { clientX: 0, clientY: 6, pointerId: 1 });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(onChangeStart).toHaveBeenCalledTimes(1);
+      expect(onChangeStart).toHaveBeenCalledWith(50);
+      expect(thumb.className).toContain('cursor-grabbing');
     });
   });
 
@@ -330,6 +474,15 @@ describe('GradientSlider', () => {
       fireEvent.keyDown(slider, { key: 'ArrowRight' });
 
       expect(mockOnChange).toHaveBeenCalledWith(0.501);
+    });
+
+    it('aligns keyboard step grid to non-zero minValue', () => {
+      render(<Controlled initial={1} maxValue={9} minValue={1} step={2} />);
+      const slider = screen.getByRole('slider');
+
+      fireEvent.keyDown(slider, { key: 'ArrowRight' });
+
+      expect(mockOnChange).toHaveBeenCalledWith(3);
     });
   });
 
