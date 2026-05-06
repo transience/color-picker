@@ -303,7 +303,7 @@ Layout: always two `RadioGroup`s side-by-side. Panel sized by `min-w-70` (≈ 28
 
 State: SettingsMenu owns `isOpen` and passes it through Floater (`open` / `onOpenChange`). Explicit dismiss (the **Done** button or `Escape`) closes the menu and returns focus to the gear trigger. Passive dismiss (outside click) does not refocus — restoring focus would steal it from the element the user just clicked.
 
-Host-popover compatibility: when the picker is rendered inside a host's popover, that host's outside-click detection runs on capture-phase document `pointerdown` and would dismiss when the user clicks our portaled menu. The Floater's portal root carries `data-color-picker-portal` so consumers can opt out via their popover's `shouldCloseOnInteractOutside` hook (or equivalent). RadioGroup focus management does not participate — the host gates on pointer location, not focus.
+Host-popover compatibility: when the picker is rendered inside a host's popover, that host's outside-click detection runs on capture-phase document `pointerdown` and would dismiss when the user clicks our portaled menu. The Floater's portal root carries `data-color-picker-portal` so consumers can opt out via their popover's `shouldCloseOnInteractOutside` hook (or equivalent). The hook also typically needs to confirm the click is outside the picker root itself: `<ColorPicker ref={pickerRef} />` forwards the ref to that root; hook consumers attach their own ref to the same node where they wire `rootRef`. The check then becomes `el.closest('[data-color-picker-portal]') || pickerRef.current?.contains(el)`. RadioGroup focus management does not participate — the host gates on pointer location, not focus.
 
 Dismissal: outside `mousedown` / `touchstart`, `Escape`, or the **Done** button.
 

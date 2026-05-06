@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode, RefObject } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Identifiers for every color channel the picker can render.
@@ -430,8 +430,6 @@ export interface SwatchClassNames {
 export interface UseColorPickerReturn {
   /** Alpha (0–1). Only meaningful when `showAlpha` is enabled. */
   alpha: number;
-  /** Imperative ref to the same root element, available after mount. */
-  containerRef: RefObject<HTMLDivElement | null>;
   /** Hue of the active mode (`oklch.h` in OKLCH mode, else `hsv.h`). */
   currentHue: number;
   /** Resolved display format for the `ColorInput`. */

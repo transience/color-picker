@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { forwardRef, ReactNode, useCallback } from 'react';
 
 import AlphaSlider from './AlphaSlider';
 import ChannelInputs from './ChannelInputs';
@@ -16,7 +16,7 @@ import SettingsMenu from './SettingsMenu';
 import Swatch from './Swatch';
 import type { ColorPickerProps } from './types';
 
-export default function ColorPicker(props: ColorPickerProps) {
+const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function ColorPicker(props, ref) {
   const { displayFormat: displayFormatProp, outputFormat: outputFormatProp } = props;
   const picker = useColorPicker(props);
   const {
@@ -45,6 +45,19 @@ export default function ColorPicker(props: ColorPickerProps) {
     solidColor,
     swatchColor,
   } = picker;
+  const setRootRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef(node);
+
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        // eslint-disable-next-line no-param-reassign
+        ref.current = node;
+      }
+    },
+    [rootRef, ref],
+  );
   const {
     channels,
     classNames,
@@ -252,7 +265,7 @@ export default function ColorPicker(props: ColorPickerProps) {
 
   return (
     <div
-      ref={rootRef}
+      ref={setRootRef}
       className={cn(
         'relative overflow-hidden flex w-full max-w-xs flex-col gap-4 p-3',
         classNames?.root,
@@ -268,4 +281,8 @@ export default function ColorPicker(props: ColorPickerProps) {
       {content.options}
     </div>
   );
-}
+});
+
+ColorPicker.displayName = 'ColorPicker';
+
+export default ColorPicker;
