@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { KEYBOARD_IDLE_MS } from '~/constants';
 
@@ -19,9 +19,17 @@ function isInteractiveTarget(target: EventTarget | null): boolean {
  * Keyboard: set on keydown, cleared after a short idle or when focus leaves.
  * Pointer and keyboard are tracked independently — a drag's implicit focus
  * on the thumb does not keep the signal held after release.
+ *
+ * Cleanup is tracked via a closure ref so detach disposes listeners under
+ * both React 19 (cleanup-return) and React <19 (null-call) ref semantics.
  */
 export default function useInteractionAttribute() {
+  const cleanupRef = useRef<(() => void) | null>(null);
+
   return useCallback((node: HTMLDivElement | null) => {
+    cleanupRef.current?.();
+    cleanupRef.current = null;
+
     if (!node) return undefined;
 
     let pointerActive = false;
@@ -87,7 +95,7 @@ export default function useInteractionAttribute() {
     node.addEventListener('keyup', handleKeyUp);
     node.addEventListener('focusout', handleFocusOut);
 
-    return () => {
+    const cleanup = () => {
       node.removeEventListener('pointerdown', handlePointerDown);
       node.removeEventListener('pointerup', handlePointerEnd);
       node.removeEventListener('pointercancel', handlePointerEnd);
@@ -96,6 +104,11 @@ export default function useInteractionAttribute() {
       node.removeEventListener('focusout', handleFocusOut);
       clearKeyboardTimer();
       setFlag(false);
+      cleanupRef.current = null;
     };
+
+    cleanupRef.current = cleanup;
+
+    return cleanup;
   }, []);
 }

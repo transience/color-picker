@@ -238,5 +238,38 @@ describe('useInteractionAttribute', () => {
       // and removed timers. Advancing time should not throw or schedule callbacks.
       vi.advanceTimersByTime(1000);
     });
+
+    it('disposes listeners when ref callback is invoked with null (React <19 detach)', () => {
+      let refCallback: ((node: HTMLDivElement | null) => unknown) | null = null;
+
+      function Capture() {
+        refCallback = useInteractionAttribute();
+
+        return null;
+      }
+
+      render(<Capture />);
+
+      const root = document.createElement('div');
+      const slider = document.createElement('div');
+
+      slider.setAttribute('role', 'slider');
+      slider.tabIndex = 0;
+      root.appendChild(slider);
+      document.body.appendChild(root);
+
+      refCallback!(root);
+
+      fireEvent.keyDown(slider, { key: 'ArrowRight' });
+      expect(root).toHaveAttribute('data-interacting', 'true');
+
+      refCallback!(null);
+
+      root.removeAttribute('data-interacting');
+      fireEvent.keyDown(slider, { key: 'ArrowRight' });
+      expect(root).not.toHaveAttribute('data-interacting');
+
+      document.body.removeChild(root);
+    });
   });
 });
