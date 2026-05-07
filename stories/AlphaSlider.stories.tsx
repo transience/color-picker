@@ -1,8 +1,7 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import AlphaSlider from '../src/AlphaSlider';
-import { DEFAULT_COLOR } from '../src/constants';
+import AlphaSlider, { defaultProps } from '../src/AlphaSlider';
 
 type Story = StoryObj<AlphaSliderWrapperProps>;
 
@@ -13,10 +12,7 @@ interface AlphaSliderWrapperProps extends ComponentProps<typeof AlphaSlider> {
 export default {
   title: 'AlphaSlider',
   component: AlphaSlider,
-  args: {
-    color: DEFAULT_COLOR,
-    value: 0.5,
-  },
+  args: defaultProps,
 } satisfies Meta<typeof AlphaSlider>;
 
 function AlphaSliderWrapper(props: AlphaSliderWrapperProps) {
@@ -47,6 +43,7 @@ export const Customized: Story = {
       track: 'h-6 rounded-lg',
       thumb: 'size-6',
     },
+    value: 0.6,
     width: 320,
   },
   render: props => <AlphaSliderWrapper {...props} />,

@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, MouseEvent } from 'react';
 
+import { mergeProps } from '~/modules/helpers';
+
 import Button from './components/Button';
 import EyeDropperIcon from './components/EyeDropperIcon';
 import { DEFAULT_LABELS } from './constants';
@@ -28,8 +30,12 @@ function isSupported(): boolean {
   return typeof window !== 'undefined' && 'EyeDropper' in window;
 }
 
+export const defaultProps = {
+  'aria-label': DEFAULT_LABELS.eyeDropper,
+} satisfies EyeDropperProps;
+
 export default function EyeDropper(props: EyeDropperProps) {
-  const { 'aria-label': ariaLabel = DEFAULT_LABELS.eyeDropper, onChange, onClick, ...rest } = props;
+  const { 'aria-label': ariaLabel, onChange, onClick, ...rest } = mergeProps(defaultProps, props);
 
   if (!isSupported()) {
     return null;

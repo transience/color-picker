@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import GradientSlider from '../src/components/GradientSlider';
+import GradientSlider, { defaultProps } from '../src/components/GradientSlider';
 
 type Story = StoryObj<GradientSliderWrapperProps>;
 
@@ -15,6 +15,7 @@ export default {
   title: 'GradientSlider',
   component: GradientSlider,
   args: {
+    ...defaultProps,
     onChange: action('onChange'),
     onChangeStart: action('onChangeStart'),
     onChangeEnd: action('onChangeEnd'),
@@ -40,7 +41,6 @@ function GradientSliderWrapper(props: GradientSliderWrapperProps) {
 }
 
 export const Default: Story = {
-  args: { value: 50 },
   render: props => <GradientSliderWrapper {...props} />,
 };
 

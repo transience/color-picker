@@ -1,6 +1,6 @@
 import { type HTMLAttributes } from 'react';
 
-import { cn, resolveLabel } from '~/modules/helpers';
+import { cn, mergeProps, resolveLabel } from '~/modules/helpers';
 
 import Button from './components/Button';
 import { DEFAULT_LABELS } from './constants';
@@ -27,16 +27,16 @@ interface ModeSelectorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onClic
   onClick?: (value: ColorMode) => void;
 }
 
+export const defaultProps = {
+  mode: 'oklch',
+  modes: ['oklch', 'hsl', 'rgb'],
+} satisfies ModeSelectorProps;
+
 export default function ModeSelector(props: ModeSelectorProps) {
-  const {
-    className,
-    classNames,
-    labels,
-    mode = 'oklch',
-    modes = ['oklch', 'hsl', 'rgb'],
-    onClick,
-    ...rest
-  } = props;
+  const { className, classNames, labels, mode, modes, onClick, ...rest } = mergeProps(
+    defaultProps,
+    props,
+  );
 
   return (
     <div

@@ -1,8 +1,7 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import ChannelInputs from '../src/ChannelInputs';
-import { DEFAULT_COLOR } from '../src/constants';
+import ChannelInputs, { defaultProps } from '../src/ChannelInputs';
 
 type Story = StoryObj<ChannelInputsWrapperProps>;
 
@@ -16,12 +15,7 @@ export default {
   parameters: {
     className: 'bg-white dark:bg-black',
   },
-  args: {
-    alpha: 1,
-    color: DEFAULT_COLOR,
-    mode: 'oklch',
-    showAlpha: false,
-  },
+  args: defaultProps,
   argTypes: {
     mode: {
       control: 'inline-radio',

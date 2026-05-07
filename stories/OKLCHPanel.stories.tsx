@@ -4,7 +4,7 @@ import { getP3MaxChroma } from 'colorizr';
 import { action } from 'storybook/actions';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import OKLCHPanel from '../src/OKLCHPanel';
+import OKLCHPanel, { defaultProps } from '../src/OKLCHPanel';
 
 type Story = StoryObj<OKLCHPanelWrapperProps>;
 
@@ -16,6 +16,7 @@ export default {
   title: 'OKLCHPanel',
   component: OKLCHPanel,
   args: {
+    ...defaultProps,
     onChange: action('onChange'),
     onChangeStart: action('onChangeStart'),
     onChangeEnd: action('onChangeEnd'),
@@ -42,7 +43,6 @@ function OKLCHPanelWrapper(props: OKLCHPanelWrapperProps) {
 }
 
 export const Default: Story = {
-  args: { hue: 250, chroma: 0.194, lightness: 0.54 },
   render: props => <OKLCHPanelWrapper {...props} />,
 };
 

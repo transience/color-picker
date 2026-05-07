@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import SettingsMenu from '../src/SettingsMenu';
+import SettingsMenu, { defaultProps } from '../src/SettingsMenu';
 
 type Story = StoryObj<typeof SettingsMenu>;
 
 export default {
   title: 'SettingsMenu',
   component: SettingsMenu,
+  args: defaultProps,
 } satisfies Meta<typeof SettingsMenu>;
 
 export const Default: Story = {};

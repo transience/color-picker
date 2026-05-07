@@ -8,7 +8,7 @@ import {
 
 import { DEFAULT_COLOR } from './constants';
 import transparentBg from './images/transparent-bg.gif';
-import { cn } from './modules/helpers';
+import { cn, mergeProps } from './modules/helpers';
 import type { SwatchClassNames } from './types';
 
 type SwatchAnchorProps = SwatchBaseProps & { as: 'a'; href: string } & Omit<
@@ -40,16 +40,16 @@ interface SwatchBaseProps {
   color?: string;
 }
 
+export const defaultProps = {
+  as: 'span',
+  color: DEFAULT_COLOR,
+} satisfies SwatchProps;
+
 export default function Swatch(props: SwatchProps) {
-  const {
-    as = 'span',
-    children,
-    className,
-    classNames,
-    color = DEFAULT_COLOR,
-    style,
-    ...rest
-  } = props;
+  const { as, children, className, classNames, color, style, ...rest } = mergeProps(
+    defaultProps,
+    props,
+  );
   const Root = as as ElementType;
   const extraProps = as === 'button' ? { type: 'button' as const } : {};
 

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import SaturationPanel from '../src/SaturationPanel';
+import SaturationPanel, { defaultProps } from '../src/SaturationPanel';
 
 type Story = StoryObj<SaturationPanelWrapperProps>;
 
@@ -15,6 +15,7 @@ export default {
   title: 'SaturationPanel',
   component: SaturationPanel,
   args: {
+    ...defaultProps,
     onChange: action('onChange'),
     onChangeEnd: action('onChangeEnd'),
     onChangeStart: action('onChangeStart'),
@@ -41,7 +42,6 @@ function SaturationPanelWrapper(props: SaturationPanelWrapperProps) {
 }
 
 export const Default: Story = {
-  args: { hue: 30, saturation: 0.1, value: 0.6 },
   render: props => <SaturationPanelWrapper {...props} />,
 };
 

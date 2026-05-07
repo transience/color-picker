@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, useEffect, useRef, useState } from 'react';
 
-import { cn, resolveLabel } from '~/modules/helpers';
+import { cn, mergeProps, resolveLabel } from '~/modules/helpers';
 
 import GearIcon from '~/components/GearIcon';
 
@@ -70,19 +70,27 @@ const OPTIONS: SettingsOption[] = [
 const PANEL_CLASSES =
   'min-w-70 overflow-hidden rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200';
 
+export const defaultProps = {
+  displayFormat: 'auto',
+  displayFormatDisabled: false,
+  outputFormat: 'auto',
+  outputFormatDisabled: false,
+  placement: 'bottom-end',
+} satisfies SettingsMenuProps;
+
 export default function SettingsMenu(props: SettingsMenuProps) {
   const {
     classNames,
-    displayFormat = 'auto',
-    displayFormatDisabled = false,
+    displayFormat,
+    displayFormatDisabled,
     labels,
     onChangeDisplayFormat,
     onChangeOutputFormat,
-    outputFormat = 'auto',
-    outputFormatDisabled = false,
-    placement = 'bottom-end',
+    outputFormat,
+    outputFormatDisabled,
+    placement,
     triggerProps,
-  } = props;
+  } = mergeProps(defaultProps, props);
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 

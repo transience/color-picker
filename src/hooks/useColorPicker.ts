@@ -37,7 +37,7 @@ export const defaultProps = {
   showSettings: false,
   showSliders: true,
   showSwatch: true,
-} satisfies Partial<ColorPickerProps>;
+} satisfies ColorPickerProps;
 
 export default function useColorPicker(props: ColorPickerProps): UseColorPickerReturn {
   // Detect controlled-ness from raw props (before mergeProps fills defaults).

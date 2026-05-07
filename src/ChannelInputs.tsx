@@ -1,7 +1,7 @@
 import { type HTMLAttributes, type ReactNode, useCallback, useMemo, useRef } from 'react';
 import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } from 'colorizr';
 
-import { cn, resolveLabel } from '~/modules/helpers';
+import { cn, mergeProps, resolveLabel } from '~/modules/helpers';
 
 import NumericInput from './components/NumericInput';
 import { DEFAULT_COLOR, DEFAULT_LABELS } from './constants';
@@ -48,7 +48,6 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
   onChange?: (value: string) => void;
   /**
    * Called with the new alpha in `[0, 1]` when the alpha input changes.
-   * @default noop
    */
   onChangeAlpha?: (alpha: number) => void;
   /**
@@ -82,14 +81,21 @@ interface FieldDefinition {
   value: string;
 }
 
+export const defaultProps = {
+  alpha: 1,
+  color: DEFAULT_COLOR,
+  mode: 'oklch',
+  showAlpha: false,
+} satisfies ChannelInputsProps;
+
 export default function ChannelInputs(props: ChannelInputsProps) {
   const {
-    alpha = 1,
+    alpha,
     className,
     classNames,
-    color = DEFAULT_COLOR,
+    color,
     labels,
-    mode = 'oklch',
+    mode,
     numericInputClassNames,
     onChange,
     onChangeAlpha,
@@ -97,7 +103,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     onChangeStart,
     showAlpha,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
 
   const lastEmittedRef = useRef<string | null>(null);
 

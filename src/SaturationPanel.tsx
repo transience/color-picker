@@ -10,7 +10,7 @@ import {
 import useEmitLifecycle from './hooks/useEmitLifecycle';
 import useRafCommit from './hooks/useRafCommit';
 import { colorToHsv } from './modules/colorSpace';
-import { clamp, cn, relativePosition } from './modules/helpers';
+import { clamp, cn, mergeProps, relativePosition } from './modules/helpers';
 import type { PanelClassNames } from './types';
 
 const DEFAULTS = colorToHsv(DEFAULT_COLOR);
@@ -70,21 +70,29 @@ interface SV {
 
 const equalsSV = (a: SV, b: SV) => a.s === b.s && a.v === b.v;
 
+export const defaultProps = {
+  'aria-label': DEFAULT_LABELS.saturationPanel.ariaLabel,
+  hue: DEFAULTS.h,
+  saturation: DEFAULTS.s,
+  value: DEFAULTS.v,
+  valueText: DEFAULT_LABELS.saturationPanel.valueText,
+} satisfies SaturationPanelProps;
+
 export default function SaturationPanel(props: SaturationPanelProps) {
   const {
-    'aria-label': ariaLabel = DEFAULT_LABELS.saturationPanel.ariaLabel,
+    'aria-label': ariaLabel,
     className,
     classNames,
-    hue = DEFAULTS.h,
+    hue,
     onChange,
     onChangeEnd,
     onChangeStart,
-    saturation = DEFAULTS.s,
+    saturation,
     style,
-    value = DEFAULTS.v,
-    valueText = DEFAULT_LABELS.saturationPanel.valueText,
+    value,
+    valueText,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { emit, notifyEnd, notifyKeyboardActivity, notifyStart } = useEmitLifecycle<SV>({

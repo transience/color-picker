@@ -9,7 +9,7 @@ import {
 import { isValidColor } from 'colorizr';
 
 import { DEFAULT_COLOR, DEFAULT_LABELS } from './constants';
-import { cn } from './modules/helpers';
+import { cn, mergeProps } from './modules/helpers';
 import type { ColorInputClassNames } from './types';
 
 interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -39,17 +39,22 @@ interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
   value?: string;
 }
 
+export const defaultProps = {
+  'aria-label': DEFAULT_LABELS.colorInput,
+  value: DEFAULT_COLOR,
+} satisfies ColorInputProps;
+
 export default function ColorInput(props: ColorInputProps) {
   const {
-    'aria-label': ariaLabel = DEFAULT_LABELS.colorInput,
+    'aria-label': ariaLabel,
     className,
     classNames,
     endContent,
     onChange,
     startContent,
-    value = DEFAULT_COLOR,
+    value,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const pendingSyncRef = useRef(false);
