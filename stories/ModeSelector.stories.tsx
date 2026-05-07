@@ -1,7 +1,7 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import ModeSelector from '../src/ModeSelector';
+import ModeSelector, { defaultProps } from '../src/ModeSelector';
 import type { ColorMode } from '../src/types';
 
 type Story = StoryObj<ModeSelectorWrapperProps>;
@@ -11,9 +11,7 @@ interface ModeSelectorWrapperProps extends ComponentProps<typeof ModeSelector> {
 export default {
   title: 'ModeSelector',
   component: ModeSelector,
-  args: {
-    mode: 'oklch',
-  },
+  args: defaultProps,
   argTypes: {
     mode: {
       control: 'inline-radio',

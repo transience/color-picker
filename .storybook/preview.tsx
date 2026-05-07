@@ -9,7 +9,6 @@ const prefersDark =
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches;
 const defaultTheme = prefersDark ? 'dark' : 'light';
 
-// eslint-disable-next-line react-refresh/only-export-components
 function PreviewDecorator(StoryFn: FC, context: Record<any, any>) {
   const {
     globals: { theme = defaultTheme },

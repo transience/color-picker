@@ -2,16 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import EyeDropperIcon from '../src/components/EyeDropperIcon';
 import { DEFAULT_COLOR } from '../src/constants';
-import Swatch from '../src/Swatch';
+import Swatch, { defaultProps } from '../src/Swatch';
 
 type Story = StoryObj<typeof Swatch>;
 
 export default {
   title: 'Swatch',
   component: Swatch,
-  args: {
-    color: DEFAULT_COLOR,
-  },
+  args: defaultProps,
 } satisfies Meta<typeof Swatch>;
 
 export const Default: Story = {};

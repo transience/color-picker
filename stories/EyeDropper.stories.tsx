@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import EyeDropper from '../src/EyeDropper';
+import EyeDropper, { defaultProps } from '../src/EyeDropper';
 
 type Story = StoryObj<typeof EyeDropper>;
 
 export default {
   title: 'EyeDropper',
   component: EyeDropper,
+  args: defaultProps,
 } satisfies Meta<typeof EyeDropper>;
 
 export const Default: Story = {};

@@ -1,7 +1,7 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import HueSlider from '../src/HueSlider';
+import HueSlider, { defaultProps } from '../src/HueSlider';
 
 type Story = StoryObj<HueSliderWrapperProps>;
 
@@ -12,10 +12,7 @@ interface HueSliderWrapperProps extends ComponentProps<typeof HueSlider> {
 export default {
   title: 'HueSlider',
   component: HueSlider,
-  args: {
-    mode: 'oklch',
-    value: 180,
-  },
+  args: defaultProps,
   argTypes: {
     mode: {
       control: { type: 'inline-radio' },

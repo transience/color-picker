@@ -9,4 +9,9 @@ export default [
   {
     ignores: ['dist/**', 'node_modules/**', 'storybook-static/**'],
   },
+  {
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ];

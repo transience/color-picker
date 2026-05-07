@@ -1,6 +1,6 @@
 import { type HTMLAttributes } from 'react';
 
-import { cn } from '~/modules/helpers';
+import { cn, mergeProps } from '~/modules/helpers';
 
 import { DEFAULT_COLOR } from '../constants';
 import useInteractionAttribute from '../hooks/useInteractionAttribute';
@@ -65,21 +65,27 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
   showInputs?: boolean;
 }
 
+export const defaultProps = {
+  color: DEFAULT_COLOR,
+  mode: 'oklch',
+  showInputs: true,
+} satisfies ChannelSlidersProps;
+
 export default function ChannelSliders(props: ChannelSlidersProps) {
   const {
     channels,
     channelSliderClassNames,
     className,
-    color = DEFAULT_COLOR,
+    color,
     labels,
-    mode = 'oklch',
+    mode,
     numericInputClassNames,
     onChange,
     onChangeEnd,
     onChangeStart,
-    showInputs = true,
+    showInputs,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
   const rootRef = useInteractionAttribute();
 
   return (

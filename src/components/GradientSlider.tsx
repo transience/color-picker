@@ -11,7 +11,7 @@ import {
 
 import useEmitLifecycle from '../hooks/useEmitLifecycle';
 import useRafCommit from '../hooks/useRafCommit';
-import { clamp, cn, quantize, relativePosition } from '../modules/helpers';
+import { clamp, cn, mergeProps, quantize, relativePosition } from '../modules/helpers';
 import type { GradientSliderClassNames } from '../types';
 
 const DEFAULT_GRADIENT = 'linear-gradient(to right, black, white)';
@@ -109,26 +109,36 @@ const thumbClassName = cn(
 
 const thumbPressedClassName = 'cursor-grabbing ring-1 ring-black dark:ring-white';
 
+export const defaultProps = {
+  'aria-label': 'Slider',
+  gradient: DEFAULT_GRADIENT,
+  isDisabled: false,
+  maxValue: 100,
+  minValue: 0,
+  step: 1,
+  value: 0,
+} satisfies GradientSliderProps;
+
 export default function GradientSlider(props: GradientSliderProps) {
   const {
-    'aria-label': ariaLabel = 'Slider',
+    'aria-label': ariaLabel,
     className,
     classNames,
     endContent,
-    gradient = DEFAULT_GRADIENT,
+    gradient,
     isDisabled,
-    maxValue = 100,
-    minValue = 0,
+    maxValue,
+    minValue,
     name,
     onChange,
     onChangeEnd,
     onChangeStart,
     startContent,
-    step = 1,
+    step,
     style,
-    value = 0,
+    value,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);

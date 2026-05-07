@@ -4,8 +4,7 @@ import { convertCSS } from 'colorizr';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { Swatch } from '../src';
-import ColorInput from '../src/ColorInput';
-import { DEFAULT_COLOR } from '../src/constants';
+import ColorInput, { defaultProps } from '../src/ColorInput';
 
 type Story = StoryObj<ColorInputWrapperProps>;
 
@@ -18,9 +17,7 @@ interface ColorInputWrapperProps extends ComponentProps<typeof ColorInput> {
 export default {
   title: 'ColorInput',
   component: ColorInput,
-  args: {
-    value: DEFAULT_COLOR,
-  },
+  args: defaultProps,
 } satisfies Meta<typeof ColorInput>;
 
 function ColorInputWrapper(props: ColorInputWrapperProps) {

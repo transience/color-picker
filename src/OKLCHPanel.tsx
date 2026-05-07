@@ -19,7 +19,7 @@ import {
 } from './constants';
 import useEmitLifecycle from './hooks/useEmitLifecycle';
 import useRafCommit from './hooks/useRafCommit';
-import { clamp, cn, relativePosition } from './modules/helpers';
+import { clamp, cn, mergeProps, relativePosition } from './modules/helpers';
 import {
   lcToPointer,
   type OKLCHCanvasResult,
@@ -86,21 +86,29 @@ interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'aria-lab
 
 const equalsLC = (a: LC, b: LC) => a.l === b.l && a.c === b.c;
 
+export const defaultProps = {
+  'aria-label': DEFAULT_LABELS.oklchPanel.ariaLabel,
+  chroma: DEFAULTS.c,
+  hue: DEFAULTS.h,
+  lightness: DEFAULTS.l,
+  valueText: DEFAULT_LABELS.oklchPanel.valueText,
+} satisfies OKLCHPanelProps;
+
 export default function OKLCHPanel(props: OKLCHPanelProps) {
   const {
-    'aria-label': ariaLabel = DEFAULT_LABELS.oklchPanel.ariaLabel,
-    chroma = DEFAULTS.c,
+    'aria-label': ariaLabel,
+    chroma,
     className,
     classNames,
-    hue = DEFAULTS.h,
-    lightness = DEFAULTS.l,
+    hue,
+    lightness,
     onChange,
     onChangeEnd,
     onChangeStart,
     style,
-    valueText = DEFAULT_LABELS.oklchPanel.valueText,
+    valueText,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasResult, setCanvasResult] = useState<OKLCHCanvasResult>({

@@ -1,5 +1,7 @@
 import { type HTMLAttributes, ReactNode, useMemo } from 'react';
 
+import { mergeProps } from '~/modules/helpers';
+
 import GradientSlider from './components/GradientSlider';
 import { DEFAULT_COLOR } from './constants';
 import transparentBg from './images/transparent-bg.gif';
@@ -29,7 +31,6 @@ interface AlphaSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' 
   label?: ReactNode;
   /**
    * Called on every drag/keyboard change with the new alpha in `[0, 1]`.
-   * @default noop
    */
   onChange?: (alpha: number) => void;
   /**
@@ -50,19 +51,26 @@ interface AlphaSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color' 
   value?: number;
 }
 
+export const defaultProps = {
+  'aria-label': 'Alpha',
+  color: DEFAULT_COLOR,
+  isDisabled: false,
+  value: 1,
+} satisfies AlphaSliderProps;
+
 export default function AlphaSlider(props: AlphaSliderProps) {
   const {
-    'aria-label': ariaLabel = 'Alpha',
+    'aria-label': ariaLabel,
     classNames,
-    color = DEFAULT_COLOR,
+    color,
     isDisabled,
     label,
     onChange,
     onChangeEnd,
     onChangeStart,
-    value = 1,
+    value,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
 
   const gradient = useMemo(
     () => `linear-gradient(to right, transparent, ${color}), url(${transparentBg})`,

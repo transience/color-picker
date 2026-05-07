@@ -1,7 +1,7 @@
 import { ComponentProps, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import ChannelSliders from '../src/ChannelSliders';
+import ChannelSliders, { defaultProps } from '../src/ChannelSliders';
 
 type Story = StoryObj<ChannelSlidersWrapperProps>;
 
@@ -12,11 +12,7 @@ interface ChannelSlidersWrapperProps extends ComponentProps<typeof ChannelSlider
 export default {
   title: 'ChannelSliders',
   component: ChannelSliders,
-  args: {
-    color: '#ff0044',
-    mode: 'oklch',
-    showInputs: true,
-  },
+  args: defaultProps,
   argTypes: {
     mode: {
       control: 'inline-radio',

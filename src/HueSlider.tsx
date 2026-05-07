@@ -3,6 +3,7 @@ import { parseCSS } from 'colorizr';
 
 import GradientSlider from './components/GradientSlider';
 import { DEFAULT_COLOR, hslHueGradient, oklchHueGradient } from './constants';
+import { mergeProps } from './modules/helpers';
 import type { ColorMode, GradientSliderClassNames } from './types';
 
 const DEFAULT_HUE = parseCSS(DEFAULT_COLOR, 'oklch').h;
@@ -52,20 +53,27 @@ interface HueSliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'
   value?: number;
 }
 
+export const defaultProps = {
+  'aria-label': 'GlobalHue',
+  isDisabled: false,
+  mode: 'oklch',
+  value: DEFAULT_HUE,
+} satisfies HueSliderProps;
+
 export default function HueSlider(props: HueSliderProps) {
   const {
-    'aria-label': ariaLabel = 'GlobalHue',
+    'aria-label': ariaLabel,
     classNames,
     gradient,
     isDisabled,
     label,
-    mode = 'oklch',
+    mode,
     onChange,
     onChangeEnd,
     onChangeStart,
-    value = DEFAULT_HUE,
+    value,
     ...rest
-  } = props;
+  } = mergeProps(defaultProps, props);
 
   let currentGradient = mode === 'oklch' ? oklchHueGradient : hslHueGradient;
 
