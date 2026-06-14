@@ -1,7 +1,6 @@
-import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
-
-import { KEYBOARD_IDLE_MS } from '../../src/constants';
-import useInteractionAttribute from '../../src/hooks/useInteractionAttribute';
+import { KEYBOARD_IDLE_MS } from '~/constants';
+import useInteractionAttribute from '~/hooks/useInteractionAttribute';
+import { fireEvent, render, screen } from '~/test-utils';
 
 function Harness() {
   const ref = useInteractionAttribute();

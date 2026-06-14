@@ -1,6 +1,6 @@
-import ChannelSliders from 'src/ChannelSliders';
-import { KEYBOARD_IDLE_MS } from 'src/constants';
-import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
+import ChannelSliders from '~/ChannelSliders';
+import { KEYBOARD_IDLE_MS } from '~/constants';
+import { fireEvent, render, screen } from '~/test-utils';
 
 const mockOnChange = vi.fn();
 const originalRAF = globalThis.requestAnimationFrame;

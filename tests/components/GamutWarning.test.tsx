@@ -1,11 +1,11 @@
-import { fireEvent, render, screen } from 'tests/__setup__/test-utils';
+import { fireEvent, render, screen } from '~/test-utils';
 
-import GamutWarning from '../../src/components/GamutWarning';
+import GamutWarning from '~/components/GamutWarning';
 
 let mockIdCounter = 0;
 
 vi.mock('~/modules/helpers', async importOriginal => {
-  const actual = await importOriginal<typeof import('src/modules/helpers')>();
+  const actual = await importOriginal<typeof import('~/modules/helpers')>();
 
   return {
     ...actual,
