@@ -1,6 +1,6 @@
 {
   "name": "@transience/color-picker",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A modern color picker component with support for OKLCH color space.",
   "author": "Gil Barbara <gilbarbara@gmail.com>",
   "repository": {
