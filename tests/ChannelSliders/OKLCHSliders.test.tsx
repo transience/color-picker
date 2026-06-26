@@ -196,6 +196,26 @@ describe('OKLCHSliders', () => {
       expect(h).toBeCloseTo(180, 0);
       expect(c).toBeCloseTo(0.101, 3); // 0.1 + step 0.001
     });
+
+    it('does not emit chroma above the gamut max when fed an out-of-gamut color', () => {
+      // c=0.32451 at h=121.83 is above the P3 max (~0.236) — relative chroma > 1.
+      // Without clamping, dragging hue toward green emits c > 0.4, which the
+      // Controlled harness's parseCSS round-trip would throw on.
+      render(<Controlled initial="oklch(0.837 0.32451 121.83)" />);
+
+      expect(() => {
+        fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), {
+          key: 'ArrowRight',
+          shiftKey: true,
+        });
+      }).not.toThrow();
+
+      const emitted = mockOnChange.mock.calls[0][0];
+      const { c: newC, h: newH, l: newL } = parseCSS(emitted, 'oklch');
+
+      expect(newC).toBeLessThan(0.4);
+      expect(newC).toBeLessThanOrEqual(getP3MaxChroma({ l: newL, c: 0, h: newH }) + 1e-6);
+    });
   });
 
   describe('Lifecycle callbacks', () => {

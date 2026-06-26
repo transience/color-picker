@@ -1,4 +1,5 @@
 import { createRef, useState } from 'react';
+import { getP3MaxChroma, parseCSS } from 'colorizr';
 
 import ColorPicker from '~/ColorPicker';
 import { KEYBOARD_IDLE_MS } from '~/constants';
@@ -771,6 +772,32 @@ describe('ColorPicker', () => {
       fireEvent.keyDown(screen.getByRole('slider', { name: /hue/i }), { key: 'ArrowRight' });
 
       expect(mockOnChange.mock.calls[0][0]).toMatch(/^#[\da-f]{6}$/i);
+    });
+
+    it('clamps chroma when an OKLCH ChannelInputs lightness change would strand it past the new max', () => {
+      // Start at the green peak with chroma at its P3 max; dropping lightness shrinks the
+      // max, so the kept-constant chroma must be clamped down at the input boundary.
+      const startMax = getP3MaxChroma({ l: 0.85, c: 0, h: 121.83 });
+
+      render(
+        <ColorPicker
+          color={`oklch(0.85 ${startMax} 121.83)`}
+          onChange={mockOnChange}
+          showColorInput={false}
+          showSliders={false}
+        />,
+      );
+
+      const lInput = screen.getAllByRole('textbox')[0];
+
+      fireEvent.focus(lInput);
+      fireEvent.change(lInput, { target: { value: '40' } });
+
+      const emitted = mockOnChange.mock.calls.at(-1)?.[0];
+      const { c, h, l } = parseCSS(emitted, 'oklch');
+
+      expect(c).toBeLessThanOrEqual(getP3MaxChroma({ l, c: 0, h }) + 1e-6);
+      expect(c).toBeLessThan(0.4);
     });
 
     it('emits OKLCH when the hue slider changes in OKLCH mode', () => {

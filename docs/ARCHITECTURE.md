@@ -110,14 +110,16 @@ Anchor file: `src/hooks/useColorPicker.ts`.
 Two parallel color states live side by side:
 
 - **`hsv`** — HSV `{ h, s, v }`, used by `SaturationPanel` (HSL/RGB modes). Initialized from the incoming `color` via `colorToHsv`.
-- **`oklch`** — `{ l, c, h }`, used by `OKLCHPanel` and OKLCH sliders. Initialized via `colorizr`'s `parseCSS(color, 'oklch')`.
+- **`oklch`** — `{ l, c, h }`, used by `OKLCHPanel` and OKLCH sliders. Initialized via `colorizr`'s `parseCSS(color, 'oklch')`, then `clampOklchToP3`.
+
+**Display-P3 chroma invariant.** Every color entering `oklch` state — init, the controlled `color` effect, text/paste/eyedropper input, the global hue slider, and the OKLCH panel — is passed through `clampOklchToP3` (`src/modules/colorSpace.ts`), which caps chroma at `getP3MaxChroma` for the current L/H. This matches the ceiling the OKLCH sliders already enforce, so state stays coherent across controls. Two consequences: the clamped value is what `emit` sends, so a pasted/typed out-of-gamut color is silently reduced; and the controlled `color` effect clamps without calling `onChange`, so a controlled prop beyond P3 renders clamped while the parent still holds the original (it re-converges on the next interaction).
 
 Plus:
 
 - **`alpha`** — only read when `showAlpha` is on; merged into emitted values only when `alpha < 1`.
 - **`mode`**, **`displayFormat`**, **`outputFormat`** — UI state.
 
-When the controlled `color` prop changes, an effect re-derives both `hsv` and `oklch` from it (guarded by `lastEmittedRef` so self-induced updates don't loop).
+When the controlled `color` prop changes, an effect re-derives both `hsv` and `oklch` from it — clamped per the invariant above — guarded by `lastEmittedRef` so self-induced updates don't loop.
 
 ### Refs shadow state
 

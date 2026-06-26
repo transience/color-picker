@@ -1,6 +1,7 @@
-import { parseCSS } from 'colorizr';
+import { getP3MaxChroma, parseCSS } from 'colorizr';
 
 import {
+  clampOklchToP3,
   colorToHsv,
   hsvToHex,
   isOklchInSRGB,
@@ -122,6 +123,23 @@ describe('colorSpace', () => {
 
     it('returns false for a high-chroma red outside P3', () => {
       expect(isOklchInSRGB(0.7, 0.3, 20)).toBe(false);
+    });
+  });
+
+  describe('clampOklchToP3', () => {
+    it('reduces chroma above the P3 max to the gamut edge, keeping l and h', () => {
+      const result = clampOklchToP3({ l: 0.837, c: 0.32451, h: 121.83 });
+
+      expect(result.l).toBe(0.837);
+      expect(result.h).toBe(121.83);
+      expect(result.c).toBeCloseTo(getP3MaxChroma({ l: 0.837, c: 0, h: 121.83 }), 6);
+      expect(result.c).toBeLessThan(0.4);
+    });
+
+    it('leaves an in-gamut color unchanged', () => {
+      const input = { l: 0.837, c: 0.1, h: 121.83 };
+
+      expect(clampOklchToP3(input)).toEqual(input);
     });
   });
 
