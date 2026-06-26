@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convertCSS, formatCSS, opacity, parseCSS } from 'colorizr';
 
 import { DEFAULT_COLOR, DEFAULT_MODES } from '~/constants';
-import { colorToHsv, hsvToHex, isOklchInSRGB } from '~/modules/colorSpace';
+import { clampOklchToP3, colorToHsv, hsvToHex, isOklchInSRGB } from '~/modules/colorSpace';
 import {
   formatColor,
   isNarrowFormat,
@@ -68,9 +68,13 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const [alpha, setAlpha] = useState<number>(() => (showAlpha ? opacity(initialColor) : 1));
   const [displayFormatState, setDisplayFormatState] = useState<ColorFormat>(displayFormatProp);
-  const [hsv, setHsv] = useState<HSV>(() => colorToHsv(initialColor));
+  const [hsv, setHsv] = useState<HSV>(() =>
+    colorToHsv(formatCSS(clampOklchToP3(parseCSS(initialColor, 'oklch')), { format: 'oklch' })),
+  );
   const [mode, setMode] = useState<ColorMode>(defaultMode);
-  const [oklch, setOklch] = useState<OklchColor>(() => parseCSS(initialColor, 'oklch'));
+  const [oklch, setOklch] = useState<OklchColor>(() =>
+    clampOklchToP3(parseCSS(initialColor, 'oklch')),
+  );
   const [outputFormatState, setOutputFormatState] = useState<ColorFormat>(outputFormatProp);
   const rootRef = useInteractionAttribute();
 
@@ -108,8 +112,10 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   useEffect(() => {
     if (color !== undefined && color !== lastEmittedRef.current) {
-      setHsv(colorToHsv(color));
-      setOklch(parseCSS(color, 'oklch'));
+      const clamped = clampOklchToP3(parseCSS(color, 'oklch'));
+
+      setHsv(colorToHsv(formatCSS(clamped, { format: 'oklch' })));
+      setOklch(clamped);
 
       if (showAlphaRef.current) {
         setAlpha(opacity(color));
@@ -190,10 +196,11 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const handleChangeColorInput = useCallback(
     (value: string) => {
-      const oklchValue = convertCSS(value, 'oklch');
+      const clamped = clampOklchToP3(parseCSS(value, 'oklch'));
+      const oklchValue = formatCSS(clamped, { format: 'oklch' });
 
-      setHsv(colorToHsv(value));
-      setOklch(parseCSS(value, 'oklch'));
+      setHsv(colorToHsv(oklchValue));
+      setOklch(clamped);
 
       if (showAlphaRef.current) {
         const nextAlpha = opacity(value);
@@ -229,7 +236,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const handleChangeOklchHue = useCallback(
     (h: number) => {
-      const next = { ...oklchRef.current, h };
+      const next = clampOklchToP3({ ...oklchRef.current, h });
 
       setOklch(next);
       oklchRef.current = next;
@@ -240,7 +247,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const handleChangeOklchPanel = useCallback(
     (l: number, c: number) => {
-      const next = { ...oklchRef.current, c, l };
+      const next = clampOklchToP3({ ...oklchRef.current, c, l });
 
       setOklch(next);
       oklchRef.current = next;

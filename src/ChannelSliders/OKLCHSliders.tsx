@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { formatCSS, getP3MaxChroma, type LCH, parseCSS } from 'colorizr';
 
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
-import { resolveLabel } from '~/modules/helpers';
+import { clamp, resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
 import NumericInput from '../components/NumericInput';
@@ -105,7 +105,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   };
 
   const handleChangeLightness = (lightness: number) => {
-    const relativeChroma = maxChroma > 0 ? c / maxChroma : 0;
+    const relativeChroma = maxChroma > 0 ? clamp(c / maxChroma, 0, 1) : 0;
     const newMaxChroma = getP3MaxChroma({ l: lightness, c: 0, h });
 
     update({ l: lightness, c: relativeChroma * newMaxChroma, h });
@@ -116,7 +116,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   };
 
   const handleChangeHue = (hue: number) => {
-    const relativeChroma = maxChroma > 0 ? c / maxChroma : 0;
+    const relativeChroma = maxChroma > 0 ? clamp(c / maxChroma, 0, 1) : 0;
     const newMaxChroma = getP3MaxChroma({ l, c: 0, h: hue });
 
     update({ l, c: relativeChroma * newMaxChroma, h: hue });

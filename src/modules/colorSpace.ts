@@ -2,6 +2,7 @@ import {
   CLMS_TO_OKLAB,
   DEG2RAD,
   formatCSS,
+  getP3MaxChroma,
   isInGamut,
   LMS_TO_LRGB,
   LRGB_TO_LMS,
@@ -17,7 +18,7 @@ import {
   XYZ_TO_SRGB,
 } from 'colorizr';
 
-import type { HSV } from '~/types';
+import type { HSV, OklchColor } from '~/types';
 
 import { clamp } from './helpers';
 
@@ -52,6 +53,18 @@ function rgbToHsv(r: number, g: number, b: number): HSV {
   const s = max === 0 ? 0 : delta / max;
 
   return { h, s, v: max };
+}
+
+/**
+ * Clamp chroma to the Display-P3 gamut max for the color's L/H — the picker's
+ * authoring ceiling. Every chroma-writing control already caps at
+ * `getP3MaxChroma`; this enforces the same invariant on colors entering state
+ * from input/paste/eyedropper/controlled prop, keeping the controls coherent.
+ */
+export function clampOklchToP3(oklch: OklchColor): OklchColor {
+  const maxChroma = getP3MaxChroma({ l: oklch.l, c: 0, h: oklch.h });
+
+  return { ...oklch, c: clamp(oklch.c, 0, maxChroma) };
 }
 
 export function colorToHsv(color: string): HSV {

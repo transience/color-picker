@@ -23,6 +23,8 @@ function useColorPicker(props: ColorPickerProps): UseColorPickerReturn;
 
 The `props` argument is the same `ColorPickerProps` that `<ColorPicker>` accepts. Controlled (`color` + `onChange`) and uncontrolled (`color` omitted) modes behave identically to the component.
 
+**Display-P3 is the chroma ceiling.** Every color entering state — the initial value, a controlled `color` change, and text/paste/eyedropper input — has its OKLCH chroma clamped to `getP3MaxChroma` for the current L/H. A controlled `color` whose chroma is out of the P3 gamut is therefore stored and rendered clamped, and the clamp does **not** fire `onChange`: the picker's displayed value can differ from the prop you passed, with no callback. The parent re-converges on the next interaction, which emits the clamped value. Pre-clamp values yourself if you need the prop and the picker to stay identical.
+
 ---
 
 ## Return reference

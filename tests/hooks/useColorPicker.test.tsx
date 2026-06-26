@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { getP3MaxChroma, parseCSS } from 'colorizr';
 
 import useColorPicker, { defaultProps } from '~/hooks/useColorPicker';
 
@@ -120,6 +121,109 @@ describe('useColorPicker', () => {
 
       expect(result.current.alpha).toBeCloseTo(0.25, 5);
       expect(onChange).toHaveBeenCalled();
+    });
+  });
+
+  describe('clamps out-of-P3 chroma to the gamut max', () => {
+    // P3 max at L=83.7%, h=121.83 is ~0.236; the input value's 0.32451 is above it.
+    const outOfGamut = 'oklch(0.837 0.32451 121.83)';
+    const maxChroma = getP3MaxChroma({ l: 0.837, c: 0, h: 121.83 });
+
+    it('clamps initial chroma from the color prop', () => {
+      const { result } = renderHook(() => useColorPicker({ color: outOfGamut }));
+
+      expect(result.current.oklch.c).toBeCloseTo(maxChroma, 5);
+      expect(result.current.oklch.c).toBeLessThan(0.4);
+    });
+
+    it('clamps chroma arriving via handleChangeColorInput', () => {
+      const { result } = renderHook(() => useColorPicker({ color: '#ff0044' }));
+
+      act(() => {
+        result.current.handleChangeColorInput(outOfGamut);
+      });
+
+      expect(result.current.oklch.c).toBeCloseTo(maxChroma, 5);
+    });
+
+    it('clamps chroma when the controlled color prop changes', () => {
+      const { rerender, result } = renderHook(({ color }) => useColorPicker({ color }), {
+        initialProps: { color: 'oklch(0.837 0.1 121.83)' },
+      });
+
+      rerender({ color: outOfGamut });
+
+      expect(result.current.oklch.c).toBeCloseTo(maxChroma, 5);
+    });
+
+    it('does not let the global hue slider strand chroma above the new hue max', () => {
+      const onChange = vi.fn();
+      // Start at a hue with a wide gamut, chroma at its max.
+      const startMax = getP3MaxChroma({ l: 0.837, c: 0, h: 145 });
+      const { result } = renderHook(() =>
+        useColorPicker({ color: `oklch(0.837 ${startMax} 145)`, onChange }),
+      );
+
+      act(() => {
+        result.current.handleChangeOklchHue(121.83);
+      });
+
+      expect(result.current.oklch.c).toBeCloseTo(maxChroma, 5);
+      expect(parseCSS(onChange.mock.calls.at(-1)?.[0], 'oklch').c).toBeLessThanOrEqual(0.4);
+    });
+
+    it('clamps chroma the OKLCH panel pushes past the gamut max', () => {
+      const onChange = vi.fn();
+      const { result } = renderHook(() =>
+        useColorPicker({ color: 'oklch(0.5 0.1 121.83)', onChange }),
+      );
+
+      // The panel emits (l, c); feed a c well above the P3 max for this l/h.
+      act(() => {
+        result.current.handleChangeOklchPanel(0.5, 0.5);
+      });
+
+      const { c, h, l } = result.current.oklch;
+
+      expect(c).toBeLessThanOrEqual(getP3MaxChroma({ l, c: 0, h }) + 1e-6);
+      expect(parseCSS(onChange.mock.calls.at(-1)?.[0], 'oklch').c).toBeLessThanOrEqual(0.4);
+    });
+
+    it('holds the invariant (c ≤ P3 max, emit ≤ 0.4) across every interaction', () => {
+      const onChange = vi.fn();
+      const { result } = renderHook(() => useColorPicker({ color: outOfGamut, onChange }));
+
+      const assertInvariant = () => {
+        const { c, h, l } = result.current.oklch;
+
+        expect(c).toBeLessThanOrEqual(getP3MaxChroma({ l, c: 0, h }) + 1e-6);
+
+        const lastEmit = onChange.mock.calls.at(-1)?.[0];
+
+        if (!lastEmit) {
+          return;
+        }
+
+        expect(parseCSS(lastEmit, 'oklch').c).toBeLessThanOrEqual(0.4);
+      };
+
+      const interactions: Array<() => void> = [
+        () => result.current.handleChangeColorInput('oklch(0.85 0.39 145)'),
+        () => result.current.handleChangeOklchHue(145),
+        () => result.current.handleChangeOklchHue(250),
+        () => result.current.handleChangeOklchPanel(0.85, 0.5),
+        () => result.current.handleChangeOklchPanel(0.2, 0.5),
+        () => result.current.handleChangeColorInput('oklch(0.7 0.38 30)'),
+      ];
+
+      assertInvariant();
+
+      interactions.forEach(run => {
+        act(() => {
+          run();
+        });
+        assertInvariant();
+      });
     });
   });
 
