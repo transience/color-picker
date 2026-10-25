@@ -18,6 +18,7 @@ describe('useColorPicker', () => {
         showInputs: true,
         showModeSelector: true,
         showPanel: true,
+        showSRGBBoundary: true,
         showSettings: false,
         showSliders: true,
         showSwatch: true,

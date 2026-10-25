@@ -107,6 +107,19 @@ describe('ColorPicker', () => {
       expect(screen.queryByTestId('SaturationPanel')).not.toBeInTheDocument();
     });
 
+    it('shows the sRGB boundary by default', () => {
+      render(<ColorPicker color="#ff0044" />);
+
+      expect(screen.getByText('sRGB')).toBeInTheDocument();
+    });
+
+    it('hides the sRGB boundary when showSRGBBoundary is false', () => {
+      render(<ColorPicker color="#ff0044" showSRGBBoundary={false} />);
+
+      expect(screen.getByTestId('OKLCHPanel')).toBeInTheDocument();
+      expect(screen.queryByText('sRGB')).not.toBeInTheDocument();
+    });
+
     it('limits the mode switcher to the provided modes', () => {
       render(<ColorPicker color="#ff0044" modes={['hsl', 'rgb']} />);
 

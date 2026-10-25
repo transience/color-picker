@@ -19,15 +19,16 @@ import {
 } from './constants';
 import useEmitLifecycle from './hooks/useEmitLifecycle';
 import useRafCommit from './hooks/useRafCommit';
+import { oklchHueToHsvHue } from './modules/colorSpace';
 import { clamp, cn, mergeProps, relativePosition } from './modules/helpers';
 import {
+  computeSRGBBoundary,
   lcToPointer,
-  type OKLCHCanvasResult,
   pointerToLC,
   pointsToPath,
   renderOKLCHCanvas,
 } from './modules/oklchCanvas';
-import type { PanelClassNames } from './types';
+import type { OklchPanelOptions, PanelClassNames } from './types';
 
 const CANVAS_WIDTH = 256;
 const CANVAS_HEIGHT = 128;
@@ -39,7 +40,8 @@ interface LC {
   l: number;
 }
 
-interface OKLCHPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'aria-label' | 'onChange'> {
+interface OKLCHPanelProps
+  extends OklchPanelOptions, Omit<HTMLAttributes<HTMLDivElement>, 'aria-label' | 'onChange'> {
   /**
    * Accessible name for the panel. Announced by screen readers when focused.
    * @default 'OKLCH color panel'
@@ -91,6 +93,7 @@ export const defaultProps = {
   chroma: DEFAULTS.c,
   hue: DEFAULTS.h,
   lightness: DEFAULTS.l,
+  showSRGBBoundary: true,
   valueText: DEFAULT_LABELS.oklchPanel.valueText,
 } satisfies OKLCHPanelProps;
 
@@ -105,16 +108,14 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     onChange,
     onChangeEnd,
     onChangeStart,
+    showSRGBBoundary,
     style,
     valueText,
     ...rest
   } = mergeProps(defaultProps, props);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvasResult, setCanvasResult] = useState<OKLCHCanvasResult>({
-    hsvHue: 0,
-    srgbBoundary: [],
-  });
+  const [isPainted, setIsPainted] = useState(false);
   const [width, setWidth] = useState(CANVAS_WIDTH);
 
   useLayoutEffect(() => {
@@ -139,15 +140,21 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
 
     if (!canvas) return;
 
-    const result = renderOKLCHCanvas(canvas, width, CANVAS_HEIGHT, hue);
-
-    setCanvasResult(result);
+    setIsPainted(renderOKLCHCanvas(canvas, width, CANVAS_HEIGHT, hue));
   }, [hue, width]);
 
-  const boundaryPath = useMemo(() => pointsToPath(canvasResult.srgbBoundary), [canvasResult]);
+  const srgbBoundary = useMemo(
+    () =>
+      showSRGBBoundary && isPainted
+        ? computeSRGBBoundary(oklchHueToHsvHue(hue), CANVAS_HEIGHT)
+        : [],
+    [hue, isPainted, showSRGBBoundary],
+  );
+
+  const boundaryPath = useMemo(() => pointsToPath(srgbBoundary), [srgbBoundary]);
 
   const labelPosition = useMemo(() => {
-    const points = canvasResult.srgbBoundary;
+    const points = srgbBoundary;
 
     if (points.length <= 2) return null;
 
@@ -164,7 +171,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
     }
 
     return anchor;
-  }, [canvasResult]);
+  }, [srgbBoundary]);
 
   const { emit, notifyEnd, notifyKeyboardActivity, notifyStart } = useEmitLifecycle<{
     c: number;
