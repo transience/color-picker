@@ -175,6 +175,33 @@ export function renderOKLCHCanvas(
 
   const hsvHue = oklchHueToHsvHue(oklchHue);
 
+  // Writing pixels directly is ~150x faster than a fillStyle per pixel, but
+  // only valid when the canvas really is P3: an sRGB canvas would read the
+  // raw P3 values as sRGB. Browsers without P3 canvases take the slow path,
+  // where the browser converts each color.
+  if (context.getContextAttributes?.().colorSpace === 'display-p3') {
+    const image = context.createImageData(width, height, { colorSpace: 'display-p3' });
+    const { data } = image;
+    let index = 0;
+
+    for (let y = 0; y < height; y++) {
+      const value = 1 - y / (height - 1);
+
+      for (let x = 0; x < width; x++) {
+        const [r, g, b] = hsvToRgb(hsvHue, x / (width - 1), value);
+
+        data[index++] = Math.round(r * 255);
+        data[index++] = Math.round(g * 255);
+        data[index++] = Math.round(b * 255);
+        data[index++] = 255;
+      }
+    }
+
+    context.putImageData(image, 0, 0);
+
+    return true;
+  }
+
   for (let y = 0; y < height; y++) {
     const value = 1 - y / (height - 1);
 

@@ -1,5 +1,11 @@
-import { oklchHueToHsvHue, oklchToP3Hsv } from '~/modules/colorSpace';
-import { computeSRGBBoundary, lcToPointer, pointerToLC, pointsToPath } from '~/modules/oklchCanvas';
+import { hsvToRgb, oklchHueToHsvHue, oklchToP3Hsv } from '~/modules/colorSpace';
+import {
+  computeSRGBBoundary,
+  lcToPointer,
+  pointerToLC,
+  pointsToPath,
+  renderOKLCHCanvas,
+} from '~/modules/oklchCanvas';
 
 // Test hues covering different gamut shapes
 const testHues = [30, 80, 160, 265, 300];
@@ -126,6 +132,66 @@ describe('oklchCanvas', () => {
       const points = computeSRGBBoundary(oklchHueToHsvHue(30), 128);
 
       expect(points[points.length - 1].x).toBe(100);
+    });
+  });
+
+  describe('renderOKLCHCanvas', () => {
+    const WIDTH = 4;
+    const HEIGHT = 3;
+
+    function fakeCanvas(colorSpace?: PredefinedColorSpace) {
+      const image = { data: new Uint8ClampedArray(WIDTH * HEIGHT * 4) };
+      const context = {
+        createImageData: vi.fn(() => image),
+        fillRect: vi.fn(),
+        fillStyle: '',
+        putImageData: vi.fn(),
+        ...(colorSpace && { getContextAttributes: () => ({ colorSpace }) }),
+      };
+      const canvas = { getContext: vi.fn(() => context) } as unknown as HTMLCanvasElement;
+
+      return { canvas, context, image };
+    }
+
+    it('returns false without a 2D context', () => {
+      const canvas = { getContext: () => null } as unknown as HTMLCanvasElement;
+
+      expect(renderOKLCHCanvas(canvas, WIDTH, HEIGHT, 250)).toBe(false);
+    });
+
+    it('writes P3 pixels in one putImageData call on a display-p3 canvas', () => {
+      const { canvas, context, image } = fakeCanvas('display-p3');
+
+      expect(renderOKLCHCanvas(canvas, WIDTH, HEIGHT, 250)).toBe(true);
+      expect(context.createImageData).toHaveBeenCalledWith(WIDTH, HEIGHT, {
+        colorSpace: 'display-p3',
+      });
+      expect(context.putImageData).toHaveBeenCalledWith(image, 0, 0);
+      expect(context.fillRect).not.toHaveBeenCalled();
+
+      const pixel = (x: number, y: number) => {
+        const index = (y * WIDTH + x) * 4;
+
+        return [0, 1, 2, 3].map(offset => image.data[index + offset]);
+      };
+
+      const saturated = hsvToRgb(oklchHueToHsvHue(250), 1, 1).map(c => Math.round(c * 255));
+
+      expect(pixel(0, 0)).toEqual([255, 255, 255, 255]);
+      expect(pixel(WIDTH - 1, 0)).toEqual([...saturated, 255]);
+      expect(pixel(0, HEIGHT - 1)).toEqual([0, 0, 0, 255]);
+      expect(pixel(WIDTH - 1, HEIGHT - 1)).toEqual([0, 0, 0, 255]);
+    });
+
+    it.each([
+      ['an sRGB canvas', 'srgb' as const],
+      ['a canvas without getContextAttributes', undefined],
+    ])('falls back to per-pixel fills on %s', (_, colorSpace) => {
+      const { canvas, context } = fakeCanvas(colorSpace);
+
+      expect(renderOKLCHCanvas(canvas, WIDTH, HEIGHT, 250)).toBe(true);
+      expect(context.putImageData).not.toHaveBeenCalled();
+      expect(context.fillRect).toHaveBeenCalledTimes(WIDTH * HEIGHT);
     });
   });
 });
