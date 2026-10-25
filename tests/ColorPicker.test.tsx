@@ -749,6 +749,23 @@ describe('ColorPicker', () => {
       expect(screen.queryByTestId('OKLCHPanel')).not.toBeInTheDocument();
       expect(screen.getByTestId('SaturationPanel')).toBeInTheDocument();
     });
+
+    it('updates the HSL sliders after an edit that left the hex unchanged', () => {
+      render(<Controlled defaultMode="hsl" initial="#000000" />);
+      const hue = screen.getByRole('textbox', { name: 'Hue' });
+
+      fireEvent.focus(hue);
+      fireEvent.change(hue, { target: { value: '120' } });
+      fireEvent.blur(hue);
+
+      fireEvent.change(screen.getByRole('textbox', { name: 'Color value' }), {
+        target: { value: '#ff0000' },
+      });
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('0');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
+      expect(screen.getByRole('textbox', { name: 'Lightness' })).toHaveValue('50');
+    });
   });
 
   describe('Emission (output follows resolved format)', () => {
