@@ -44,7 +44,8 @@ Path alias `~/*` → `src/*`. Prefer it for intra-`src` imports.
 - `src/hooks/useEmitLifecycle.ts` — per-component pointer/keyboard mux that produces Start/Change/End for every interactive primitive (sliders, panels, NumericInput, ChannelSliders aggregation).
 - `src/hooks/useRafCommit.ts` — rAF coalescer used by pointer-driven surfaces to drop duplicate values inside the same frame.
 - `src/hooks/useInteractionAttribute.ts` — sets `data-interacting` on the root during drags/keys.
-- `src/modules/` — pure logic. `colorSpace.ts` (HSV ↔ RGB, OKLCH ↔ P3-HSV, gamut checks), `format.ts` (format resolution + `formatColor`), `oklchCanvas.ts` (OKLCH panel coordinate math), `helpers.ts` (`cn`, `clamp`, `quantize`, `relativePosition`, `mergeProps`, `resolveLabel`).
+- `src/hooks/useChannelState.ts` — per-channel values derived from a color string, keeping what the string loses (hex fractions, hue at zero chroma/saturation). Used by the channel sliders and `ChannelInputs`; `derive` functions live in `modules/channels.ts`.
+- `src/modules/` — pure logic. `channels.ts` (`derive` functions for `useChannelState`), `colorSpace.ts` (HSV ↔ RGB, OKLCH ↔ P3-HSV, gamut checks), `format.ts` (format resolution + `formatColor`), `oklchCanvas.ts` (OKLCH panel coordinate math), `helpers.ts` (`cn`, `clamp`, `quantize`, `relativePosition`, `mergeProps`, `resolveLabel`).
 - `src/ChannelSliders/` — per-mode slider group (HSL / OKLCH / RGB), dispatched by `mode`.
 - `src/components/` — primitives. `GradientSlider` (1D slider), `NumericInput` (clamped text input with arrow-step + lifecycle), `Floater` (floating-UI primitive used by `SettingsMenu` + `GamutWarning`), `Button`, `RadioGroup`, plus inline SVG icons.
 - `src/types.ts` — public types. `ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `ChannelsConfig`, `ColorPickerClassNames`, `ColorPickerLabels`, `LabelSlot`.
