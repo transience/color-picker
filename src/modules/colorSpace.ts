@@ -3,6 +3,7 @@ import {
   DEG2RAD,
   formatCSS,
   getP3MaxChroma,
+  type HSL,
   isInGamut,
   LMS_TO_LRGB,
   LRGB_TO_LMS,
@@ -23,6 +24,10 @@ import type { HSV, OklchColor } from '~/types';
 import { clamp } from './helpers';
 
 const GAMUT_EPSILON = 0.0001;
+
+// Parsed grays carry chroma noise around 1e-10; anything below this has no
+// perceivable hue.
+const ACHROMATIC_CHROMA = 1e-6;
 
 /**
  * RGB (0-1) → HSV. Standard formula.
@@ -248,4 +253,26 @@ export function p3HsvToOKLCH(h: number, s: number, v: number): { c: number; h: n
   if (oklchH < 0) oklchH += 360;
 
   return { c: oklchC, h: oklchH, l: labL };
+}
+
+/**
+ * Parsed grays report hue 0, which would snap hue-driven controls to red.
+ * These keep the previous value for channels the next color can't express.
+ */
+export function preserveHslHue(next: HSL, previous: HSL): HSL {
+  if (next.l === 0 || next.l === 100) return { h: previous.h, s: previous.s, l: next.l };
+  if (next.s === 0) return { ...next, h: previous.h };
+
+  return next;
+}
+
+export function preserveHsvHue(next: HSV, previous: HSV): HSV {
+  if (next.v === 0) return { h: previous.h, s: previous.s, v: 0 };
+  if (next.s === 0) return { ...next, h: previous.h };
+
+  return next;
+}
+
+export function preserveOklchHue(next: OklchColor, previous: OklchColor): OklchColor {
+  return next.c < ACHROMATIC_CHROMA ? { ...next, h: previous.h } : next;
 }

@@ -166,6 +166,25 @@ describe('HSLSliders', () => {
       expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
       expect(screen.getByRole('textbox', { name: 'Lightness' })).toHaveValue('50');
     });
+
+    it('keeps the hue when the external color turns gray', () => {
+      const { rerender } = render(<HSLSliders color="#0088ff" onChange={mockOnChange} />);
+
+      rerender(<HSLSliders color="#808080" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('208');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('0');
+    });
+
+    it('keeps hue and saturation when the external color turns black', () => {
+      const { rerender } = render(<HSLSliders color="#0088ff" onChange={mockOnChange} />);
+
+      rerender(<HSLSliders color="#000000" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('208');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
+      expect(screen.getByRole('textbox', { name: 'Lightness' })).toHaveValue('0');
+    });
   });
 
   describe('Lifecycle callbacks', () => {

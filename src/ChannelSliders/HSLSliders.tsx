@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { convertCSS, formatCSS, type HSL, parseCSS } from 'colorizr';
 
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
+import { preserveHslHue } from '~/modules/colorSpace';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -72,7 +73,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
     setHsl(previous =>
       convertCSS(color, 'hex') === formatCSS(previous, { format: 'hex' })
         ? previous
-        : parseCSS(color, 'hsl'),
+        : preserveHslHue(parseCSS(color, 'hsl'), previous),
     );
   }, [color]);
 

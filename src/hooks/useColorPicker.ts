@@ -2,7 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { convertCSS, formatCSS, opacity, parseCSS } from 'colorizr';
 
 import { DEFAULT_COLOR, DEFAULT_MODES } from '~/constants';
-import { clampOklchToP3, colorToHsv, hsvToHex, isOklchInSRGB } from '~/modules/colorSpace';
+import {
+  clampOklchToP3,
+  colorToHsv,
+  hsvToHex,
+  isOklchInSRGB,
+  preserveHsvHue,
+  preserveOklchHue,
+} from '~/modules/colorSpace';
 import {
   formatColor,
   isNarrowFormat,
@@ -40,12 +47,12 @@ export const defaultProps = {
   showSwatch: true,
 } satisfies ColorPickerProps;
 
-function hsvToOklch(value: HSV): OklchColor {
-  return clampOklchToP3(parseCSS(hsvToHex(value), 'oklch'));
+function hsvToOklch(value: HSV, previous: OklchColor): OklchColor {
+  return preserveOklchHue(clampOklchToP3(parseCSS(hsvToHex(value), 'oklch')), previous);
 }
 
-function oklchToHsv(value: OklchColor): HSV {
-  return colorToHsv(formatCSS(value, { format: 'oklch' }));
+function oklchToHsv(value: OklchColor, previous: HSV): HSV {
+  return preserveHsvHue(colorToHsv(formatCSS(value, { format: 'oklch' })), previous);
 }
 
 export default function useColorPicker(props: ColorPickerProps): UseColorPickerReturn {
@@ -122,7 +129,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   // Both color states are written together so switching modes never reads a
   // stale copy.
   const commitOklch = useCallback((next: OklchColor) => {
-    const nextHsv = oklchToHsv(next);
+    const nextHsv = oklchToHsv(next, hsvRef.current);
 
     oklchRef.current = next;
     hsvRef.current = nextHsv;
@@ -131,7 +138,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   }, []);
 
   const commitHsv = useCallback((next: HSV) => {
-    const nextOklch = hsvToOklch(next);
+    const nextOklch = hsvToOklch(next, oklchRef.current);
 
     hsvRef.current = next;
     oklchRef.current = nextOklch;
@@ -141,7 +148,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const commitColor = useCallback(
     (value: string) => {
-      const next = clampOklchToP3(parseCSS(value, 'oklch'));
+      const next = preserveOklchHue(clampOklchToP3(parseCSS(value, 'oklch')), oklchRef.current);
 
       commitOklch(next);
 

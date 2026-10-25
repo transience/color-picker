@@ -8,12 +8,53 @@ import {
   oklchHueToHsvHue,
   oklchToP3Hsv,
   p3HsvToOKLCH,
+  preserveHslHue,
+  preserveHsvHue,
+  preserveOklchHue,
 } from '~/modules/colorSpace';
 
 // Test hues covering different gamut shapes
 const testHues = [30, 80, 160, 265, 300];
 
 describe('colorSpace', () => {
+  describe('preserve hue helpers', () => {
+    it('preserveOklchHue keeps the previous hue only for achromatic colors', () => {
+      const previous = { l: 0.6, c: 0.15, h: 250 };
+
+      expect(preserveOklchHue({ l: 0.5, c: 1e-10, h: 0 }, previous)).toEqual({
+        l: 0.5,
+        c: 1e-10,
+        h: 250,
+      });
+      expect(preserveOklchHue({ l: 0.5, c: 0.1, h: 30 }, previous)).toEqual({
+        l: 0.5,
+        c: 0.1,
+        h: 30,
+      });
+    });
+
+    it('preserveHsvHue keeps hue at s=0 and hue + saturation at v=0', () => {
+      const previous = { h: 208, s: 0.8, v: 1 };
+
+      expect(preserveHsvHue({ h: 0, s: 0, v: 0.5 }, previous)).toEqual({ h: 208, s: 0, v: 0.5 });
+      expect(preserveHsvHue({ h: 0, s: 0, v: 0 }, previous)).toEqual({ h: 208, s: 0.8, v: 0 });
+      expect(preserveHsvHue({ h: 30, s: 0.5, v: 0.5 }, previous)).toEqual({
+        h: 30,
+        s: 0.5,
+        v: 0.5,
+      });
+    });
+
+    it('preserveHslHue keeps hue at s=0 and hue + saturation at l=0/100', () => {
+      const previous = { h: 208, s: 80, l: 50 };
+
+      expect(preserveHslHue({ h: 0, s: 0, l: 40 }, previous)).toEqual({ h: 208, s: 0, l: 40 });
+      expect(preserveHslHue({ h: 0, s: 0, l: 0 }, previous)).toEqual({ h: 208, s: 80, l: 0 });
+      expect(preserveHslHue({ h: 0, s: 0, l: 100 }, previous)).toEqual({ h: 208, s: 80, l: 100 });
+      expect(preserveHslHue({ h: 30, s: 50, l: 50 }, previous)).toEqual({ h: 30, s: 50, l: 50 });
+    });
+  });
+
   describe('oklchToP3Hsv / p3HsvToOKLCH round-trip', () => {
     it.each(testHues)('should round-trip at hue %d for mid-range values', hue => {
       const l = 0.6;
