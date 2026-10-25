@@ -76,19 +76,19 @@ Computed from state on every render. Most sub-components expect these shapes dir
 
 Each return field maps directly onto the props of a built-in sub-component. The table below covers the common wirings — the full pattern lives in `src/ColorPicker.tsx`.
 
-| Hook field                           | Sub-component                  | Prop                          |
-|--------------------------------------|--------------------------------|-------------------------------|
-| `rootRef`                            | root `<div>`                   | `ref`                         |
-| `oklch.{l,c,h}` + `handleChangeOklchPanel` | `OKLCHPanel`             | `lightness` / `chroma` / `hue` / `onChange` |
-| `hsv.{h,s,v}` + `handleChangeSaturationPanel` | `SaturationPanel`     | `hue` / `saturation` / `value` / `onChange` |
-| `mode` + `currentHue` + hue handler  | `HueSlider`                    | `mode` / `value` / `onChange` (`isOklch ? handleChangeOklchHue : handleChangeHsvHue`) |
-| `alpha` + `solidColor` + `handleChangeAlpha` | `AlphaSlider`          | `value` / `color` / `onChange` |
-| `displayValue` + `handleChangeColorInput` | `ColorInput`              | `value` / `onChange`          |
-| `swatchColor`                        | `Swatch`                       | `color` (optional `children` for icon overlay) |
-| `mode` + `handleClickMode`           | `ModeSelector`                 | `mode` / `onClick`            |
-| `displayFormat` / `outputFormat` + handlers | `SettingsMenu`          | `displayFormat` / `outputFormat` / `onChangeDisplayFormat` / `onChangeOutputFormat` |
-| `solidColor` + `mode` + `handleChangeColorInput` | `ChannelSliders`   | `color` / `mode` / `onChange` |
-| `showGamutWarning`                   | `ColorInput endContent`        | render `<GamutWarning />` conditionally |
+| Hook field | Sub-component | Prop |
+| --- | --- | --- |
+| `rootRef` | root `<div>` | `ref` |
+| `oklch.{l,c,h}` + `handleChangeOklchPanel` | `OKLCHPanel` | `lightness` / `chroma` / `hue` / `onChange` |
+| `hsv.{h,s,v}` + `handleChangeSaturationPanel` | `SaturationPanel` | `hue` / `saturation` / `value` / `onChange` |
+| `mode` + `currentHue` + hue handler | `HueSlider` | `mode` / `value` / `onChange` (`isOklch ? handleChangeOklchHue : handleChangeHsvHue`) |
+| `alpha` + `solidColor` + `handleChangeAlpha` | `AlphaSlider` | `value` / `color` / `onChange` |
+| `displayValue` + `handleChangeColorInput` | `ColorInput` | `value` / `onChange` |
+| `swatchColor` | `Swatch` | `color` (optional `children` for icon overlay) |
+| `mode` + `handleClickMode` | `ModeSelector` | `mode` / `onClick` |
+| `displayFormat` / `outputFormat` + handlers | `SettingsMenu` | `displayFormat` / `outputFormat` / `onChangeDisplayFormat` / `onChangeOutputFormat` |
+| `solidColor` + `mode` + `handleChangeColorInput` | `ChannelSliders` | `color` / `mode` / `onChange` |
+| `showGamutWarning` | `ColorInput endContent` | render `<GamutWarning />` conditionally |
 
 ---
 

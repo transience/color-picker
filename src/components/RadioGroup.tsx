@@ -61,7 +61,7 @@ export default function RadioGroup(props: RadioGroupProps) {
   return (
     // The radiogroup itself is not focusable — focus is managed via roving
     // tabindex on the radio children per WAI-ARIA radio-group pattern.
-    // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+    // eslint-disable-next-line jsx-a11y-x/interactive-supports-focus
     <div
       aria-disabled={disabled || undefined}
       aria-labelledby={titleId}
