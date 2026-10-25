@@ -166,6 +166,49 @@ describe('HSLSliders', () => {
       expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
       expect(screen.getByRole('textbox', { name: 'Lightness' })).toHaveValue('50');
     });
+
+    it('reads an external color that is more precise than the same hex', () => {
+      const { rerender } = render(<HSLSliders color="#000000" onChange={mockOnChange} />);
+
+      rerender(<HSLSliders color="hsl(120 100% 0.05%)" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('120');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
+    });
+
+    it('keeps fractional channels through its own echo', () => {
+      render(<Controlled />);
+
+      const saturation = screen.getByRole('textbox', { name: 'Saturation' });
+
+      fireEvent.focus(saturation);
+      fireEvent.change(saturation, { target: { value: '80' } });
+      fireEvent.blur(saturation);
+
+      expect(screen.getByRole('slider', { name: 'Saturation' })).toHaveAttribute(
+        'aria-valuenow',
+        '80',
+      );
+    });
+
+    it('keeps the hue when the external color turns gray', () => {
+      const { rerender } = render(<HSLSliders color="#0088ff" onChange={mockOnChange} />);
+
+      rerender(<HSLSliders color="#808080" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('208');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('0');
+    });
+
+    it('keeps hue and saturation when the external color turns black', () => {
+      const { rerender } = render(<HSLSliders color="#0088ff" onChange={mockOnChange} />);
+
+      rerender(<HSLSliders color="#000000" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('208');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
+      expect(screen.getByRole('textbox', { name: 'Lightness' })).toHaveValue('0');
+    });
   });
 
   describe('Lifecycle callbacks', () => {
@@ -271,6 +314,70 @@ describe('HSLSliders', () => {
       expect(startOrder[1]).toBeLessThan(endOrder[1]);
 
       expect(onChangeStart.mock.calls[1][0]).toBe(onChangeEnd.mock.calls[0][0]);
+    });
+  });
+
+  describe('Owner hue', () => {
+    it('shows the hue prop only while the color is gray', () => {
+      const { rerender } = render(<HSLSliders color="hsl(0 0% 50%)" hue={120} />);
+
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '120');
+
+      rerender(<HSLSliders color="hsl(250 50% 50%)" hue={120} />);
+
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '250');
+    });
+
+    it('shows the hue prop while the color rounds to gray', () => {
+      render(<HSLSliders color="hsl(208 1% 11%)" hue={120} />);
+
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '120');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('1');
+    });
+
+    it('calls onChangeHue instead of onChange for hue edits while gray', () => {
+      const onChangeHue = vi.fn();
+
+      render(
+        <HSLSliders
+          color="hsl(0 0% 50%)"
+          hue={120}
+          onChange={mockOnChange}
+          onChangeHue={onChangeHue}
+        />,
+      );
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'Hue' }), { key: 'ArrowRight' });
+
+      expect(onChangeHue).toHaveBeenCalledTimes(1);
+      expect(onChangeHue.mock.calls[0][0]).toBeGreaterThan(120);
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('emits through onChange for hue edits on a chromatic color', () => {
+      const onChangeHue = vi.fn();
+
+      render(
+        <HSLSliders
+          color="hsl(250 50% 50%)"
+          hue={120}
+          onChange={mockOnChange}
+          onChangeHue={onChangeHue}
+        />,
+      );
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'Hue' }), { key: 'ArrowRight' });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(onChangeHue).not.toHaveBeenCalled();
+    });
+
+    it('emits through onChange while gray when onChangeHue is not given', () => {
+      render(<HSLSliders color="hsl(0 0% 50%)" onChange={mockOnChange} />);
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'Hue' }), { key: 'ArrowRight' });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
     });
   });
 });

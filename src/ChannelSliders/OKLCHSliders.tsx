@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import { formatCSS, getP3MaxChroma, type LCH, parseCSS } from 'colorizr';
+import { formatCSS, getP3MaxChroma, type LCH } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
+import { deriveOklch, isGrayOklch, withHue } from '~/modules/channels';
 import { clamp, resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -25,6 +27,11 @@ interface OKLCHSlidersProps {
   channelSliderClassNames?: GradientSliderClassNames;
   /** Current color as any CSS string parseable by `colorizr`. */
   color?: string;
+  /**
+   * Hue to show while the color is gray (chroma 0), when the string carries
+   * none. Pair with `onChangeHue` so the owner keeps a single hue.
+   */
+  hue?: number;
   /** Per-channel label/aria overrides. Falls back to `DEFAULT_LABELS.oklchSliders`. */
   labels?: ColorPickerLabels['oklchSliders'];
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
@@ -37,6 +44,11 @@ interface OKLCHSlidersProps {
    * was emitted during the interaction).
    */
   onChangeEnd?: (value: string) => void;
+  /**
+   * Called instead of `onChange` for hue edits while the color is gray, since
+   * the emitted color would be unchanged.
+   */
+  onChangeHue?: (hue: number) => void;
   /**
    * Called once when an interaction on any of L/C/H begins. Receives the
    * incoming `color` (the value before any change).
@@ -54,10 +66,12 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     channels,
     channelSliderClassNames,
     color = DEFAULT_COLOR,
+    hue,
     labels,
     numericInputClassNames,
     onChange,
     onChangeEnd,
+    onChangeHue,
     onChangeStart,
     showInputs = true,
   } = props;
@@ -69,7 +83,9 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     value: color,
   });
 
-  const { c, h, l } = useMemo(() => parseCSS(color, 'oklch'), [color]);
+  const [localLch, setLch] = useChannelState(color, deriveOklch);
+  const isGray = isGrayOklch(localLch);
+  const { c, h, l } = withHue(localLch, isGray, hue);
   const lightnessConfig = channels?.l;
   const chromaConfig = channels?.c;
   const hueConfig = channels?.h;
@@ -101,6 +117,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   );
 
   const update = (okLCH: LCH) => {
+    setLch(okLCH);
     emit(formatCSS(okLCH, { format: 'oklch' }));
   };
 
@@ -115,11 +132,18 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     update({ l, c: Number.isNaN(chroma) ? 0 : chroma, h });
   };
 
-  const handleChangeHue = (hue: number) => {
-    const relativeChroma = maxChroma > 0 ? clamp(c / maxChroma, 0, 1) : 0;
-    const newMaxChroma = getP3MaxChroma({ l, c: 0, h: hue });
+  const handleChangeHue = (nextHue: number) => {
+    if (isGray && onChangeHue) {
+      setLch({ l, c, h: nextHue });
+      onChangeHue(nextHue);
 
-    update({ l, c: relativeChroma * newMaxChroma, h: hue });
+      return;
+    }
+
+    const relativeChroma = maxChroma > 0 ? clamp(c / maxChroma, 0, 1) : 0;
+    const newMaxChroma = getP3MaxChroma({ l, c: 0, h: nextHue });
+
+    update({ l, c: relativeChroma * newMaxChroma, h: nextHue });
   };
 
   return (

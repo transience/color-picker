@@ -1,6 +1,16 @@
 import { type HTMLAttributes, type ReactNode, useCallback, useMemo, useRef } from 'react';
-import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } from 'colorizr';
+import { formatCSS, getP3MaxChroma, type HSL, type LCH, type RGB } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
+import {
+  deriveHsl,
+  deriveOklch,
+  deriveRgb,
+  isGrayColor,
+  isGrayHsl,
+  isGrayOklch,
+  withHue,
+} from '~/modules/channels';
 import { cn, mergeProps, resolveLabel } from '~/modules/helpers';
 
 import NumericInput from './components/NumericInput';
@@ -29,6 +39,11 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
    */
   color?: string;
   /**
+   * Hue to show while the color is gray, when the string carries none.
+   * Pair with `onChangeHue` so the owner keeps a single hue. Ignored in RGB.
+   */
+  hue?: number;
+  /**
    * Per-channel label/aria overrides for this input row.
    *
    * Keys: `r`, `g`, `b`, `h`, `s`, `l`, `c`, `a` (alpha). Each falls back
@@ -56,6 +71,11 @@ interface ChannelInputsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color
    * after the last keystroke, or on blur.
    */
   onChangeEnd?: (value: string) => void;
+  /**
+   * Called instead of `onChange` for hue edits while the color is gray, since
+   * the emitted color would be unchanged. Not called in RGB.
+   */
+  onChangeHue?: (hue: number) => void;
   /**
    * Called once when an interaction on any channel input begins. Receives the
    * incoming `color` (the value before any change). Fires on the first
@@ -94,18 +114,30 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     className,
     classNames,
     color,
+    hue,
     labels,
     mode,
     numericInputClassNames,
     onChange,
     onChangeAlpha,
     onChangeEnd,
+    onChangeHue,
     onChangeStart,
     showAlpha,
     ...rest
   } = mergeProps(defaultProps, props);
 
   const lastEmittedRef = useRef<string | null>(null);
+  // Local channels survive what the color string loses (hue at S=0 or C=0,
+  // fractions in hex). Only the active mode's set is read.
+  const [rgb, setRgb] = useChannelState(color, deriveRgb);
+  const [localHsl, setHsl] = useChannelState(color, deriveHsl);
+  const [localLch, setLch] = useChannelState(color, deriveOklch);
+  const isGrayIncoming = useMemo(() => isGrayColor(color), [color]);
+  const isGrayHslColor = isGrayHsl(localHsl) || isGrayIncoming;
+  const isGrayOklchColor = isGrayOklch(localLch);
+  const hsl = withHue(localHsl, isGrayHslColor, hue);
+  const lch = withHue(localLch, isGrayOklchColor, hue);
 
   const emitColor = useCallback(
     (next: string) => {
@@ -145,8 +177,12 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
   const fields = useMemo<FieldDefinition[]>(() => {
     if (mode === 'rgb') {
-      const rgb = parseCSS(color, 'rgb');
-      const emit = (next: RGB) => emitColor(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: RGB) => {
+        const value = formatCSS(next, { format: 'oklch' });
+
+        setRgb(next, value);
+        emitColor(value);
+      };
 
       return [
         {
@@ -177,9 +213,12 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     }
 
     if (mode === 'oklch') {
-      const lch = parseCSS(color, 'oklch');
       const maxC = getP3MaxChroma({ l: lch.l, c: 0, h: lch.h });
-      const emit = (next: LCH) => emitColor(formatCSS(next, { format: 'oklch' }));
+
+      const emit = (next: LCH) => {
+        setLch(next);
+        emitColor(formatCSS(next, { format: 'oklch' }));
+      };
 
       return [
         {
@@ -206,7 +245,16 @@ export default function ChannelInputs(props: ChannelInputsProps) {
           key: 'h',
           max: 360,
           min: 0,
-          onChange: v => emit({ ...lch, h: v }),
+          onChange: v => {
+            if (isGrayOklchColor && onChangeHue) {
+              setLch({ ...lch, h: v });
+              onChangeHue(v);
+
+              return;
+            }
+
+            emit({ ...lch, h: v });
+          },
           step: 0.1,
           suffix: '°',
           value: lch.h.toFixed(1),
@@ -214,8 +262,12 @@ export default function ChannelInputs(props: ChannelInputsProps) {
       ];
     }
 
-    const hsl = parseCSS(color, 'hsl');
-    const emit = (next: HSL) => emitColor(formatCSS(next, { format: 'oklch' }));
+    const emit = (next: HSL) => {
+      const value = formatCSS(next, { format: 'oklch' });
+
+      setHsl(next, value);
+      emitColor(value);
+    };
 
     return [
       {
@@ -223,7 +275,16 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         key: 'h',
         max: 360,
         min: 0,
-        onChange: v => emit({ ...hsl, h: v }),
+        onChange: v => {
+          if (isGrayHslColor && onChangeHue) {
+            setHsl({ ...hsl, h: v });
+            onChangeHue(v);
+
+            return;
+          }
+
+          emit({ ...hsl, h: v });
+        },
         suffix: '°',
         value: `${Math.round(hsl.h)}`,
       },
@@ -246,7 +307,20 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.l)}`,
       },
     ];
-  }, [color, mode, slot, emitColor]);
+  }, [
+    emitColor,
+    hsl,
+    isGrayHslColor,
+    isGrayOklchColor,
+    lch,
+    mode,
+    onChangeHue,
+    rgb,
+    setHsl,
+    setLch,
+    setRgb,
+    slot,
+  ]);
 
   const labelClassName = cn(
     'text-xs text-neutral-500 dark:text-neutral-400 leading-none',

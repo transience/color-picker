@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { convertCSS, formatCSS, parseCSS, type RGB } from 'colorizr';
+import { formatCSS, type RGB } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
+import { deriveRgb } from '~/modules/channels';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -64,17 +65,7 @@ export default function RGBSliders(props: RGBSlidersProps) {
     onChangeStart,
     value: color,
   });
-  const [rgb, setRgb] = useState<RGB>(() => parseCSS(color, 'rgb'));
-
-  // Keep local channels when `color` is the same color they already describe
-  // (e.g. our own echo), so typed values survive the parent's hex round-trip.
-  useEffect(() => {
-    setRgb(previous =>
-      convertCSS(color, 'hex') === formatCSS(previous, { format: 'hex' })
-        ? previous
-        : parseCSS(color, 'rgb'),
-    );
-  }, [color]);
+  const [rgb, setRgb] = useChannelState(color, deriveRgb);
 
   const { b, g, r } = rgb;
   const redConfig = channels?.r;
@@ -95,8 +86,10 @@ export default function RGBSliders(props: RGBSlidersProps) {
   const blueSlot = slot('b');
 
   const update = (newRgb: RGB) => {
-    setRgb(newRgb);
-    emit(formatCSS(newRgb, { format: 'oklch' }));
+    const next = formatCSS(newRgb, { format: 'oklch' });
+
+    setRgb(newRgb, next);
+    emit(next);
   };
 
   return (
