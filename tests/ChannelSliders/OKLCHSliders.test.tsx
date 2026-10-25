@@ -218,6 +218,22 @@ describe('OKLCHSliders', () => {
     });
   });
 
+  describe('Zero chroma', () => {
+    it('keeps the hue when chroma goes to 0 and back', () => {
+      render(<Controlled initial="oklch(60% 0.15 250)" />);
+      const chroma = screen.getByRole('slider', { name: 'Chroma' });
+
+      fireEvent.keyDown(chroma, { key: 'Home' });
+
+      expect(mockOnChange.mock.lastCall?.[0]).toBe('oklch(60% 0 none)');
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '250');
+
+      fireEvent.keyDown(chroma, { key: 'ArrowRight' });
+
+      expect(parseCSS(mockOnChange.mock.lastCall?.[0] as string, 'oklch').h).toBe(250);
+    });
+  });
+
   describe('Lifecycle callbacks', () => {
     it('onChangeStart fires with the current color (not a stale value) on a drag after an external color change', () => {
       const onChangeStart = vi.fn();

@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import { formatCSS, getP3MaxChroma, type LCH, parseCSS } from 'colorizr';
+import { formatCSS, getP3MaxChroma, type LCH } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
+import { deriveOklch } from '~/modules/channels';
 import { clamp, resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -69,7 +71,8 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
     value: color,
   });
 
-  const { c, h, l } = useMemo(() => parseCSS(color, 'oklch'), [color]);
+  const [lch, setLch] = useChannelState(color, deriveOklch);
+  const { c, h, l } = lch;
   const lightnessConfig = channels?.l;
   const chromaConfig = channels?.c;
   const hueConfig = channels?.h;
@@ -101,6 +104,7 @@ export default function OKLCHSliders(props: OKLCHSlidersProps) {
   );
 
   const update = (okLCH: LCH) => {
+    setLch(okLCH);
     emit(formatCSS(okLCH, { format: 'oklch' }));
   };
 

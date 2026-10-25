@@ -1038,6 +1038,21 @@ describe('ColorPicker', () => {
     });
   });
 
+  describe('Zero chroma', () => {
+    it('keeps the OKLCH hue when chroma goes to 0 and back', () => {
+      render(<Controlled initial="oklch(60% 0.15 250)" />);
+      const chroma = screen.getByRole('slider', { name: 'Chroma' });
+
+      fireEvent.keyDown(chroma, { key: 'Home' });
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('250.0');
+
+      fireEvent.keyDown(chroma, { key: 'ArrowRight', shiftKey: true });
+
+      expect(parseCSS(mockOnChange.mock.lastCall?.[0] as string, 'oklch').h).toBe(250);
+    });
+  });
+
   describe('Drag integration', () => {
     it('firing a full drag on the OKLCHPanel emits multiple OKLCH values', () => {
       render(<Controlled />);

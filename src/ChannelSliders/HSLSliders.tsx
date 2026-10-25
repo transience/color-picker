@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { convertCSS, formatCSS, type HSL, parseCSS } from 'colorizr';
+import { useMemo } from 'react';
+import { formatCSS, type HSL } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
-import { preserveHslHue } from '~/modules/colorSpace';
+import { deriveHsl } from '~/modules/channels';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -65,17 +66,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
     onChangeStart,
     value: color,
   });
-  const [hsl, setHsl] = useState<HSL>(() => parseCSS(color, 'hsl'));
-
-  // Keep local channels when `color` is the same color they already describe
-  // (e.g. our own echo): the hex round-trip drops fractions and collapses hue.
-  useEffect(() => {
-    setHsl(previous =>
-      convertCSS(color, 'hex') === formatCSS(previous, { format: 'hex' })
-        ? previous
-        : preserveHslHue(parseCSS(color, 'hsl'), previous),
-    );
-  }, [color]);
+  const [hsl, setHsl] = useChannelState(color, deriveHsl);
 
   const { h, l, s } = hsl;
   const hueConfig = channels?.h;
