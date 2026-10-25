@@ -111,7 +111,7 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 - **`ColorMode`** — `'oklch' | 'hsl' | 'rgb'`. Drives the 2D panel, mode switcher, and which channel slider/input set is rendered.
 - **`ColorFormat`** — `'auto' | 'hex' | 'hsl' | 'oklab' | 'oklch' | 'rgb'`. Used for both `displayFormat` (text input value) and `outputFormat` (what `onChange` emits).
 
-`'auto'` resolves against the active mode: OKLCH mode → `'oklch'`, otherwise `'hex'`. `outputFormat` defaults to following the resolved `displayFormat`, so the emitted string matches what the user sees unless you set them independently.
+`'auto'` resolves against the active mode: OKLCH mode → `'oklch'`, otherwise `'hex'`. The two resolve independently — `outputFormat` never reads `displayFormat` — but with both on `'auto'` they resolve to the same format, so the emitted string matches what the user sees.
 
 When an OKLCH color doesn't fit inside a narrow format (`hex`, `hsl`, `rgb`), a gamut warning icon appears inside the color input.
 

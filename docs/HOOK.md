@@ -42,6 +42,8 @@ Raw color and UI state. Read these to render thumbs, slider values, and selected
 - **`mode`** (`ColorMode`) — active color space driving the 2D panel and channel controls.
 - **`hsv`** (`HSV`) — HSV triplet feeding `SaturationPanel` and the HSL/RGB sliders.
 - **`oklch`** (`OklchColor`) — OKLCH triplet feeding `OKLCHPanel` and the OKLCH sliders.
+
+  Both are kept in sync on every change, so either is current regardless of `mode`. For grays (zero saturation/chroma) each keeps its previous hue rather than resetting to 0.
 - **`alpha`** (`number`, 0–1) — only used when `showAlpha` is on. Appended to emitted values when `< 1`.
 - **`displayFormat`** / **`outputFormat`** (`ColorFormat`) — resolved formats for the text input and `onChange` emission respectively.
 
@@ -66,7 +68,7 @@ Computed from state on every render. Most sub-components expect these shapes dir
 - **`currentHue`** (`number`) — hue of the active mode (`oklch.h` or `hsv.h`).
 - **`solidColor`** (`string`) — current color as an opaque CSS string. Feeds `<AlphaSlider color>`, `<ChannelSliders color>`, `<ChannelInputs color>`.
 - **`displayValue`** (`string`) — current color formatted per `displayFormat`. Feeds `<ColorInput value>`.
-- **`swatchColor`** (`string`) — alias of `displayValue`. Feeds `<Swatch color>`.
+- **`swatchColor`** (`string`) — current color as OKLCH with alpha, not clipped by a narrow `displayFormat`. Feeds `<Swatch color>`.
 - **`showGamutWarning`** (`boolean`) — true when the OKLCH color falls outside sRGB and a narrow format is active. Use to render `<GamutWarning>` inside `<ColorInput endContent>`.
 - **`props`** (`ColorPickerProps`) — input props merged with defaults. Useful when forwarding configuration (`channels`, `classNames`, `labels`, `showAlpha`, etc.) to sub-components.
 

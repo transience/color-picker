@@ -49,6 +49,7 @@ src/
     useEmitLifecycle.ts         Per-component pointer/keyboard mux for Start/Change/End
     useRafCommit.ts             rAF coalescer for high-frequency pointer values
     useInteractionAttribute.ts  Sets data-interacting on the root during drags/keys
+    useChannelState.ts          Per-channel values derived from a color string (sliders, inputs)
     useId.ts                    React 16/17-compatible useId polyfill
   ChannelSliders/
     index.tsx              Dispatches by mode
@@ -64,6 +65,7 @@ src/
     RadioGroup.tsx           Settings-menu format picker
     EyeDropperIcon.tsx, GearIcon.tsx, WarningIcon.tsx   Inline SVGs
   modules/                 Pure logic
+    channels.ts
     colorSpace.ts
     format.ts
     oklchCanvas.ts
@@ -113,6 +115,10 @@ Two parallel color states live side by side:
 - **`oklch`** — `{ l, c, h }`, used by `OKLCHPanel` and OKLCH sliders. Initialized via `colorizr`'s `parseCSS(color, 'oklch')`, then `clampOklchToP3`.
 
 **Display-P3 chroma invariant.** Every color entering `oklch` state — init, the controlled `color` effect, text/paste/eyedropper input, the global hue slider, and the OKLCH panel — is passed through `clampOklchToP3` (`src/modules/colorSpace.ts`), which caps chroma at `getP3MaxChroma` for the current L/H. This matches the ceiling the OKLCH sliders already enforce, so state stays coherent across controls. Two consequences: the clamped value is what `emit` sends, so a pasted/typed out-of-gamut color is silently reduced; and the controlled `color` effect clamps without calling `onChange`, so a controlled prop beyond P3 renders clamped while the parent still holds the original (it re-converges on the next interaction).
+
+**Both states are written together.** Every color-changing handler goes through `commitOklch` / `commitHsv` / `commitColor`, which update one state and derive the other from it. Switching modes therefore always reads the current color, and the hook's returned `hsv` / `oklch` stay current whichever mode is active.
+
+**Achromatic colors keep their hue.** A parsed gray reports hue 0 (and OKLCH strings write hue as `none` at zero chroma). The derivations pass through `preserveOklchHue` / `preserveHsvHue` (`src/modules/colorSpace.ts`), which keep the previous hue — and, at black, the previous saturation — when the new color can't express them. Without this, the panels and sliders snap to red whenever saturation or chroma reaches zero.
 
 Plus:
 
@@ -187,6 +193,11 @@ Conversions needed inside this package. `colorizr` supplies the matrix constants
 - `oklchHueToHsvHue(h)` — maps an OKLCH hue to the HSV hue of a saturated reference point (`l=0.7`, `c=0.15`). Used as the canvas rendering hue.
 - `isOklchInSRGB(l, c, h)` — uses the same rule `colorizr` applies when converting OKLCH to hex/rgb/hsl. Drives `GamutWarning`.
 - `isP3HSVInSRGB(h, s, v, epsilon)` — used by the panel to trace the sRGB gamut overlay.
+- `preserveOklchHue` / `preserveHsvHue` / `preserveHslHue` — keep the previous hue (and saturation at black/white) for colors that have none. See §4.
+
+### `channels.ts`
+
+`derive` functions for `useChannelState`, one per slider mode. `deriveHsl` / `deriveRgb` keep the previous values when the incoming color has the same hex (usually the component's own echo, where the hex round-trip would drop fractions); `deriveHsl` / `deriveOklch` keep the hue for achromatic colors.
 
 ### `oklchCanvas.ts` — the OKLCH panel's coordinate math
 
@@ -200,7 +211,7 @@ Three load-bearing exports plus a helper. The OKLCH panel mirrors Chrome DevTool
   The fix is a binary search: find the HSV hue whose `p3HsvToOKLCH` at `(x, y)` returns exactly the slider's `oklchHue`. 16 iterations over a ±40° bracket centered on `oklchHueToHsvHue(oklchHue)`. Round-trip error < 0.1% across tested hues (100, 135, 160, 240, 250, 300).
 
 - **`renderOKLCHCanvas(canvas, w, h, oklchHue)`** → `false` without a 2D context.
-  Pixel-by-pixel P3-HSV fill (`color(display-p3 …)`) at the canvas HSV hue.
+  Fills the canvas with P3-HSV pixels at the canvas HSV hue. When the context really is `display-p3` (`getContextAttributes().colorSpace`), it writes all pixels into one `ImageData` and calls `putImageData`, far faster than a `fillStyle` per pixel. Otherwise it falls back to per-pixel `fillStyle = color(display-p3 …)`, so the browser converts each color: raw P3 values written into an sRGB canvas would be read as sRGB.
 
 - **`computeSRGBBoundary(hsvHue, rowCount)`** →
   Per-row sRGB gamut trace: coarse scan (80 steps) for the first out-of-gamut saturation, then 16-iteration binary search for the exact crossing. Near the blue-violet cusp (~hue 282) the default tolerance lets saturated P3 blue read as in-gamut; the strict (`epsilon=0`) fallback at `s=1` anchors the overlay to the right edge instead of terminating mid-panel.
@@ -280,7 +291,7 @@ Timing rules mirror `useInteractionAttribute`:
 
 `GradientSlider`, `SaturationPanel`, `OKLCHPanel`, and `NumericInput` consume `useEmitLifecycle` directly with the appropriate `<V>`. `NumericInput` is text-input only — no pointer surface — so it drives Start/End purely from `notifyKeyboardActivity` (first value-changing keystroke after idle → start, 600 ms after the last keystroke → end) and `notifyBlur` (focus leaves the field → fire end immediately).
 
-Channel sliders (`HSLSliders`, `OKLCHSliders`, `RGBSliders`) consume `useEmitLifecycle<string>` and aggregate Start/Change/End across their three child sliders by wiring child `onChangeStart`/`onChangeEnd` to the parent's `notifyStart`/`notifyEnd` and channeling each child `onChange` through the parent's `emit`. `ChannelInputs` aggregates the same way without `useEmitLifecycle` — a single `lastEmittedRef` plus inline `handleStart`/`handleEnd` that wrap each `NumericInput`'s lifecycle callbacks and forward the parent's `onChangeStart`/`onChangeEnd` (`src/ChannelInputs.tsx:112-118`).
+Channel sliders (`HSLSliders`, `OKLCHSliders`, `RGBSliders`) consume `useEmitLifecycle<string>` and aggregate Start/Change/End across their three child sliders by wiring child `onChangeStart`/`onChangeEnd` to the parent's `notifyStart`/`notifyEnd` and channeling each child `onChange` through the parent's `emit`. `ChannelInputs` aggregates the same way without `useEmitLifecycle` — a single `lastEmittedRef` plus inline `handleStart`/`handleEnd` that wrap each `NumericInput`'s lifecycle callbacks and forward the parent's `onChangeStart`/`onChangeEnd`.
 
 Use `onChangeStart` / `onChangeEnd` for value-bearing logic (e.g. snapshotting at start, persisting to a URL only at end). Use `data-interacting` for purely visual/CSS reactions or when an external host needs a single signal across the whole picker.
 
@@ -293,14 +304,14 @@ Use `onChangeStart` / `onChangeEnd` for value-bearing logic (e.g. snapshotting a
 Notable details:
 
 - **OKLCH sliders** (`OKLCHSliders.tsx`) — chroma's `maxValue` is dynamic: `getP3MaxChroma({ l, c: 0, h })`. When lightness or hue changes, the handler preserves *relative* chroma (`c / oldMaxChroma * newMaxChroma`), which keeps the slider thumb's visual position intuitive across mode/L/H changes. The L/C/H gradients are regenerated on every value change; the hue gradient is a static constant (`oklchHueGradient`).
-- **HSL / RGB sliders** keep a local `useState` mirror plus a small `lastEmittedRef` so their derived channel values survive the OKLCH round-trip the outer `ColorPicker` runs for every emission. (Start/Change/End plumbing lives in `useEmitLifecycle<string>` — see §7.)
+- **Local channel state.** The HSL, RGB and OKLCH sliders and `ChannelInputs` read their values through `useChannelState(color, derive)` (`src/hooks/useChannelState.ts`) with the `derive` functions in `src/modules/channels.ts`. The `color` string they receive can't carry everything they show — HSL/RGB lose fractions to the parent's hex round-trip, and HSL/OKLCH lose the hue at zero saturation/chroma — so `derive` gets the previous values and keeps what the string doesn't express. Edits set the local values directly; an incoming color re-derives during render (not in an effect), so the controls never paint a frame behind it. (Start/Change/End plumbing lives in `useEmitLifecycle<string>` — see §7.)
 - **Gradient tracks** use the CSS `background` shorthand directly — `AlphaSlider` layers a gradient with a checkerboard tile via a comma-separated value.
 
 ---
 
 ## 9. SettingsMenu
 
-Trigger is a gear button. The panel is portal'd to `document.body` and anchored to the trigger via `Floater` (`src/components/Floater.tsx`) — a small floating-UI primitive that handles fixed-coordinate positioning, top↔bottom auto-flip (with `start` / `end` alignment preserved), scroll/resize re-positioning, outside-click + Escape dismissal, and an opacity-fade visibility transition.
+Trigger is a gear button (`aria-haspopup="dialog"`). The panel is a `role="dialog"` named by its title (or the trigger label when the title is hidden), portal'd to `document.body` and anchored to the trigger via `Floater` (`src/components/Floater.tsx`) — a small floating-UI primitive that handles fixed-coordinate positioning, top↔bottom auto-flip (with `start` / `end` alignment preserved), scroll/resize re-positioning, outside-click + Escape dismissal, and an opacity-fade visibility transition.
 
 SettingsMenu uses Floater in click-controlled mode. Default placement is `bottom-end`: the gear sits at the picker's right edge, so the panel right-aligns to the gear and extends left into the picker. Consumers can override via `<SettingsMenu placement>` (`FloaterPlacement` exported from `src/components/Floater.tsx`).
 
