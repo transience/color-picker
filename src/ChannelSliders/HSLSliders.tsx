@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { formatCSS, type HSL, parseCSS } from 'colorizr';
+import { useEffect, useMemo, useState } from 'react';
+import { convertCSS, formatCSS, type HSL, parseCSS } from 'colorizr';
 
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
 import { resolveLabel } from '~/modules/helpers';
@@ -64,19 +64,16 @@ export default function HSLSliders(props: HSLSlidersProps) {
     onChangeStart,
     value: color,
   });
-  // Skip re-derive when the [color] prop is our own echo — hex round-trip
-  // drops fractional precision and collapses hue at s=0%.
-  const selfEchoRef = useRef(false);
   const [hsl, setHsl] = useState<HSL>(() => parseCSS(color, 'hsl'));
 
+  // Keep local channels when `color` is the same color they already describe
+  // (e.g. our own echo): the hex round-trip drops fractions and collapses hue.
   useEffect(() => {
-    if (selfEchoRef.current) {
-      selfEchoRef.current = false;
-
-      return;
-    }
-
-    setHsl(parseCSS(color, 'hsl'));
+    setHsl(previous =>
+      convertCSS(color, 'hex') === formatCSS(previous, { format: 'hex' })
+        ? previous
+        : parseCSS(color, 'hsl'),
+    );
   }, [color]);
 
   const { h, l, s } = hsl;
@@ -110,7 +107,6 @@ export default function HSLSliders(props: HSLSlidersProps) {
 
   const update = (newHsl: HSL) => {
     setHsl(newHsl);
-    selfEchoRef.current = true;
     emit(formatCSS(newHsl, { format: 'oklch' }));
   };
 

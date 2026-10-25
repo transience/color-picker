@@ -141,6 +141,20 @@ describe('RGBSliders', () => {
       expect(Number(green.getAttribute('aria-valuenow'))).toBeCloseTo(255, 0);
       expect(Number(blue.getAttribute('aria-valuenow'))).toBeCloseTo(0, 0);
     });
+
+    it('reflects an external color after an edit that left the hex unchanged', () => {
+      const { rerender } = render(<RGBSliders color="#000000" onChange={mockOnChange} />);
+      const red = screen.getByRole('textbox', { name: 'Red' });
+
+      fireEvent.focus(red);
+      fireEvent.change(red, { target: { value: '0.4' } });
+      fireEvent.blur(red);
+
+      rerender(<RGBSliders color="#00ff00" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Red' })).toHaveValue('0');
+      expect(screen.getByRole('textbox', { name: 'Green' })).toHaveValue('255');
+    });
   });
 
   describe('Lifecycle callbacks', () => {
