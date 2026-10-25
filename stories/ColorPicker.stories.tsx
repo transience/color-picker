@@ -14,6 +14,9 @@ interface ColorPickerWrapperProps extends ComponentProps<typeof ColorPicker> {
   showPreview?: boolean;
 }
 
+// eslint-disable-next-line unused-imports/no-unused-vars
+const { displayFormat, outputFormat, ...storyDefaults } = defaultProps;
+
 export default {
   title: 'ColorPicker',
   component: ColorPicker,
@@ -21,7 +24,7 @@ export default {
     classNames: {
       root: 'bg-white dark:bg-black',
     },
-    ...defaultProps,
+    ...storyDefaults,
   },
   argTypes: {
     precision: {

@@ -1,5 +1,6 @@
 import { type ButtonHTMLAttributes, useEffect, useRef, useState } from 'react';
 
+import useId from '~/hooks/useId';
 import { cn, mergeProps, resolveLabel } from '~/modules/helpers';
 
 import GearIcon from '~/components/GearIcon';
@@ -67,8 +68,11 @@ const OPTIONS: SettingsOption[] = [
   { label: 'OkLab', value: 'oklab' },
 ];
 
+// Unchecked radios are skipped (roving tabindex).
+const TABBABLE = 'button:not(:disabled):not([tabindex="-1"])';
+
 const PANEL_CLASSES =
-  'min-w-70 overflow-hidden rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200';
+  'min-w-70 overflow-hidden outline-none rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200';
 
 export const defaultProps = {
   displayFormat: 'auto',
@@ -93,6 +97,8 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   } = mergeProps(defaultProps, props);
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId('settings-title');
 
   const triggerLabel = labels?.trigger ?? DEFAULT_LABELS.settingsMenu.trigger;
   const titleLabel = resolveLabel(DEFAULT_LABELS.settingsMenu.title, labels?.title);
@@ -109,7 +115,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
 
   // Explicit dismiss (Done button, Esc) restores focus to the trigger so
   // ancestor focus-within popovers (HeroUI / React Aria hosts) keep treating
-  // the picker as focused, and to satisfy the WAI-ARIA menu pattern. Passive
+  // the picker as focused, and to satisfy the WAI-ARIA dialog pattern. Passive
   // dismiss (outside click) leaves focus where the user moved it —
   // restoring would steal focus from the element they just clicked.
   const closeAndReturnFocus = () => {
@@ -120,15 +126,48 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   useEffect(() => {
     if (!isOpen) return undefined;
 
+    // The panel is portal'd to the end of `document.body`, so Tab from the
+    // trigger would reach it only after the rest of the page. The panel itself
+    // is the fallback when every control is hidden or disabled.
+    const panel = panelRef.current;
+    const target = panel?.querySelector<HTMLElement>(TABBABLE) ?? panel;
+
+    target?.focus({ preventScroll: true });
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         triggerRef.current?.focus();
       }
+
+      // Tab past either edge would land far from the trigger (the portal sits
+      // at the end of `body`) with the panel still open. Leaving by keyboard
+      // closes it like Done does.
+      const active = document.activeElement;
+
+      if (event.key === 'Tab' && active && panel?.contains(active)) {
+        const tabbables = [...panel.querySelectorAll<HTMLElement>(TABBABLE)];
+        const edge = event.shiftKey ? tabbables[0] : tabbables[tabbables.length - 1];
+        const beyond = event.shiftKey
+          ? Node.DOCUMENT_POSITION_PRECEDING
+          : Node.DOCUMENT_POSITION_FOLLOWING;
+
+        // Compared by position, not identity: a radio focused by arrow keys
+        // keeps `tabIndex=-1` until its group's value changes, so it isn't in
+        // `tabbables`. The panel precedes its controls, so Shift+Tab from it
+        // closes while a forward Tab reaches the first control natively.
+        if (!edge || active === edge || edge.compareDocumentPosition(active) & beyond) {
+          event.preventDefault();
+          setIsOpen(false);
+          triggerRef.current?.focus();
+        }
+      }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    // Capture phase: Floater closes on the same Escape, and the re-render it
+    // triggers removes this listener before a bubble-phase one would run.
+    document.addEventListener('keydown', handleKeyDown, true);
 
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
   }, [isOpen]);
 
   let header = null;
@@ -136,7 +175,11 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   if (titleLabel || doneLabel) {
     header = (
       <div className="flex items-center justify-between">
-        {!!titleLabel && <p className="text-sm font-semibold">{titleLabel}</p>}
+        {!!titleLabel && (
+          <p className="text-sm font-semibold" id={titleId}>
+            {titleLabel}
+          </p>
+        )}
         {!!doneLabel && (
           <button
             aria-label={closeLabel}
@@ -152,7 +195,15 @@ export default function SettingsMenu(props: SettingsMenuProps) {
   }
 
   const panel = (
-    <div className={cn(PANEL_CLASSES, classNames?.menu)} data-testid="SettingsMenu">
+    <div
+      ref={panelRef}
+      aria-label={titleLabel ? undefined : triggerLabel}
+      aria-labelledby={titleLabel ? titleId : undefined}
+      className={cn(PANEL_CLASSES, classNames?.menu)}
+      data-testid="SettingsMenu"
+      role="dialog"
+      tabIndex={-1}
+    >
       <div className="flex flex-col gap-3 p-3">
         {header}
         <div className="flex flex-row justify-center flex-1 gap-6">
@@ -189,7 +240,7 @@ export default function SettingsMenu(props: SettingsMenuProps) {
           {...triggerProps}
           ref={triggerRef}
           aria-expanded={isOpen}
-          aria-haspopup="menu"
+          aria-haspopup="dialog"
           className={cn(triggerProps?.className, classNames?.trigger)}
           data-testid="SettingsTrigger"
         >
