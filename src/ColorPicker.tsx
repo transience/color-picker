@@ -78,6 +78,7 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
   } = picker.props;
 
   const hueConfig = channels?.h;
+  const handleChangeHue = isOklch ? handleChangeOklchHue : handleChangeHsvHue;
   const content: Record<string, ReactNode> = {};
 
   if (showPanel) {
@@ -157,7 +158,7 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
         isDisabled={hueConfig?.disabled}
         label={labels?.hueSlider?.label}
         mode={mode}
-        onChange={isOklch ? handleChangeOklchHue : handleChangeHsvHue}
+        onChange={handleChangeHue}
         onChangeEnd={handleInteractionEnd}
         onChangeStart={handleInteractionStart}
         value={currentHue}
@@ -181,11 +182,13 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
         channelSliderClassNames={classNames?.channelSlider}
         className={classNames?.channelSliders}
         color={solidColor}
+        hue={currentHue}
         labels={labels}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
         onChange={handleChangeColorInput}
         onChangeEnd={handleInteractionEnd}
+        onChangeHue={handleChangeHue}
         onChangeStart={handleInteractionStart}
         showInputs={showInputs}
       />
@@ -196,12 +199,14 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
         alpha={alpha}
         classNames={classNames?.channelInputs}
         color={solidColor}
+        hue={currentHue}
         labels={labels?.channelInputs}
         mode={mode}
         numericInputClassNames={classNames?.numericInput}
         onChange={handleChangeColorInput}
         onChangeAlpha={handleChangeAlpha}
         onChangeEnd={handleInteractionEnd}
+        onChangeHue={handleChangeHue}
         onChangeStart={handleInteractionStart}
         showAlpha={showAlpha}
       />

@@ -32,6 +32,11 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
    */
   color?: string;
   /**
+   * Hue to show while the color is gray, when the string carries none.
+   * Pair with `onChangeHue` so the owner keeps a single hue. Ignored in RGB.
+   */
+  hue?: number;
+  /**
    * Per-mode label/aria overrides. Only the slot matching the active `mode`
    * is forwarded (`rgbSliders` / `hslSliders` / `oklchSliders`).
    */
@@ -52,6 +57,11 @@ interface ChannelSlidersProps extends Omit<HTMLAttributes<HTMLDivElement>, 'colo
    * most recently emitted OKLCH CSS string.
    */
   onChangeEnd?: (value: string) => void;
+  /**
+   * Called instead of `onChange` for hue edits while the color is gray, since
+   * the emitted color would be unchanged. Not called in RGB.
+   */
+  onChangeHue?: (hue: number) => void;
   /**
    * Called once when an interaction on any channel slider begins. Receives
    * the incoming `color`.
@@ -77,11 +87,13 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     channelSliderClassNames,
     className,
     color,
+    hue,
     labels,
     mode,
     numericInputClassNames,
     onChange,
     onChangeEnd,
+    onChangeHue,
     onChangeStart,
     showInputs,
     ...rest
@@ -100,10 +112,12 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           channels={channels}
           channelSliderClassNames={channelSliderClassNames}
           color={color}
+          hue={hue}
           labels={labels?.hslSliders}
           numericInputClassNames={numericInputClassNames}
           onChange={onChange}
           onChangeEnd={onChangeEnd}
+          onChangeHue={onChangeHue}
           onChangeStart={onChangeStart}
           showInputs={showInputs}
         />
@@ -126,10 +140,12 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
           channels={channels}
           channelSliderClassNames={channelSliderClassNames}
           color={color}
+          hue={hue}
           labels={labels?.oklchSliders}
           numericInputClassNames={numericInputClassNames}
           onChange={onChange}
           onChangeEnd={onChangeEnd}
+          onChangeHue={onChangeHue}
           onChangeStart={onChangeStart}
           showInputs={showInputs}
         />

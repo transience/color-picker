@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { convertCSS, formatCSS, type HSL, parseCSS } from 'colorizr';
+import { useMemo } from 'react';
+import { formatCSS, type HSL } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
+import { deriveHsl, isGrayColor, isGrayHsl, withHue } from '~/modules/channels';
 import { resolveLabel } from '~/modules/helpers';
 
 import GradientSlider from '../components/GradientSlider';
@@ -21,6 +23,12 @@ interface HSLSlidersProps {
   channelSliderClassNames?: GradientSliderClassNames;
   /** Current color as any CSS string parseable by `colorizr`. */
   color?: string;
+  /**
+   * Hue to show while the color is gray (saturation 0, black or white), when
+   * the string carries none. Pair with `onChangeHue` so the owner keeps a
+   * single hue.
+   */
+  hue?: number;
   /** Per-channel label/aria overrides. Falls back to `DEFAULT_LABELS.hslSliders`. */
   labels?: ColorPickerLabels['hslSliders'];
   /** Per-part className overrides forwarded to each channel's `NumericInput`. */
@@ -33,6 +41,11 @@ interface HSLSlidersProps {
    * was emitted during the interaction).
    */
   onChangeEnd?: (value: string) => void;
+  /**
+   * Called instead of `onChange` for hue edits while the color is gray, since
+   * the emitted color would be unchanged.
+   */
+  onChangeHue?: (hue: number) => void;
   /**
    * Called once when an interaction on any of H/S/L begins. Receives the
    * incoming `color` (the value before any change).
@@ -50,10 +63,12 @@ export default function HSLSliders(props: HSLSlidersProps) {
     channels,
     channelSliderClassNames,
     color = DEFAULT_COLOR,
+    hue,
     labels,
     numericInputClassNames,
     onChange,
     onChangeEnd,
+    onChangeHue,
     onChangeStart,
     showInputs = true,
   } = props;
@@ -64,19 +79,10 @@ export default function HSLSliders(props: HSLSlidersProps) {
     onChangeStart,
     value: color,
   });
-  const [hsl, setHsl] = useState<HSL>(() => parseCSS(color, 'hsl'));
-
-  // Keep local channels when `color` is the same color they already describe
-  // (e.g. our own echo): the hex round-trip drops fractions and collapses hue.
-  useEffect(() => {
-    setHsl(previous =>
-      convertCSS(color, 'hex') === formatCSS(previous, { format: 'hex' })
-        ? previous
-        : parseCSS(color, 'hsl'),
-    );
-  }, [color]);
-
-  const { h, l, s } = hsl;
+  const [localHsl, setHsl] = useChannelState(color, deriveHsl);
+  const isGrayIncoming = useMemo(() => isGrayColor(color), [color]);
+  const isGray = isGrayHsl(localHsl) || isGrayIncoming;
+  const { h, l, s } = withHue(localHsl, isGray, hue);
   const hueConfig = channels?.h;
   const saturationConfig = channels?.s;
   const lightnessConfig = channels?.l;
@@ -106,8 +112,21 @@ export default function HSLSliders(props: HSLSlidersProps) {
   );
 
   const update = (newHsl: HSL) => {
-    setHsl(newHsl);
-    emit(formatCSS(newHsl, { format: 'oklch' }));
+    const next = formatCSS(newHsl, { format: 'oklch' });
+
+    setHsl(newHsl, next);
+    emit(next);
+  };
+
+  const handleChangeHue = (nextHue: number) => {
+    if (isGray && onChangeHue) {
+      setHsl({ h: nextHue, s, l });
+      onChangeHue(nextHue);
+
+      return;
+    }
+
+    update({ h: nextHue, s, l });
   };
 
   return (
@@ -125,7 +144,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
                 isDisabled={hueConfig?.disabled}
                 max={360}
                 min={0}
-                onChange={v => update({ h: v, s, l })}
+                onChange={handleChangeHue}
                 onChangeEnd={notifyEnd}
                 onChangeStart={notifyStart}
                 suffix="°"
@@ -136,7 +155,7 @@ export default function HSLSliders(props: HSLSlidersProps) {
           gradient={hslHueGradient}
           isDisabled={hueConfig?.disabled}
           maxValue={359.9}
-          onChange={(v: number) => update({ h: v, s, l })}
+          onChange={handleChangeHue}
           onChangeEnd={notifyEnd}
           onChangeStart={notifyStart}
           startContent={hueSlot.label}

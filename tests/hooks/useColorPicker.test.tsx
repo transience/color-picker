@@ -452,6 +452,55 @@ describe('useColorPicker', () => {
     });
   });
 
+  describe('achromatic colors keep the hue', () => {
+    it('keeps the HSV hue when the input turns gray', () => {
+      const { result } = renderHook(() => useColorPicker({ color: '#0088ff', defaultMode: 'hsl' }));
+      const { h } = result.current.hsv;
+
+      act(() => {
+        result.current.handleChangeColorInput(
+          formatCSS({ h: 210, s: 0, l: 50 }, { format: 'oklch' }),
+        );
+      });
+
+      expect(result.current.hsv.h).toBe(h);
+      expect(result.current.hsv.s).toBe(0);
+    });
+
+    it('keeps the HSV hue and saturation at black', () => {
+      const { result } = renderHook(() => useColorPicker({ color: '#0088ff', defaultMode: 'hsl' }));
+      const { h, s } = result.current.hsv;
+
+      act(() => {
+        result.current.handleChangeColorInput('#000000');
+      });
+
+      expect(result.current.hsv).toEqual({ h, s, v: 0 });
+    });
+
+    it('keeps the OKLCH hue when a gray is typed', () => {
+      const { result } = renderHook(() => useColorPicker({ color: 'oklch(60% 0.15 250)' }));
+
+      act(() => {
+        result.current.handleChangeColorInput('#808080');
+      });
+
+      expect(result.current.oklch.h).toBe(250);
+    });
+
+    it('keeps both hues when the controlled color turns gray', () => {
+      const { rerender, result } = renderHook((props: { color: string }) => useColorPicker(props), {
+        initialProps: { color: 'oklch(60% 0.15 250)' },
+      });
+      const hsvHue = result.current.hsv.h;
+
+      rerender({ color: '#808080' });
+
+      expect(result.current.oklch.h).toBe(250);
+      expect(result.current.hsv.h).toBe(hsvHue);
+    });
+  });
+
   describe('controlled re-render dedup (lastEmittedRef)', () => {
     it('skips state reset when parent re-passes the same just-emitted value', () => {
       const onChange = vi.fn();

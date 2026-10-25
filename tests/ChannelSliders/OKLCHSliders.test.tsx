@@ -218,6 +218,22 @@ describe('OKLCHSliders', () => {
     });
   });
 
+  describe('Zero chroma', () => {
+    it('keeps the hue when chroma goes to 0 and back', () => {
+      render(<Controlled initial="oklch(60% 0.15 250)" />);
+      const chroma = screen.getByRole('slider', { name: 'Chroma' });
+
+      fireEvent.keyDown(chroma, { key: 'Home' });
+
+      expect(mockOnChange.mock.lastCall?.[0]).toBe('oklch(60% 0 none)');
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '250');
+
+      fireEvent.keyDown(chroma, { key: 'ArrowRight' });
+
+      expect(parseCSS(mockOnChange.mock.lastCall?.[0] as string, 'oklch').h).toBe(250);
+    });
+  });
+
   describe('Lifecycle callbacks', () => {
     it('onChangeStart fires with the current color (not a stale value) on a drag after an external color change', () => {
       const onChangeStart = vi.fn();
@@ -310,6 +326,63 @@ describe('OKLCHSliders', () => {
       expect(startOrder[1]).toBeLessThan(endOrder[1]);
 
       expect(onChangeStart.mock.calls[1][0]).toBe(onChangeEnd.mock.calls[0][0]);
+    });
+  });
+
+  describe('Owner hue', () => {
+    it('shows the hue prop only while the color is gray', () => {
+      const { rerender } = render(<OKLCHSliders color="oklch(60% 0 none)" hue={120} />);
+
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '120');
+
+      rerender(<OKLCHSliders color="oklch(60% 0.1 250)" hue={120} />);
+
+      expect(screen.getByRole('slider', { name: 'Hue' })).toHaveAttribute('aria-valuenow', '250');
+    });
+
+    it('calls onChangeHue instead of onChange for hue edits while gray', () => {
+      const onChangeHue = vi.fn();
+
+      render(
+        <OKLCHSliders
+          color="oklch(60% 0 none)"
+          hue={120}
+          onChange={mockOnChange}
+          onChangeHue={onChangeHue}
+        />,
+      );
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'Hue' }), { key: 'ArrowRight' });
+
+      expect(onChangeHue).toHaveBeenCalledTimes(1);
+      expect(onChangeHue.mock.calls[0][0]).toBeGreaterThan(120);
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('emits through onChange for hue edits on a chromatic color', () => {
+      const onChangeHue = vi.fn();
+
+      render(
+        <OKLCHSliders
+          color="oklch(60% 0.1 250)"
+          hue={120}
+          onChange={mockOnChange}
+          onChangeHue={onChangeHue}
+        />,
+      );
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'Hue' }), { key: 'ArrowRight' });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(onChangeHue).not.toHaveBeenCalled();
+    });
+
+    it('emits through onChange while gray when onChangeHue is not given', () => {
+      render(<OKLCHSliders color="oklch(60% 0 none)" onChange={mockOnChange} />);
+
+      fireEvent.keyDown(screen.getByRole('slider', { name: 'Hue' }), { key: 'ArrowRight' });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -3,6 +3,7 @@ import {
   DEG2RAD,
   formatCSS,
   getP3MaxChroma,
+  type HSL,
   isInGamut,
   LMS_TO_LRGB,
   LRGB_TO_LMS,
@@ -23,6 +24,10 @@ import type { HSV, OklchColor } from '~/types';
 import { clamp } from './helpers';
 
 const GAMUT_EPSILON = 0.0001;
+
+// Parsed grays carry chroma noise around 1e-10; anything below this has no
+// perceivable hue.
+export const ACHROMATIC_CHROMA = 1e-6;
 
 /**
  * RGB (0-1) → HSV. Standard formula.
@@ -73,6 +78,18 @@ export function colorToHsv(color: string): HSV {
   return rgbToHsv(r / 255, g / 255, b / 255);
 }
 
+/**
+ * sRGB HSV hue → OKLCH hue, through a low-saturation reference color. The
+ * inverse of `oklchHueToSrgbHsvHue`, for the same gray case. Float RGB, not
+ * hex: 8-bit rounding at low saturation costs several degrees of hue.
+ */
+export function hsvHueToOklchHue(hsvHue: number): number {
+  const [r, g, b] = hsvToRgb(hsvHue, 0.1, 0.7);
+
+  return parseCSS(formatCSS({ r: r * 255, g: g * 255, b: b * 255 }, { format: 'oklch' }), 'oklch')
+    .h;
+}
+
 export function hsvToHex({ h, s, v }: HSV): string {
   const [r, g, b] = hsvToRgb(h, s, v);
 
@@ -119,6 +136,10 @@ export function hsvToRgb(h: number, s: number, v: number): [number, number, numb
   }
 
   return [r + m, g + m, b + m];
+}
+
+export function isGrayHsv({ s, v }: HSV): boolean {
+  return s === 0 || v === 0;
 }
 
 /**
@@ -170,6 +191,16 @@ export function isP3HSVInSRGB(h: number, s: number, v: number, epsilon = GAMUT_E
  */
 export function oklchHueToHsvHue(oklchHue: number): number {
   return oklchToP3Hsv(0.7, 0.15, oklchHue).h;
+}
+
+/**
+ * OKLCH hue → sRGB HSV hue, through a low-chroma reference color that stays
+ * in sRGB at every hue. Unlike `oklchHueToHsvHue` (P3-HSV, for the canvas),
+ * this matches the hook's `hsv` state. Used when a gray's hue changes, since
+ * the gray itself can't carry it into the other space.
+ */
+export function oklchHueToSrgbHsvHue(oklchHue: number): number {
+  return colorToHsv(formatCSS({ l: 0.7, c: 0.05, h: oklchHue }, { format: 'oklch' })).h;
 }
 
 /**
@@ -248,4 +279,26 @@ export function p3HsvToOKLCH(h: number, s: number, v: number): { c: number; h: n
   if (oklchH < 0) oklchH += 360;
 
   return { c: oklchC, h: oklchH, l: labL };
+}
+
+/**
+ * Parsed grays report hue 0, which would snap hue-driven controls to red.
+ * These keep the previous value for channels the next color can't express.
+ */
+export function preserveHslHue(next: HSL, previous: HSL): HSL {
+  if (next.l === 0 || next.l === 100) return { h: previous.h, s: previous.s, l: next.l };
+  if (next.s === 0) return { ...next, h: previous.h };
+
+  return next;
+}
+
+export function preserveHsvHue(next: HSV, previous: HSV): HSV {
+  if (next.v === 0) return { h: previous.h, s: previous.s, v: 0 };
+  if (next.s === 0) return { ...next, h: previous.h };
+
+  return next;
+}
+
+export function preserveOklchHue(next: OklchColor, previous: OklchColor): OklchColor {
+  return next.c < ACHROMATIC_CHROMA ? { ...next, h: previous.h } : next;
 }
