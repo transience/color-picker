@@ -30,7 +30,7 @@ exports[`ColorPicker > Render > renders HSL mode when defaultMode is "hsl" 1`] =
     >
       <span
         class="flex items-center justify-center size-full"
-        style="background-color: rgb(255, 0, 68);"
+        style="background-color: oklch(0.63269 0.25404 19.902);"
       />
     </span>
     <div
@@ -535,7 +535,7 @@ exports[`ColorPicker > Render > renders RGB mode with defaultMode is "rgb"" 1`] 
     >
       <span
         class="flex items-center justify-center size-full"
-        style="background-color: rgb(255, 0, 68);"
+        style="background-color: oklch(0.63269 0.25404 19.902);"
       />
     </span>
     <div

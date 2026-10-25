@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { convertCSS, formatCSS, getP3MaxChroma, parseCSS } from 'colorizr';
 
 import useColorPicker, { defaultProps } from '~/hooks/useColorPicker';
-import { hsvToHex } from '~/modules/colorSpace';
+import { hsvToHex, isOklchInSRGB } from '~/modules/colorSpace';
 
 describe('useColorPicker', () => {
   describe('defaultProps', () => {
@@ -449,6 +449,49 @@ describe('useColorPicker', () => {
 
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(hsvToHex(result.current.hsv)).toBe(emitted);
+    });
+  });
+
+  describe('swatchColor', () => {
+    it('stays unclipped when the display format is narrow', () => {
+      const { result } = renderHook(() =>
+        useColorPicker({ color: 'oklch(60% 0.25 150)', displayFormat: 'hex' }),
+      );
+
+      expect(result.current.displayValue).toMatch(/^#/);
+      expect(result.current.swatchColor).toMatch(/^oklch\(/);
+      expect(parseCSS(result.current.swatchColor, 'oklch').c).toBeCloseTo(
+        result.current.oklch.c,
+        3,
+      );
+    });
+
+    it('stays unclipped in HSL mode after a wide-gamut input', () => {
+      const { result } = renderHook(() =>
+        useColorPicker({ defaultMode: 'hsl', outputFormat: 'oklch' }),
+      );
+
+      act(() => {
+        result.current.handleChangeColorInput('oklch(60% 0.25 150)');
+      });
+
+      expect(parseCSS(result.current.swatchColor, 'oklch').c).toBeCloseTo(
+        result.current.oklch.c,
+        3,
+      );
+      expect(isOklchInSRGB(result.current.oklch.l, result.current.oklch.c, 150)).toBe(false);
+    });
+
+    it('includes alpha', () => {
+      const { result } = renderHook(() =>
+        useColorPicker({
+          color: 'oklch(60% 0.1 150 / 0.5)',
+          displayFormat: 'hex',
+          showAlpha: true,
+        }),
+      );
+
+      expect(result.current.swatchColor).toMatch(/\/ 50%\)$/);
     });
   });
 
