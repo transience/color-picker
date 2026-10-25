@@ -7,9 +7,74 @@ import {
 } from './colorSpace';
 import { clamp } from './helpers';
 
-export interface OKLCHCanvasResult {
-  hsvHue: number;
-  srgbBoundary: Array<{ x: number; y: number }>;
+export type BoundaryPoint = { x: number; y: number };
+
+/**
+ * Trace the sRGB gamut boundary across the P3-HSV panel at `hsvHue`, one point
+ * per row (0-100% coordinates), via P3 → XYZ → linear sRGB checks.
+ */
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function computeSRGBBoundary(hsvHue: number, rowCount: number): BoundaryPoint[] {
+  const srgbBoundary: BoundaryPoint[] = [];
+  const coarseSteps = 80;
+
+  for (let index = 0; index <= rowCount; index++) {
+    const yNorm = index / rowCount;
+    const value = 1 - yNorm;
+
+    // coarseX resets per row: near the P3-HSV purple cusp the boundary
+    // saturation is non-monotonic in y, so persisting sx across rows would
+    // skip real crossings.
+    let found = false;
+
+    for (let sx = 0; sx <= coarseSteps; sx++) {
+      const saturation = sx / coarseSteps;
+
+      if (!isP3HSVInSRGB(hsvHue, saturation, value)) {
+        // Binary search between previous (in-gamut) and current (out-of-gamut) for exact boundary
+        let lo = Math.max(0, (sx - 1) / coarseSteps);
+        let hi = saturation;
+
+        for (let iter = 0; iter < 16; iter++) {
+          const mid = (lo + hi) / 2;
+
+          if (isP3HSVInSRGB(hsvHue, mid, value)) {
+            lo = mid;
+          } else {
+            hi = mid;
+          }
+        }
+
+        srgbBoundary.push({
+          x: clamp(((lo + hi) / 2) * 100, 0, 100),
+          y: clamp(yNorm * 100, 0, 100),
+        });
+        found = true;
+        break;
+      }
+    }
+
+    // Near the blue-violet cusp (≈ hue 282), saturated P3 blue sits inside the
+    // default GAMUT_EPSILON of sRGB blue, so the loose check misses every
+    // mid/low-value row. Fall back to a strict (epsilon=0) check at sat=1:
+    // if strictly out-of-gamut, anchor the boundary at the right edge so the
+    // overlay traces down the edge instead of terminating mid-panel.
+    if (!found && !isP3HSVInSRGB(hsvHue, 1, value, 0)) {
+      srgbBoundary.push({ x: 100, y: clamp(yNorm * 100, 0, 100) });
+    }
+  }
+
+  // Close off the polyline to the right edge if the last detected point
+  // stopped before saturation = 1. Mirrors Chromium DevTools' overlay.
+  if (srgbBoundary.length > 0) {
+    const last = srgbBoundary[srgbBoundary.length - 1];
+
+    if (last.x < 100) {
+      srgbBoundary.push({ x: 100, y: last.y });
+    }
+  }
+
+  return srgbBoundary;
 }
 
 /**
@@ -80,7 +145,7 @@ export function pointerToLC(
  * Convert boundary points to an SVG polyline path (M + L commands).
  * Matches Chrome DevTools' sRGB overlay, which uses straight segments.
  */
-export function pointsToPath(points: Array<{ x: number; y: number }>): string {
+export function pointsToPath(points: BoundaryPoint[]): string {
   if (points.length < 2) return '';
 
   const [first, ...rest] = points;
@@ -93,24 +158,23 @@ export function pointsToPath(points: Array<{ x: number; y: number }>): string {
  * - X = saturation (0 left → 1 right)
  * - Y = value (1 top → 0 bottom)
  * - HSV treated as Display P3 colors
- * - sRGB boundary via P3 → XYZ → linear sRGB check
+ *
+ * Returns `false` when no 2D context is available.
  */
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export function renderOKLCHCanvas(
   canvas: HTMLCanvasElement,
   width: number,
   height: number,
   oklchHue: number,
-): OKLCHCanvasResult {
+): boolean {
   const context = canvas.getContext('2d', {
     colorSpace: 'display-p3',
   });
 
-  if (!context) return { hsvHue: 0, srgbBoundary: [] };
+  if (!context) return false;
 
   const hsvHue = oklchHueToHsvHue(oklchHue);
 
-  // Render pixels as P3 HSV
   for (let y = 0; y < height; y++) {
     const value = 1 - y / (height - 1);
 
@@ -123,66 +187,5 @@ export function renderOKLCHCanvas(
     }
   }
 
-  // Compute sRGB boundary with binary search refinement per row
-  const srgbBoundary: Array<{ x: number; y: number }> = [];
-  const rowCount = height;
-  const coarseSteps = 80;
-
-  for (let index = 0; index <= rowCount; index++) {
-    const yNorm = index / rowCount;
-    const value = 1 - yNorm;
-
-    // coarseX resets per row: near the P3-HSV purple cusp the boundary
-    // saturation is non-monotonic in y, so persisting sx across rows would
-    // skip real crossings.
-    let found = false;
-
-    for (let sx = 0; sx <= coarseSteps; sx++) {
-      const saturation = sx / coarseSteps;
-
-      if (!isP3HSVInSRGB(hsvHue, saturation, value)) {
-        // Binary search between previous (in-gamut) and current (out-of-gamut) for exact boundary
-        let lo = Math.max(0, (sx - 1) / coarseSteps);
-        let hi = saturation;
-
-        for (let iter = 0; iter < 16; iter++) {
-          const mid = (lo + hi) / 2;
-
-          if (isP3HSVInSRGB(hsvHue, mid, value)) {
-            lo = mid;
-          } else {
-            hi = mid;
-          }
-        }
-
-        srgbBoundary.push({
-          x: clamp(((lo + hi) / 2) * 100, 0, 100),
-          y: clamp(yNorm * 100, 0, 100),
-        });
-        found = true;
-        break;
-      }
-    }
-
-    // Near the blue-violet cusp (≈ hue 282), saturated P3 blue sits inside the
-    // default GAMUT_EPSILON of sRGB blue, so the loose check misses every
-    // mid/low-value row. Fall back to a strict (epsilon=0) check at sat=1:
-    // if strictly out-of-gamut, anchor the boundary at the right edge so the
-    // overlay traces down the edge instead of terminating mid-panel.
-    if (!found && !isP3HSVInSRGB(hsvHue, 1, value, 0)) {
-      srgbBoundary.push({ x: 100, y: clamp(yNorm * 100, 0, 100) });
-    }
-  }
-
-  // Close off the polyline to the right edge if the last detected point
-  // stopped before saturation = 1. Mirrors Chromium DevTools' overlay.
-  if (srgbBoundary.length > 0) {
-    const last = srgbBoundary[srgbBoundary.length - 1];
-
-    if (last.x < 100) {
-      srgbBoundary.push({ x: 100, y: last.y });
-    }
-  }
-
-  return { hsvHue, srgbBoundary };
+  return true;
 }
