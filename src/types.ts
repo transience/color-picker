@@ -484,6 +484,6 @@ export interface UseColorPickerReturn {
   showGamutWarning: boolean;
   /** Current color as a solid CSS string (no alpha). Feed to panels / backgrounds. */
   solidColor: string;
-  /** Alias of `displayValue` — intended for the `Swatch` `color` prop. */
+  /** Current color as OKLCH with alpha, unclipped by the display format. Intended for the `Swatch` `color` prop. */
   swatchColor: string;
 }
