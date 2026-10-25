@@ -150,6 +150,55 @@ describe('ColorInput', () => {
       expect(mockOnChange).toHaveBeenCalledWith('#ff0044');
     });
 
+    it('emits 8-digit hex with alpha (#rrggbbaa)', () => {
+      render(<Controlled initial="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '#ff00448' } });
+      fireEvent.change(input, { target: { value: '#ff004480' } });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange).toHaveBeenCalledWith('#ff004480');
+    });
+
+    it('prefixes 8-digit bare hex with #', () => {
+      render(<ColorInput onChange={mockOnChange} value="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'ff004480' } });
+
+      expect(mockOnChange).toHaveBeenCalledWith('#ff004480');
+      expect(input).toHaveValue('#ff004480');
+    });
+
+    it('emits pasted 4-digit hex (#rgba)', () => {
+      render(<ColorInput onChange={mockOnChange} value="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.paste(input);
+      fireEvent.change(input, { target: { value: 'f048' } });
+
+      expect(mockOnChange).toHaveBeenCalledWith('#f048');
+    });
+
+    it('holds typed 4-digit hex until Enter', () => {
+      render(<Reformatting initial="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '#f048' } });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(mockOnChange).toHaveBeenCalledWith('#f048');
+      expect(input).toHaveValue('#F048');
+    });
+
     it('emits once hex reaches 4 characters (#rgb)', () => {
       render(<Controlled initial="" />);
       const input = screen.getByLabelText('Color value');

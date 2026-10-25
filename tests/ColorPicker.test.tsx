@@ -680,6 +680,19 @@ describe('ColorPicker', () => {
   });
 
   describe('Alpha', () => {
+    it('reads alpha from typed 8-digit hex', () => {
+      render(<ColorPicker onChange={mockOnChange} showAlpha />);
+
+      fireEvent.change(screen.getByRole('textbox', { name: 'Color value' }), {
+        target: { value: '#ff000080' },
+      });
+
+      expect(
+        Number(screen.getByRole('slider', { name: 'Alpha' }).getAttribute('aria-valuenow')),
+      ).toBeCloseTo(0.5, 2);
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+    });
+
     it('emits a color with alpha suffix when alpha is dragged below 1', () => {
       const onChange = vi.fn();
 
