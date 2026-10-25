@@ -192,16 +192,11 @@ Conversions needed inside this package. `colorizr` supplies the matrix constants
 
 Three load-bearing exports plus a helper. The OKLCH panel mirrors Chrome DevTools' Spectrum picker: both thumb and sRGB overlay trace in raw P3 HSV coordinates — the same coordinate system as the canvas pixels — so the thumb always sits on the gamut boundary when the color is at the sRGB edge. Many "fixes" were tried before this (OKLCH-native normalization, 2D Newton's method, ratio iteration, linear normalization by `sMax`) — all broke either the thumb/curve alignment or monotonicity. The current approach is the one Chrome ships.
 
-- **`lcToPointer(oklchHue, l, c)`** → `{ x, y }` in 0–100%.
-  Raw P3-HSV projection: `oklchToP3Hsv` then `{ s*100, (1-v)*100 }`. This matches Chrome DevTools' Spectrum picker exactly — thumb lives in the same coordinate system as the canvas pixels.
+- **`lcToPointer(oklchHue, l, c)`** → `{ x, y }` in 0–100%. Raw P3-HSV projection: `oklchToP3Hsv` then `{ s*100, (1-v)*100 }`. This matches Chrome DevTools' Spectrum picker exactly — thumb lives in the same coordinate system as the canvas pixels.
 
-- **`pointerToLC(oklchHue, xNorm, yNorm)`** → `{ l, c }`.
-  A naive `p3HsvToOKLCH(canvasHue, x, y)` drifts during drag: the canvas HSV hue comes from the fixed reference point, but the color at the cursor has a different HSV hue (offset up to ~40° at blue/violet). Feeding that `(l, c)` back through `lcToPointer` would land the thumb at a different `x` than the cursor — visible as acceleration and sticking at the gamut edge.
-  The fix is a binary search: find the HSV hue whose `p3HsvToOKLCH` at `(x, y)` returns exactly the slider's `oklchHue`. 16 iterations over a ±40° bracket centered on `oklchHueToHsvHue(oklchHue)`. Round-trip error < 0.1% across tested hues (100, 135, 160, 240, 250, 300).
+- **`pointerToLC(oklchHue, xNorm, yNorm)`** → `{ l, c }`. A naive `p3HsvToOKLCH(canvasHue, x, y)` drifts during drag: the canvas HSV hue comes from the fixed reference point, but the color at the cursor has a different HSV hue (offset up to ~40° at blue/violet). Feeding that `(l, c)` back through `lcToPointer` would land the thumb at a different `x` than the cursor — visible as acceleration and sticking at the gamut edge. The fix is a binary search: find the HSV hue whose `p3HsvToOKLCH` at `(x, y)` returns exactly the slider's `oklchHue`. 16 iterations over a ±40° bracket centered on `oklchHueToHsvHue(oklchHue)`. Round-trip error < 0.1% across tested hues (100, 135, 160, 240, 250, 300).
 
-- **`renderOKLCHCanvas(canvas, w, h, oklchHue)`** →
-  Pixel-by-pixel P3-HSV fill (`color(display-p3 …)`) at the canvas HSV hue, then a per-row sRGB gamut trace: coarse scan (80 steps) for the first out-of-gamut saturation, then 16-iteration binary search for the exact crossing. Near the blue-violet cusp (~hue 282) the default tolerance lets saturated P3 blue read as in-gamut; the strict (`epsilon=0`) fallback at `s=1` anchors the overlay to the right edge instead of terminating mid-panel.
-  Returns an `{ x, y }` polyline; the panel renders it as an SVG `path` (`M … L …`) via `pointsToPath`, with `vectorEffect="non-scaling-stroke"` so the line stays crisp at any canvas width.
+- **`renderOKLCHCanvas(canvas, w, h, oklchHue)`** → Pixel-by-pixel P3-HSV fill (`color(display-p3 …)`) at the canvas HSV hue, then a per-row sRGB gamut trace: coarse scan (80 steps) for the first out-of-gamut saturation, then 16-iteration binary search for the exact crossing. Near the blue-violet cusp (~hue 282) the default tolerance lets saturated P3 blue read as in-gamut; the strict (`epsilon=0`) fallback at `s=1` anchors the overlay to the right edge instead of terminating mid-panel. Returns an `{ x, y }` polyline; the panel renders it as an SVG `path` (`M … L …`) via `pointsToPath`, with `vectorEffect="non-scaling-stroke"` so the line stays crisp at any canvas width.
 
 ### `format.ts`
 
@@ -289,7 +284,7 @@ Use `onChangeStart` / `onChangeEnd` for value-bearing logic (e.g. snapshotting a
 
 Notable details:
 
-- **OKLCH sliders** (`OKLCHSliders.tsx`) — chroma's `maxValue` is dynamic: `getP3MaxChroma({ l, c: 0, h })`. When lightness or hue changes, the handler preserves *relative* chroma (`c / oldMaxChroma * newMaxChroma`), which keeps the slider thumb's visual position intuitive across mode/L/H changes. The L/C/H gradients are regenerated on every value change; the hue gradient is a static constant (`oklchHueGradient`).
+- **OKLCH sliders** (`OKLCHSliders.tsx`) — chroma's `maxValue` is dynamic: `getP3MaxChroma({ l, c: 0, h })`. When lightness or hue changes, the handler preserves _relative_ chroma (`c / oldMaxChroma * newMaxChroma`), which keeps the slider thumb's visual position intuitive across mode/L/H changes. The L/C/H gradients are regenerated on every value change; the hue gradient is a static constant (`oklchHueGradient`).
 - **HSL / RGB sliders** keep a local `useState` mirror plus a small `lastEmittedRef` so their derived channel values survive the OKLCH round-trip the outer `ColorPicker` runs for every emission. (Start/Change/End plumbing lives in `useEmitLifecycle<string>` — see §7.)
 - **Gradient tracks** use the CSS `background` shorthand directly — `AlphaSlider` layers a gradient with a checkerboard tile via a comma-separated value.
 

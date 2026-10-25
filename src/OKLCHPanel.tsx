@@ -254,7 +254,7 @@ export default function OKLCHPanel(props: OKLCHPanelProps) {
 
   // 2D control: aria-valuenow can only describe one axis. We omit it and let
   // aria-valuetext announce both. Same shape react-colorful ships.
-  /* eslint-disable jsx-a11y/role-has-required-aria-props */
+  /* eslint-disable jsx-a11y-x/role-has-required-aria-props */
   return (
     <div
       ref={containerRef}

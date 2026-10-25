@@ -27,7 +27,7 @@ export const Button: Story = {
 export const Anchor: Story = {
   args: {
     as: 'a',
-    'aria-label': 'View color details',
+    'aria-label': 'Open Color picker',
     classNames: {
       root: 'h-8 w-32 text-white border-none focus-visible:outline-2 focus-visible:outline-black dark:focus-visible:outline-white',
     },

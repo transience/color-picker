@@ -41,12 +41,7 @@ interface FloaterProps {
 }
 
 export type FloaterPlacement =
-  | 'bottom'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'top'
-  | 'top-start'
-  | 'top-end';
+  'bottom' | 'bottom-start' | 'bottom-end' | 'top' | 'top-start' | 'top-end';
 
 const GAP = 4;
 const EDGE_MARGIN = 4;

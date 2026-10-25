@@ -10,7 +10,7 @@ exports[`AlphaSlider > Render > renders correctly 1`] = `
   >
     <div
       class="relative h-3 w-full rounded-full cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-      style="background: linear-gradient(to right, transparent, oklch(0.54 0.194 250)), url("/src/images/transparent-bg.gif"); touch-action: none;"
+      style="background: , url("/src/images/transparent-bg.gif"); touch-action: none;"
     >
       <input
         aria-label="Alpha"

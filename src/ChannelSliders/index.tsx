@@ -97,8 +97,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
     >
       {mode === 'hsl' && (
         <HSLSliders
-          channelSliderClassNames={channelSliderClassNames}
           channels={channels}
+          channelSliderClassNames={channelSliderClassNames}
           color={color}
           labels={labels?.hslSliders}
           numericInputClassNames={numericInputClassNames}
@@ -110,8 +110,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
       )}
       {mode === 'rgb' && (
         <RGBSliders
-          channelSliderClassNames={channelSliderClassNames}
           channels={channels}
+          channelSliderClassNames={channelSliderClassNames}
           color={color}
           labels={labels?.rgbSliders}
           numericInputClassNames={numericInputClassNames}
@@ -123,8 +123,8 @@ export default function ChannelSliders(props: ChannelSlidersProps) {
       )}
       {mode === 'oklch' && (
         <OKLCHSliders
-          channelSliderClassNames={channelSliderClassNames}
           channels={channels}
+          channelSliderClassNames={channelSliderClassNames}
           color={color}
           labels={labels?.oklchSliders}
           numericInputClassNames={numericInputClassNames}
