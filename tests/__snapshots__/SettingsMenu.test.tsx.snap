@@ -2,8 +2,11 @@
 
 exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click 1`] = `
 <div
-  class="min-w-70 overflow-hidden rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200"
+  aria-labelledby="settings-title-3"
+  class="min-w-70 overflow-hidden outline-none rounded-lg shadow-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200"
   data-testid="SettingsMenu"
+  role="dialog"
+  tabindex="-1"
 >
   <div
     class="flex flex-col gap-3 p-3"
@@ -13,6 +16,7 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
     >
       <p
         class="text-sm font-semibold"
+        id="settings-title-3"
       >
         Settings
       </p>
@@ -28,14 +32,14 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
       class="flex flex-row justify-center flex-1 gap-6"
     >
       <div
-        aria-labelledby="radiogroup-title-3"
+        aria-labelledby="radiogroup-title-5"
         class="flex flex-col flex-1"
         data-testid="RadioGroup"
         role="radiogroup"
       >
         <div
           class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500"
-          id="radiogroup-title-3"
+          id="radiogroup-title-5"
         >
           Display format
         </div>
@@ -131,14 +135,14 @@ exports[`SettingsMenu > opens the panel and flips aria-expanded on trigger click
         </button>
       </div>
       <div
-        aria-labelledby="radiogroup-title-4"
+        aria-labelledby="radiogroup-title-6"
         class="flex flex-col flex-1"
         data-testid="RadioGroup"
         role="radiogroup"
       >
         <div
           class="text-xs font-semibold uppercase text-neutral-600 dark:text-neutral-500"
-          id="radiogroup-title-4"
+          id="radiogroup-title-6"
         >
           Output format
         </div>
@@ -244,7 +248,7 @@ exports[`SettingsMenu > renders only the trigger when closed 1`] = `
 >
   <button
     aria-expanded="false"
-    aria-haspopup="menu"
+    aria-haspopup="dialog"
     aria-label="Color format settings"
     class="flex items-center justify-center outline-none bg-black/10 dark:bg-white/10 hover:bg-black/15 dark:hover:bg-white/15 focus-visible:ring-2 focus:ring-black/30 dark:focus:ring-white/30 size-8 shrink-0 rounded-sm text-neutral-800 dark:text-neutral-200"
     data-testid="SettingsTrigger"

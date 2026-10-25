@@ -47,6 +47,25 @@ describe('SettingsMenu', () => {
     expect(screen.getByTestId('SettingsMenu')).toMatchSnapshot();
   });
 
+  it('opens a dialog named by its title', () => {
+    renderMenu();
+    const trigger = screen.getByRole('button', { name: 'Color format settings' });
+
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+
+    fireEvent.click(trigger);
+
+    expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument();
+  });
+
+  it('names the dialog after the trigger when the title is hidden', () => {
+    renderMenu({ labels: { title: null } });
+
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+    expect(screen.getByRole('dialog', { name: 'Color format settings' })).toBeInTheDocument();
+  });
+
   it('fires onChangeDisplayFormat with the selected value', () => {
     const onChangeDisplayFormat = vi.fn();
 
@@ -80,6 +99,30 @@ describe('SettingsMenu', () => {
 
     expect(onChangeOutputFormat).toHaveBeenCalledWith('hex');
     expect(onChangeDisplayFormat).not.toHaveBeenCalled();
+  });
+
+  it('moves focus to the first control on open', () => {
+    renderMenu();
+
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+    expect(screen.getByRole('button', { name: 'Close settings' })).toHaveFocus();
+  });
+
+  it('moves focus to the checked radio on open when the Done button is hidden', () => {
+    renderMenu({ displayFormat: 'hex', labels: { done: null } });
+
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+    expect(within(getGroup('Display format')).getByRole('radio', { name: 'Hex' })).toHaveFocus();
+  });
+
+  it('moves focus to the panel on open when no control is focusable', () => {
+    renderMenu({ displayFormatDisabled: true, labels: { done: null }, outputFormatDisabled: true });
+
+    fireEvent.click(screen.getByTestId('SettingsTrigger'));
+
+    expect(screen.getByRole('dialog')).toHaveFocus();
   });
 
   it('keeps focus on the clicked radio (does not steal focus to trigger)', () => {
