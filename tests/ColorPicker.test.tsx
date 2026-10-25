@@ -1,5 +1,5 @@
 import { createRef, useState } from 'react';
-import { getP3MaxChroma, parseCSS } from 'colorizr';
+import { convertCSS, getP3MaxChroma, parseCSS } from 'colorizr';
 
 import ColorPicker from '~/ColorPicker';
 import { KEYBOARD_IDLE_MS } from '~/constants';
@@ -748,6 +748,37 @@ describe('ColorPicker', () => {
 
       expect(screen.queryByTestId('OKLCHPanel')).not.toBeInTheDocument();
       expect(screen.getByTestId('SaturationPanel')).toBeInTheDocument();
+    });
+
+    it('keeps a SaturationPanel edit when switching to OKLCH', () => {
+      render(<Controlled defaultMode="hsl" />);
+
+      fireEvent.keyDown(screen.getByTestId('SaturationPanel'), {
+        key: 'ArrowDown',
+        shiftKey: true,
+      });
+
+      const edited = mockOnChange.mock.lastCall?.[0] as string;
+
+      expect(screen.getByRole('textbox', { name: 'Color value' })).toHaveValue(edited);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Switch to OKLCH' }));
+
+      const switched = mockOnChange.mock.lastCall?.[0] as string;
+
+      expect(convertCSS(switched, 'hex')).toBe(edited);
+    });
+
+    it('keeps an OKLCHPanel edit when switching to HSL', () => {
+      render(<Controlled />);
+
+      fireEvent.keyDown(screen.getByTestId('OKLCHPanel'), { key: 'ArrowDown', shiftKey: true });
+
+      const edited = mockOnChange.mock.lastCall?.[0] as string;
+
+      fireEvent.click(screen.getByRole('button', { name: 'Switch to HSL' }));
+
+      expect(mockOnChange.mock.lastCall?.[0]).toBe(convertCSS(edited, 'hex'));
     });
 
     it('updates the HSL sliders after an edit that left the hex unchanged', () => {

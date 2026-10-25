@@ -40,6 +40,14 @@ export const defaultProps = {
   showSwatch: true,
 } satisfies ColorPickerProps;
 
+function hsvToOklch(value: HSV): OklchColor {
+  return clampOklchToP3(parseCSS(hsvToHex(value), 'oklch'));
+}
+
+function oklchToHsv(value: OklchColor): HSV {
+  return colorToHsv(formatCSS(value, { format: 'oklch' }));
+}
+
 export default function useColorPicker(props: ColorPickerProps): UseColorPickerReturn {
   // Detect controlled-ness from raw props (before mergeProps fills defaults).
   // When a format prop is passed, it owns the value; the settings radio is
@@ -111,18 +119,46 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
   precisionRef.current = precision;
   showAlphaRef.current = showAlpha;
 
+  // Both color states are written together so switching modes never reads a
+  // stale copy.
+  const commitOklch = useCallback((next: OklchColor) => {
+    const nextHsv = oklchToHsv(next);
+
+    oklchRef.current = next;
+    hsvRef.current = nextHsv;
+    setOklch(next);
+    setHsv(nextHsv);
+  }, []);
+
+  const commitHsv = useCallback((next: HSV) => {
+    const nextOklch = hsvToOklch(next);
+
+    hsvRef.current = next;
+    oklchRef.current = nextOklch;
+    setHsv(next);
+    setOklch(nextOklch);
+  }, []);
+
+  const commitColor = useCallback(
+    (value: string) => {
+      const next = clampOklchToP3(parseCSS(value, 'oklch'));
+
+      commitOklch(next);
+
+      return next;
+    },
+    [commitOklch],
+  );
+
   useEffect(() => {
     if (color !== undefined && color !== lastEmittedRef.current) {
-      const clamped = clampOklchToP3(parseCSS(color, 'oklch'));
-
-      setHsv(colorToHsv(formatCSS(clamped, { format: 'oklch' })));
-      setOklch(clamped);
+      commitColor(color);
 
       if (showAlphaRef.current) {
         setAlpha(opacity(color));
       }
     }
-  }, [color]);
+  }, [color, commitColor]);
 
   const renderOutput = useCallback((oklchValue: string) => {
     const resolved = resolveOutputFormat(outputFormatRef.current, modeRef.current);
@@ -197,11 +233,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
   const handleChangeColorInput = useCallback(
     (value: string) => {
-      const clamped = clampOklchToP3(parseCSS(value, 'oklch'));
-      const oklchValue = formatCSS(clamped, { format: 'oklch' });
-
-      setHsv(colorToHsv(oklchValue));
-      setOklch(clamped);
+      const oklchValue = formatCSS(commitColor(value), { format: 'oklch' });
 
       if (showAlphaRef.current) {
         const nextAlpha = opacity(value);
@@ -212,7 +244,7 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
 
       emit(oklchValue);
     },
-    [emit],
+    [commitColor, emit],
   );
 
   const handleChangeDisplayFormat = useCallback(
@@ -228,33 +260,30 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     (h: number) => {
       const next = { ...hsvRef.current, h };
 
-      setHsv(next);
-      hsvRef.current = next;
+      commitHsv(next);
       emit(convertCSS(hsvToHex(next), 'oklch'));
     },
-    [emit],
+    [commitHsv, emit],
   );
 
   const handleChangeOklchHue = useCallback(
     (h: number) => {
       const next = clampOklchToP3({ ...oklchRef.current, h });
 
-      setOklch(next);
-      oklchRef.current = next;
+      commitOklch(next);
       emit(formatCSS(next, 'oklch'));
     },
-    [emit],
+    [commitOklch, emit],
   );
 
   const handleChangeOklchPanel = useCallback(
     (l: number, c: number) => {
       const next = clampOklchToP3({ ...oklchRef.current, c, l });
 
-      setOklch(next);
-      oklchRef.current = next;
+      commitOklch(next);
       emit(formatCSS(next, 'oklch'));
     },
-    [emit],
+    [commitOklch, emit],
   );
 
   const handleChangeOutputFormat = useCallback(
@@ -271,11 +300,10 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     (s: number, v: number) => {
       const next = { h: hsvRef.current.h, s, v };
 
-      setHsv(next);
-      hsvRef.current = next;
+      commitHsv(next);
       emit(convertCSS(hsvToHex(next), 'oklch'));
     },
-    [emit],
+    [commitHsv, emit],
   );
 
   const handleClickMode = useCallback(

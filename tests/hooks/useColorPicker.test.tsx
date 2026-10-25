@@ -1,7 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
-import { getP3MaxChroma, parseCSS } from 'colorizr';
+import { convertCSS, formatCSS, getP3MaxChroma, parseCSS } from 'colorizr';
 
 import useColorPicker, { defaultProps } from '~/hooks/useColorPicker';
+import { hsvToHex } from '~/modules/colorSpace';
 
 describe('useColorPicker', () => {
   describe('defaultProps', () => {
@@ -393,6 +394,61 @@ describe('useColorPicker', () => {
       const emitted = onChange.mock.lastCall?.[0] as string;
 
       expect(emitted).toMatch(/^#[\da-f]{8}$/);
+    });
+  });
+
+  describe('mode switching keeps the current color', () => {
+    it('carries SaturationPanel edits into OKLCH mode', () => {
+      const onChange = vi.fn();
+      const { result } = renderHook(() =>
+        useColorPicker({ color: '#ff0044', defaultMode: 'hsl', onChange, outputFormat: 'hex' }),
+      );
+
+      act(() => {
+        result.current.handleChangeSaturationPanel(0.2, 0.3);
+      });
+
+      const emitted = onChange.mock.lastCall?.[0] as string;
+
+      act(() => {
+        result.current.handleClickMode('oklch');
+      });
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(convertCSS(formatCSS(result.current.oklch, { format: 'oklch' }), 'hex')).toBe(emitted);
+    });
+
+    it('carries HSV hue edits into OKLCH mode', () => {
+      const { result } = renderHook(() =>
+        useColorPicker({ color: '#ff0044', defaultMode: 'hsl', outputFormat: 'hex' }),
+      );
+
+      act(() => {
+        result.current.handleChangeHsvHue(120);
+      });
+
+      expect(result.current.oklch.h).toBeGreaterThan(120);
+      expect(result.current.oklch.h).toBeLessThan(160);
+    });
+
+    it('carries OKLCHPanel edits into HSL mode', () => {
+      const onChange = vi.fn();
+      const { result } = renderHook(() =>
+        useColorPicker({ color: '#ff0044', onChange, outputFormat: 'hex' }),
+      );
+
+      act(() => {
+        result.current.handleChangeOklchPanel(0.3, 0.05);
+      });
+
+      const emitted = onChange.mock.lastCall?.[0] as string;
+
+      act(() => {
+        result.current.handleClickMode('hsl');
+      });
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(hsvToHex(result.current.hsv)).toBe(emitted);
     });
   });
 
