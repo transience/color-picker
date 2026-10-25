@@ -1,3 +1,7 @@
+import { act } from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
+
 import EyeDropper from '~/EyeDropper';
 import { fireEvent, render, screen, waitFor } from '~/test-utils';
 
@@ -40,6 +44,35 @@ describe('EyeDropper', () => {
     render(<EyeDropper />);
 
     expect(screen.getByTestId('EyeDropper')).toMatchSnapshot();
+  });
+
+  it('hydrates server markup without a mismatch', async () => {
+    // The server has no EyeDropper API; the browser does.
+    setEyeDropper(undefined);
+    const container = document.createElement('div');
+
+    container.innerHTML = renderToString(<EyeDropper />);
+    document.body.append(container);
+    setEyeDropper(makeResolving('#112233'));
+
+    const recoverable = vi.fn();
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+
+    try {
+      await act(async () => {
+        root = hydrateRoot(container, <EyeDropper />, { onRecoverableError: recoverable });
+      });
+
+      expect(recoverable).not.toHaveBeenCalled();
+      expect(consoleError).not.toHaveBeenCalled();
+      expect(container.querySelector('[data-testid="EyeDropper"]')).toBeInTheDocument();
+    } finally {
+      consoleError.mockRestore();
+      act(() => root?.unmount());
+      container.remove();
+    }
   });
 
   it('emits the selected hex color', async () => {

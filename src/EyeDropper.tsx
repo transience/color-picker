@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, MouseEvent } from 'react';
+import { type ButtonHTMLAttributes, type MouseEvent, useEffect, useState } from 'react';
 
 import { mergeProps } from '~/modules/helpers';
 
@@ -36,8 +36,15 @@ export const defaultProps = {
 
 export default function EyeDropper(props: EyeDropperProps) {
   const { 'aria-label': ariaLabel, onChange, onClick, ...rest } = mergeProps(defaultProps, props);
+  // Detected after mount: the server can't know, and rendering differently
+  // on the first client render would break hydration.
+  const [supported, setSupported] = useState(false);
 
-  if (!isSupported()) {
+  useEffect(() => {
+    setSupported(isSupported());
+  }, []);
+
+  if (!supported) {
     return null;
   }
 
