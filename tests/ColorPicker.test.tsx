@@ -1038,6 +1038,53 @@ describe('ColorPicker', () => {
     });
   });
 
+  describe('ChannelInputs without sliders', () => {
+    it('keeps the HSL hue at S=0 so it can be edited', () => {
+      render(
+        <ColorPicker
+          color="#0088ff"
+          defaultMode="hsl"
+          onChange={mockOnChange}
+          showSliders={false}
+        />,
+      );
+
+      const type = (label: string, value: string) => {
+        const input = screen.getByRole('textbox', { name: label });
+
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value } });
+        fireEvent.blur(input);
+      };
+
+      type('Saturation', '0');
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('208');
+
+      type('Hue', '120');
+      type('Saturation', '100');
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('120');
+      expect(mockOnChange.mock.lastCall?.[0]).toBe('#00ff00');
+    });
+
+    it('keeps the OKLCH hue when chroma goes to 0 and back', () => {
+      render(
+        <ColorPicker color="oklch(60% 0.15 250)" onChange={mockOnChange} showSliders={false} />,
+      );
+      const chroma = screen.getByRole('textbox', { name: 'Chroma' });
+
+      fireEvent.focus(chroma);
+      fireEvent.change(chroma, { target: { value: '0' } });
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('250.0');
+
+      fireEvent.change(chroma, { target: { value: '0.1' } });
+
+      expect(parseCSS(mockOnChange.mock.lastCall?.[0] as string, 'oklch').h).toBe(250);
+    });
+  });
+
   describe('Zero chroma', () => {
     it('keeps the OKLCH hue when chroma goes to 0 and back', () => {
       render(<Controlled initial="oklch(60% 0.15 250)" />);

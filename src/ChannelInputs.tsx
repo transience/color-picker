@@ -1,6 +1,8 @@
 import { type HTMLAttributes, type ReactNode, useCallback, useMemo, useRef } from 'react';
-import { formatCSS, getP3MaxChroma, type HSL, type LCH, parseCSS, type RGB } from 'colorizr';
+import { formatCSS, getP3MaxChroma, type HSL, type LCH, type RGB } from 'colorizr';
 
+import useChannelState from '~/hooks/useChannelState';
+import { deriveHsl, deriveOklch, deriveRgb } from '~/modules/channels';
 import { cn, mergeProps, resolveLabel } from '~/modules/helpers';
 
 import NumericInput from './components/NumericInput';
@@ -106,6 +108,11 @@ export default function ChannelInputs(props: ChannelInputsProps) {
   } = mergeProps(defaultProps, props);
 
   const lastEmittedRef = useRef<string | null>(null);
+  // Local channels survive what the color string loses (hue at S=0 or C=0,
+  // fractions in hex). Only the active mode's set is read.
+  const [rgb, setRgb] = useChannelState(color, deriveRgb);
+  const [hsl, setHsl] = useChannelState(color, deriveHsl);
+  const [lch, setLch] = useChannelState(color, deriveOklch);
 
   const emitColor = useCallback(
     (next: string) => {
@@ -145,8 +152,10 @@ export default function ChannelInputs(props: ChannelInputsProps) {
 
   const fields = useMemo<FieldDefinition[]>(() => {
     if (mode === 'rgb') {
-      const rgb = parseCSS(color, 'rgb');
-      const emit = (next: RGB) => emitColor(formatCSS(next, { format: 'oklch' }));
+      const emit = (next: RGB) => {
+        setRgb(next);
+        emitColor(formatCSS(next, { format: 'oklch' }));
+      };
 
       return [
         {
@@ -177,9 +186,12 @@ export default function ChannelInputs(props: ChannelInputsProps) {
     }
 
     if (mode === 'oklch') {
-      const lch = parseCSS(color, 'oklch');
       const maxC = getP3MaxChroma({ l: lch.l, c: 0, h: lch.h });
-      const emit = (next: LCH) => emitColor(formatCSS(next, { format: 'oklch' }));
+
+      const emit = (next: LCH) => {
+        setLch(next);
+        emitColor(formatCSS(next, { format: 'oklch' }));
+      };
 
       return [
         {
@@ -214,8 +226,10 @@ export default function ChannelInputs(props: ChannelInputsProps) {
       ];
     }
 
-    const hsl = parseCSS(color, 'hsl');
-    const emit = (next: HSL) => emitColor(formatCSS(next, { format: 'oklch' }));
+    const emit = (next: HSL) => {
+      setHsl(next);
+      emitColor(formatCSS(next, { format: 'oklch' }));
+    };
 
     return [
       {
@@ -246,7 +260,7 @@ export default function ChannelInputs(props: ChannelInputsProps) {
         value: `${Math.round(hsl.l)}`,
       },
     ];
-  }, [color, mode, slot, emitColor]);
+  }, [emitColor, hsl, lch, mode, rgb, setHsl, setLch, setRgb, slot]);
 
   const labelClassName = cn(
     'text-xs text-neutral-500 dark:text-neutral-400 leading-none',
