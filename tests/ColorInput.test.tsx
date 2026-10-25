@@ -20,6 +20,14 @@ function Controlled({ initial }: { initial: string }) {
   );
 }
 
+// A browser paste fires `paste`, then `input` with `inputType: 'insertFromPaste'`.
+// `result` is the field after the paste; it differs from `text` when pasting
+// into existing text.
+function paste(input: HTMLElement, text: string, result = text) {
+  fireEvent.paste(input, { clipboardData: { getData: () => text } });
+  fireEvent.input(input, { inputType: 'insertFromPaste', target: { value: result } });
+}
+
 // Simulates a parent that reformats the emitted color to a canonical form
 // (e.g. converting any input to OKLCH) — uppercase stands in for reformat.
 function Reformatting({ initial }: { initial: string }) {
@@ -150,6 +158,54 @@ describe('ColorInput', () => {
       expect(mockOnChange).toHaveBeenCalledWith('#ff0044');
     });
 
+    it('emits 8-digit hex with alpha (#rrggbbaa)', () => {
+      render(<Controlled initial="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '#ff00448' } });
+      fireEvent.change(input, { target: { value: '#ff004480' } });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange).toHaveBeenCalledWith('#ff004480');
+    });
+
+    it('prefixes 8-digit bare hex with #', () => {
+      render(<ColorInput onChange={mockOnChange} value="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'ff004480' } });
+
+      expect(mockOnChange).toHaveBeenCalledWith('#ff004480');
+      expect(input).toHaveValue('#ff004480');
+    });
+
+    it('emits pasted 4-digit hex (#rgba)', () => {
+      render(<ColorInput onChange={mockOnChange} value="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      paste(input, 'f048');
+
+      expect(mockOnChange).toHaveBeenCalledWith('#f048');
+    });
+
+    it('holds typed 4-digit hex until Enter', () => {
+      render(<Reformatting initial="" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '#f048' } });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(mockOnChange).toHaveBeenCalledWith('#f048');
+      expect(input).toHaveValue('#F048');
+    });
+
     it('emits once hex reaches 4 characters (#rgb)', () => {
       render(<Controlled initial="" />);
       const input = screen.getByLabelText('Color value');
@@ -210,8 +266,7 @@ describe('ColorInput', () => {
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
-      fireEvent.paste(input);
-      fireEvent.change(input, { target: { value: 'oklab(0.75 -0.21 0.18)' } });
+      paste(input, 'oklab(0.75 -0.21 0.18)');
 
       expect(mockOnChange).toHaveBeenCalledWith('oklab(0.75 -0.21 0.18)');
       expect(screen.getByDisplayValue('OKLAB(0.75 -0.21 0.18)')).toBeInTheDocument();
@@ -245,7 +300,7 @@ describe('ColorInput', () => {
     });
   });
 
-  describe('Paste sync flag lifecycle', () => {
+  describe('Commit lifecycle', () => {
     // eslint-disable-next-line unicorn/consistent-function-scoping
     function ExternalValue({ initial }: { initial: string }) {
       const [value, setValue] = useState(initial);
@@ -271,8 +326,7 @@ describe('ColorInput', () => {
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
-      fireEvent.paste(input);
-      fireEvent.change(input, { target: { value: 'garbage' } });
+      paste(input, 'garbage');
       // Invalid paste — no emit, parent value unchanged. User keeps editing:
       fireEvent.change(input, { target: { value: 'still-typing' } });
       expect(screen.getByDisplayValue('still-typing')).toBeInTheDocument();
@@ -284,15 +338,112 @@ describe('ColorInput', () => {
       expect(screen.getByDisplayValue('still-typing')).toBeInTheDocument();
     });
 
-    it('clears pending sync flag on blur', () => {
+    it('keeps typed text after completing a partial hex paste', () => {
+      render(<Reformatting initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      paste(input, '#ab');
+      // User finishes typing the pasted fragment.
+      fireEvent.change(input, { target: { value: '#abc' } });
+
+      expect(mockOnChange).toHaveBeenCalledWith('#abc');
+      expect(screen.getByDisplayValue('#abc')).toBeInTheDocument();
+    });
+
+    it('holds a 4-digit hex completed by pasting into existing text', () => {
+      render(<Controlled initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '#ff' } });
+      paste(input, '00', '#ff00');
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(screen.getByDisplayValue('#ff00')).toBeInTheDocument();
+
+      fireEvent.change(input, { target: { value: '#ff000' } });
+      fireEvent.change(input, { target: { value: '#ff0000' } });
+
+      expect(mockOnChange).toHaveBeenCalledExactlyOnceWith('#ff0000');
+    });
+
+    it('holds a typed 4-digit hex after an incomplete hex paste', () => {
+      render(<Controlled initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      paste(input, '#12');
+      fireEvent.change(input, { target: { value: '#1234' } });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('does not treat typing after a no-op paste as a whole value', () => {
+      render(<ColorInput onChange={mockOnChange} value="#aabbcc" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      // Same color as `value`, so the parent's value doesn't change.
+      paste(input, '#abc');
+      mockOnChange.mockClear();
+      fireEvent.change(input, { target: { value: '#abcd' } });
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('does not overwrite typing after an Enter that left the value unchanged', () => {
+      const expand = (hex: string) => hex.replace(/^#(\w)(\w)(\w)(\w)?$/, '#$1$1$2$2$3$3$4$4');
+
+      function Expanding() {
+        const [value, setValue] = useState('#aabbccdd');
+
+        return <ColorInput onChange={next => setValue(expand(next))} value={value} />;
+      }
+
+      render(<Expanding />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '#abcd' } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(input).toHaveValue('#aabbccdd');
+
+      fireEvent.change(input, { target: { value: '#abc' } });
+
+      expect(input).toHaveValue('#abc');
+    });
+
+    it('shows external value changes after a commit until the next keystroke', () => {
       render(<ExternalValue initial="#ff0044" />);
       const input = screen.getByLabelText('Color value');
 
       fireEvent.focus(input);
-      fireEvent.paste(input);
-      fireEvent.blur(input);
+      paste(input, '#123456');
+      fireEvent.click(screen.getByText('external'));
 
-      // Re-focus and edit, then trigger external change — must not stomp.
+      expect(input).toHaveValue('#00ff00');
+    });
+
+    it('does not re-emit the committed text on Enter after a commit', () => {
+      render(<ExternalValue initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
+      fireEvent.focus(input);
+      paste(input, '#abcd');
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByText('external'));
+      fireEvent.keyDown(input, { key: 'Enter' });
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(input).toHaveValue('#00ff00');
+    });
+
+    it('does not overwrite typed text when the value changes externally', () => {
+      render(<ExternalValue initial="#ff0044" />);
+      const input = screen.getByLabelText('Color value');
+
       fireEvent.focus(input);
       fireEvent.change(input, { target: { value: 'typing' } });
       fireEvent.click(screen.getByText('external'));
