@@ -77,6 +77,33 @@ describe('OKLCHPanel', () => {
       expect(canvas.spy).toHaveBeenCalled();
     });
 
+    it('renders the sRGB boundary by default', () => {
+      render(<OKLCHPanel />);
+
+      expect(screen.getByTestId('OKLCHPanel').querySelector('svg path')).toBeInTheDocument();
+      expect(screen.getByText('sRGB')).toBeInTheDocument();
+    });
+
+    it('omits the sRGB boundary when showSRGBBoundary is false', () => {
+      render(<OKLCHPanel showSRGBBoundary={false} />);
+
+      const panel = screen.getByTestId('OKLCHPanel');
+
+      expect(panel.querySelector('svg')).toBeNull();
+      expect(screen.queryByText('sRGB')).not.toBeInTheDocument();
+    });
+
+    it('omits the sRGB boundary when the canvas has no 2D context', () => {
+      canvas.spy.mockReturnValue(null);
+
+      render(<OKLCHPanel />);
+
+      const panel = screen.getByTestId('OKLCHPanel');
+
+      expect(panel.querySelector('svg')).toBeNull();
+      expect(screen.queryByText('sRGB')).not.toBeInTheDocument();
+    });
+
     it('re-renders canvas when hue changes', () => {
       const { rerender } = render(
         <OKLCHPanel chroma={0.1} hue={30} lightness={0.6} onChange={mockOnChange} />,

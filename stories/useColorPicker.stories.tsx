@@ -29,6 +29,7 @@ export default {
     onChange: action('onChange'),
     onChangeStart: action('onChangeStart'),
     onChangeEnd: action('onChangeEnd'),
+    showSRGBBoundary: false,
   },
 } satisfies Meta<ColorPickerProps>;
 
@@ -38,7 +39,7 @@ const PALETTE_CHROMA = 0.15;
 
 export const CustomLayout: Story = {
   render: function CustomLayoutPicker(props: ColorPickerProps) {
-    const { color: initial, onChange, ...rest } = props;
+    const { color: initial, onChange, showSRGBBoundary, ...rest } = props;
 
     const [color, setColor] = useState(initial);
     const picker = useColorPicker({
@@ -64,6 +65,7 @@ export const CustomLayout: Story = {
               onChange={picker.handleChangeOklchPanel}
               onChangeEnd={picker.handleInteractionEnd}
               onChangeStart={picker.handleInteractionStart}
+              showSRGBBoundary={showSRGBBoundary}
             />
           ) : (
             <SaturationPanel

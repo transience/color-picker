@@ -1,5 +1,5 @@
 import { oklchHueToHsvHue, oklchToP3Hsv } from '~/modules/colorSpace';
-import { lcToPointer, pointerToLC, pointsToPath } from '~/modules/oklchCanvas';
+import { computeSRGBBoundary, lcToPointer, pointerToLC, pointsToPath } from '~/modules/oklchCanvas';
 
 // Test hues covering different gamut shapes
 const testHues = [30, 80, 160, 265, 300];
@@ -105,6 +105,27 @@ describe('oklchCanvas', () => {
       ]);
 
       expect(path).toMatch(/20,5$/);
+    });
+  });
+
+  describe('computeSRGBBoundary', () => {
+    it.each(testHues)('returns points within 0-100 for hue %i', hue => {
+      const points = computeSRGBBoundary(oklchHueToHsvHue(hue), 128);
+
+      expect(points.length).toBeGreaterThan(2);
+
+      for (const { x, y } of points) {
+        expect(x).toBeGreaterThanOrEqual(0);
+        expect(x).toBeLessThanOrEqual(100);
+        expect(y).toBeGreaterThanOrEqual(0);
+        expect(y).toBeLessThanOrEqual(100);
+      }
+    });
+
+    it('closes the polyline at the right edge', () => {
+      const points = computeSRGBBoundary(oklchHueToHsvHue(30), 128);
+
+      expect(points[points.length - 1].x).toBe(100);
     });
   });
 });

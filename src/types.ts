@@ -182,7 +182,7 @@ export interface ColorPickerLabels {
   };
 }
 
-export interface ColorPickerProps {
+export interface ColorPickerProps extends OklchPanelOptions {
   /**
    * Per-channel toggles (`hidden`, `disabled`).
    *
@@ -399,6 +399,17 @@ export interface OklchColor {
   c: number;
   h: number;
   l: number;
+}
+
+/**
+ * Props `ColorPicker` passes through to `OKLCHPanel`.
+ */
+export interface OklchPanelOptions {
+  /**
+   * Draws the sRGB gamut boundary over the OKLCH panel.
+   * @default true
+   */
+  showSRGBBoundary?: boolean;
 }
 
 export interface PanelClassNames {

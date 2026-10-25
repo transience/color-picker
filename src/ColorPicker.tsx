@@ -72,6 +72,7 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
     showPanel,
     showSettings,
     showSliders,
+    showSRGBBoundary,
     showSwatch,
     style,
   } = picker.props;
@@ -90,6 +91,7 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
         onChange={handleChangeOklchPanel}
         onChangeEnd={handleInteractionEnd}
         onChangeStart={handleInteractionStart}
+        showSRGBBoundary={showSRGBBoundary}
         valueText={labels?.oklchPanel?.valueText}
       />
     ) : (

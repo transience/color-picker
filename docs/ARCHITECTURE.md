@@ -199,9 +199,12 @@ Three load-bearing exports plus a helper. The OKLCH panel mirrors Chrome DevTool
   A naive `p3HsvToOKLCH(canvasHue, x, y)` drifts during drag: the canvas HSV hue comes from the fixed reference point, but the color at the cursor has a different HSV hue (offset up to ~40° at blue/violet). Feeding that `(l, c)` back through `lcToPointer` would land the thumb at a different `x` than the cursor — visible as acceleration and sticking at the gamut edge.
   The fix is a binary search: find the HSV hue whose `p3HsvToOKLCH` at `(x, y)` returns exactly the slider's `oklchHue`. 16 iterations over a ±40° bracket centered on `oklchHueToHsvHue(oklchHue)`. Round-trip error < 0.1% across tested hues (100, 135, 160, 240, 250, 300).
 
-- **`renderOKLCHCanvas(canvas, w, h, oklchHue)`** →
-  Pixel-by-pixel P3-HSV fill (`color(display-p3 …)`) at the canvas HSV hue, then a per-row sRGB gamut trace: coarse scan (80 steps) for the first out-of-gamut saturation, then 16-iteration binary search for the exact crossing. Near the blue-violet cusp (~hue 282) the default tolerance lets saturated P3 blue read as in-gamut; the strict (`epsilon=0`) fallback at `s=1` anchors the overlay to the right edge instead of terminating mid-panel.
-  Returns an `{ x, y }` polyline; the panel renders it as an SVG `path` (`M … L …`) via `pointsToPath`, with `vectorEffect="non-scaling-stroke"` so the line stays crisp at any canvas width.
+- **`renderOKLCHCanvas(canvas, w, h, oklchHue)`** → `false` without a 2D context.
+  Pixel-by-pixel P3-HSV fill (`color(display-p3 …)`) at the canvas HSV hue.
+
+- **`computeSRGBBoundary(hsvHue, rowCount)`** →
+  Per-row sRGB gamut trace: coarse scan (80 steps) for the first out-of-gamut saturation, then 16-iteration binary search for the exact crossing. Near the blue-violet cusp (~hue 282) the default tolerance lets saturated P3 blue read as in-gamut; the strict (`epsilon=0`) fallback at `s=1` anchors the overlay to the right edge instead of terminating mid-panel.
+  Returns an `{ x, y }` polyline. The panel computes it only when `showSRGBBoundary` is on and the canvas painted, and renders it as an SVG `path` (`M … L …`) via `pointsToPath`, with `vectorEffect="non-scaling-stroke"` so the line stays crisp at any canvas width.
 
 ### `format.ts`
 

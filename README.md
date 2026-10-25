@@ -103,6 +103,7 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 | **showPanel**<br />Shows the 2D color panel (saturation/value for HSL/RGB, chroma/lightness for OKLCH).                                                                                                                               | `boolean` | `true` |
 | **showSettings**<br />Adds a menu to expose display and output format choices to end users.<br />Opens in a portal with the `data-color-picker-portal` attribute.                                                                                                                                      | `boolean` | `false` |
 | **showSliders**<br />Shows the per-channel sliders matching the active mode (L/C/H, H/S/L, or R/G/B).                                                                                                                                 | `boolean` | `true` |
+| **showSRGBBoundary**<br />Draws the sRGB gamut boundary over the OKLCH panel. | `boolean` | `true` |
 | **showSwatch**<br />Shows the circular color preview next to the color input.                                                                                                                                                         | `boolean` | `true` |
 
 ## Color modes and formats

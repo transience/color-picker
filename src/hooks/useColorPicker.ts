@@ -36,6 +36,7 @@ export const defaultProps = {
   showPanel: true,
   showSettings: false,
   showSliders: true,
+  showSRGBBoundary: true,
   showSwatch: true,
 } satisfies ColorPickerProps;
 
