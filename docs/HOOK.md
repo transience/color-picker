@@ -42,6 +42,9 @@ Raw color and UI state. Read these to render thumbs, slider values, and selected
 - **`mode`** (`ColorMode`) — active color space driving the 2D panel and channel controls.
 - **`hsv`** (`HSV`) — HSV triplet feeding `SaturationPanel` and the HSL/RGB sliders.
 - **`oklch`** (`OklchColor`) — OKLCH triplet feeding `OKLCHPanel` and the OKLCH sliders.
+
+  Both are kept in sync on every change, so either is current regardless of `mode`. For grays (zero saturation/chroma) each keeps its previous hue rather than resetting to 0.
+
 - **`alpha`** (`number`, 0–1) — only used when `showAlpha` is on. Appended to emitted values when `< 1`.
 - **`displayFormat`** / **`outputFormat`** (`ColorFormat`) — resolved formats for the text input and `onChange` emission respectively.
 
@@ -51,7 +54,7 @@ Pre-bound callbacks to pass to the corresponding controls. Each handler updates 
 
 - **`handleChangeOklchPanel(l, c)`** — for `<OKLCHPanel onChange>`.
 - **`handleChangeSaturationPanel(s, v)`** — for `<SaturationPanel onChange>`.
-- **`handleChangeOklchHue(h)`** / **`handleChangeHsvHue(h)`** — for hue sliders; dispatch by `isOklch`.
+- **`handleChangeOklchHue(h)`** / **`handleChangeHsvHue(h)`** — for hue sliders and `<ChannelSliders onChangeHue>` / `<ChannelInputs onChangeHue>`; dispatch by `isOklch`.
 - **`handleChangeAlpha(next)`** — for `<AlphaSlider onChange>`.
 - **`handleChangeColorInput(value)`** — for `<ColorInput onChange>` (accepts any CSS color string), the eye dropper, and `<ChannelSliders onChange>` / `<ChannelInputs onChange>`.
 - **`handleChangeDisplayFormat(format)`** / **`handleChangeOutputFormat(format)`** — for `<SettingsMenu>`.
@@ -63,10 +66,10 @@ Pre-bound callbacks to pass to the corresponding controls. Each handler updates 
 Computed from state on every render. Most sub-components expect these shapes directly.
 
 - **`isOklch`** (`boolean`) — true when `mode === 'oklch'`. Dispatches between OKLCH and HSV panels/sliders.
-- **`currentHue`** (`number`) — hue of the active mode (`oklch.h` or `hsv.h`).
+- **`currentHue`** (`number`) — hue of the active mode (`oklch.h` or `hsv.h`). Feeds `<HueSlider value>` and `hue` on `ChannelSliders` / `ChannelInputs`, which show it while the color is gray.
 - **`solidColor`** (`string`) — current color as an opaque CSS string. Feeds `<AlphaSlider color>`, `<ChannelSliders color>`, `<ChannelInputs color>`.
 - **`displayValue`** (`string`) — current color formatted per `displayFormat`. Feeds `<ColorInput value>`.
-- **`swatchColor`** (`string`) — alias of `displayValue`. Feeds `<Swatch color>`.
+- **`swatchColor`** (`string`) — current color as OKLCH with alpha, not clipped by a narrow `displayFormat`. Feeds `<Swatch color>`.
 - **`showGamutWarning`** (`boolean`) — true when the OKLCH color falls outside sRGB and a narrow format is active. Use to render `<GamutWarning>` inside `<ColorInput endContent>`.
 - **`props`** (`ColorPickerProps`) — input props merged with defaults. Useful when forwarding configuration (`channels`, `classNames`, `labels`, `showAlpha`, etc.) to sub-components.
 
@@ -87,7 +90,7 @@ Each return field maps directly onto the props of a built-in sub-component. The 
 | `swatchColor` | `Swatch` | `color` (optional `children` for icon overlay) |
 | `mode` + `handleClickMode` | `ModeSelector` | `mode` / `onClick` |
 | `displayFormat` / `outputFormat` + handlers | `SettingsMenu` | `displayFormat` / `outputFormat` / `onChangeDisplayFormat` / `onChangeOutputFormat` |
-| `solidColor` + `mode` + `handleChangeColorInput` | `ChannelSliders` | `color` / `mode` / `onChange` |
+| `solidColor` + `mode` + `currentHue` + `handleChangeColorInput` + hue handler | `ChannelSliders` / `ChannelInputs` | `color` / `mode` / `hue` / `onChange` / `onChangeHue` |
 | `showGamutWarning` | `ColorInput endContent` | render `<GamutWarning />` conditionally |
 
 ---
