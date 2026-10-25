@@ -119,6 +119,11 @@ export interface ColorPickerLabels {
   colorInput?: string;
   /** EyeDropper button aria-label. @default 'Pick color from screen' */
   eyeDropper?: string;
+  /**
+   * GamutWarning tooltip and aria-label.
+   * @default 'Color is outside the sRGB gamut and clipped for hex/rgb/hsl display.'
+   */
+  gamutWarning?: string;
   /** Inline HSL sliders. */
   hslSliders?: Partial<Record<'h' | 's' | 'l', LabelSlot>>;
   /** Toolbar global hue slider (independent from the per-mode hue inside `hslSliders`/`oklchSliders`). */
