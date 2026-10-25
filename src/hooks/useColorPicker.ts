@@ -361,7 +361,12 @@ export default function useColorPicker(props: ColorPickerProps): UseColorPickerR
     () => formatColor(canonicalOklch, resolvedDisplayFormat, alphaForDisplay, precision),
     [canonicalOklch, resolvedDisplayFormat, alphaForDisplay, precision],
   );
-  const swatchColor = displayValue;
+  // OKLCH, not the display format: a narrow display format would clip a
+  // wide-gamut color.
+  const swatchColor = useMemo(
+    () => formatColor(canonicalOklch, 'oklch', alphaForDisplay),
+    [canonicalOklch, alphaForDisplay],
+  );
   const showGamutWarning = useMemo(
     () =>
       isOklch && isNarrowFormat(resolvedDisplayFormat) && !isOklchInSRGB(oklch.l, oklch.c, oklch.h),
