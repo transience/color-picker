@@ -236,6 +236,18 @@ describe('ColorPicker', () => {
       expect(screen.getByTestId('GamutWarning')).toBeInTheDocument();
     });
 
+    it('passes labels.gamutWarning to the gamut warning', () => {
+      render(
+        <ColorPicker
+          color="oklch(0.7 0.3 20)"
+          displayFormat="hex"
+          labels={{ gamutWarning: 'Fuera de sRGB' }}
+        />,
+      );
+
+      expect(screen.getByRole('button', { name: 'Fuera de sRGB' })).toBeInTheDocument();
+    });
+
     it('hides the gamut warning for an in-sRGB color even when displayFormat is narrow', () => {
       render(<ColorPicker color="#ff0044" displayFormat="hex" />);
 

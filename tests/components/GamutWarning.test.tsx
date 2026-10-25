@@ -2,25 +2,6 @@ import { fireEvent, render, screen } from '~/test-utils';
 
 import GamutWarning from '~/components/GamutWarning';
 
-let mockIdCounter = 0;
-
-vi.mock('~/modules/helpers', async importOriginal => {
-  const actual = await importOriginal<typeof import('~/modules/helpers')>();
-
-  return {
-    ...actual,
-    createId: (prefix: string) => {
-      mockIdCounter += 1;
-
-      return `${prefix}-${mockIdCounter}`;
-    },
-  };
-});
-
-beforeEach(() => {
-  mockIdCounter = 0;
-});
-
 describe('GamutWarning', () => {
   it('renders correctly', () => {
     render(<GamutWarning />);
@@ -32,6 +13,16 @@ describe('GamutWarning', () => {
     render(<GamutWarning className="extra-gamut" />);
 
     expect(screen.getByTestId('GamutWarning')).toHaveClass('extra-gamut');
+  });
+
+  it('uses a custom label for the tooltip and aria-label', () => {
+    render(<GamutWarning label="Fuera de sRGB" />);
+
+    const button = screen.getByRole('button', { name: 'Fuera de sRGB' });
+
+    fireEvent.focus(button);
+
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Fuera de sRGB');
   });
 
   it('generates unique ids per instance', () => {

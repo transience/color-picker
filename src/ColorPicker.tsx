@@ -114,7 +114,11 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) =>
       <ColorInput
         aria-label={labels?.colorInput}
         classNames={classNames?.colorInput}
-        endContent={showGamutWarning ? <GamutWarning className={classNames?.gamutWarning} /> : null}
+        endContent={
+          showGamutWarning ? (
+            <GamutWarning className={classNames?.gamutWarning} label={labels?.gamutWarning} />
+          ) : null
+        }
         onChange={handleChangeColorInput}
         value={displayValue}
       />

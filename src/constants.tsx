@@ -14,6 +14,7 @@ export const DEFAULT_MODES: ColorMode[] = ['oklch', 'hsl', 'rgb'];
 export const DEFAULT_LABELS = {
   eyeDropper: 'Pick color from screen',
   colorInput: 'Color value',
+  gamutWarning: 'Color is outside the sRGB gamut and clipped for hex/rgb/hsl display.',
   settingsMenu: {
     trigger: 'Color format settings',
     title: 'Settings',
