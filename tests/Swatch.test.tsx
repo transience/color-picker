@@ -17,6 +17,7 @@ describe('Swatch', () => {
   it('renders as a button when as="button"', () => {
     const handleClick = vi.fn();
 
+    // eslint-disable-next-line @eslint-react/dom-no-missing-button-type
     render(<Swatch aria-label="Pick color" as="button" color="#ff0044" onClick={handleClick} />);
 
     const root = screen.getByTestId('Swatch');
@@ -30,6 +31,7 @@ describe('Swatch', () => {
   });
 
   it('forwards disabled to the button', () => {
+    // eslint-disable-next-line @eslint-react/dom-no-missing-button-type
     render(<Swatch as="button" color="#000" disabled />);
 
     expect(screen.getByTestId('Swatch')).toBeDisabled();

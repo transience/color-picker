@@ -246,6 +246,7 @@ describe('ColorInput', () => {
   });
 
   describe('Paste sync flag lifecycle', () => {
+    // eslint-disable-next-line unicorn/consistent-function-scoping
     function ExternalValue({ initial }: { initial: string }) {
       const [value, setValue] = useState(initial);
 

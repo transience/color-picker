@@ -132,7 +132,7 @@ export const CustomLayout: Story = {
 };
 
 export const PalettePicker: Story = {
-  render: function PalettePicker(props: ColorPickerProps) {
+  render: function Render(props: ColorPickerProps) {
     const { color: initial, onChange, ...rest } = props;
     const [color, setColor] = useState(initial);
     const picker = useColorPicker({

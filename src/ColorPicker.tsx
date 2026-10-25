@@ -16,7 +16,7 @@ import SettingsMenu from './SettingsMenu';
 import Swatch from './Swatch';
 import type { ColorPickerProps } from './types';
 
-const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function ColorPicker(props, ref) {
+const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>((props, ref) => {
   const { displayFormat: displayFormatProp, outputFormat: outputFormatProp } = props;
   const picker = useColorPicker(props);
   const {
@@ -175,8 +175,8 @@ const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function ColorP
   if (showSliders) {
     content.sliders = (
       <ChannelSliders
-        channelSliderClassNames={classNames?.channelSlider}
         channels={channels}
+        channelSliderClassNames={classNames?.channelSlider}
         className={classNames?.channelSliders}
         color={solidColor}
         labels={labels}

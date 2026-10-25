@@ -30,18 +30,17 @@ const VARIANTS: Record<Variant, string> = {
     'h-8 px-3 text-xs leading-none first:rounded-l-sm last:rounded-r-sm text-neutral-900 dark:text-neutral-50 focus-visible:relative focus-visible:z-10',
 };
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { activeClassName = ACTIVE_CLASSNAME, className, isActive, variant = 'icon', ...rest },
-  ref,
-) {
-  return (
-    <button
-      ref={ref}
-      className={cn(BASE, VARIANTS[variant], className, isActive && activeClassName)}
-      type="button"
-      {...rest}
-    />
-  );
-});
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ activeClassName = ACTIVE_CLASSNAME, className, isActive, variant = 'icon', ...rest }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={cn(BASE, VARIANTS[variant], className, isActive && activeClassName)}
+        type="button"
+        {...rest}
+      />
+    );
+  },
+);
 
 export default Button;

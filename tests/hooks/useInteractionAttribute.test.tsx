@@ -7,10 +7,10 @@ function Harness() {
 
   return (
     <div ref={ref} data-testid="root">
-      {/* eslint-disable-next-line jsx-a11y/role-has-required-aria-props,jsx-a11y/control-has-associated-label */}
+      {/* eslint-disable-next-line jsx-a11y-x/role-has-required-aria-props,jsx-a11y-x/control-has-associated-label */}
       <div data-testid="slider" role="slider" tabIndex={0} />
       <input data-testid="input" />
-      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      {/* eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex */}
       <span data-testid="non-interactive" tabIndex={0}>
         text
       </span>
