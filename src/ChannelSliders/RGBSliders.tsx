@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { formatCSS, parseCSS, type RGB } from 'colorizr';
+import { useEffect, useState } from 'react';
+import { convertCSS, formatCSS, parseCSS, type RGB } from 'colorizr';
 
 import useEmitLifecycle from '~/hooks/useEmitLifecycle';
 import { resolveLabel } from '~/modules/helpers';
@@ -64,19 +64,16 @@ export default function RGBSliders(props: RGBSlidersProps) {
     onChangeStart,
     value: color,
   });
-  // Skip re-derive when the [color] prop is our own echo — keeps the slider
-  // pinned to user-input values across the parent's hex round-trip.
-  const selfEchoRef = useRef(false);
   const [rgb, setRgb] = useState<RGB>(() => parseCSS(color, 'rgb'));
 
+  // Keep local channels when `color` is the same color they already describe
+  // (e.g. our own echo), so typed values survive the parent's hex round-trip.
   useEffect(() => {
-    if (selfEchoRef.current) {
-      selfEchoRef.current = false;
-
-      return;
-    }
-
-    setRgb(parseCSS(color, 'rgb'));
+    setRgb(previous =>
+      convertCSS(color, 'hex') === formatCSS(previous, { format: 'hex' })
+        ? previous
+        : parseCSS(color, 'rgb'),
+    );
   }, [color]);
 
   const { b, g, r } = rgb;
@@ -99,7 +96,6 @@ export default function RGBSliders(props: RGBSlidersProps) {
 
   const update = (newRgb: RGB) => {
     setRgb(newRgb);
-    selfEchoRef.current = true;
     emit(formatCSS(newRgb, { format: 'oklch' }));
   };
 

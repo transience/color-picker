@@ -151,6 +151,21 @@ describe('HSLSliders', () => {
 
       expect(Number(hue.getAttribute('aria-valuenow'))).toBeCloseTo(blueHsl.h, 0);
     });
+
+    it('reflects an external color after an edit that left the hex unchanged', () => {
+      const { rerender } = render(<HSLSliders color="#000000" onChange={mockOnChange} />);
+      const hue = screen.getByRole('textbox', { name: 'Hue' });
+
+      fireEvent.focus(hue);
+      fireEvent.change(hue, { target: { value: '120' } });
+      fireEvent.blur(hue);
+
+      rerender(<HSLSliders color="#ff0000" onChange={mockOnChange} />);
+
+      expect(screen.getByRole('textbox', { name: 'Hue' })).toHaveValue('0');
+      expect(screen.getByRole('textbox', { name: 'Saturation' })).toHaveValue('100');
+      expect(screen.getByRole('textbox', { name: 'Lightness' })).toHaveValue('50');
+    });
   });
 
   describe('Lifecycle callbacks', () => {
