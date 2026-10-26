@@ -92,12 +92,12 @@
     "lint": "eslint --fix .",
     "typecheck": "tsc && tsc -p tests/tsconfig.json && tsc -p stories/tsconfig.json",
     "typevalidation": "attw -P",
-    "format": "prettier \"**/*.{css,graphql,js,json,jsx,less,md,mdx,scss,ts,tsx,yaml,yml}\" --write",
+    "format": "prettier --write --log-level=warn \"**/*.{yml,json,md,css}\"",
     "size": "size-limit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "check": "pnpm lint && pnpm typecheck && pnpm test:coverage",
-    "validate": "pnpm check && pnpm build && pnpm size && pnpm typevalidation",
+    "validate": "pnpm check && pnpm build && pnpm size && pnpm format && pnpm typevalidation",
     "prepare": "husky"
   },
   "tsup": {

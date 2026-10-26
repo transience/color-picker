@@ -44,6 +44,7 @@ Raw color and UI state. Read these to render thumbs, slider values, and selected
 - **`oklch`** (`OklchColor`) — OKLCH triplet feeding `OKLCHPanel` and the OKLCH sliders.
 
   Both are kept in sync on every change, so either is current regardless of `mode`. For grays (zero saturation/chroma) each keeps its previous hue rather than resetting to 0.
+
 - **`alpha`** (`number`, 0–1) — only used when `showAlpha` is on. Appended to emitted values when `< 1`.
 - **`displayFormat`** / **`outputFormat`** (`ColorFormat`) — resolved formats for the text input and `onChange` emission respectively.
 
@@ -78,19 +79,19 @@ Computed from state on every render. Most sub-components expect these shapes dir
 
 Each return field maps directly onto the props of a built-in sub-component. The table below covers the common wirings — the full pattern lives in `src/ColorPicker.tsx`.
 
-| Hook field                           | Sub-component                  | Prop                          |
-|--------------------------------------|--------------------------------|-------------------------------|
-| `rootRef`                            | root `<div>`                   | `ref`                         |
-| `oklch.{l,c,h}` + `handleChangeOklchPanel` | `OKLCHPanel`             | `lightness` / `chroma` / `hue` / `onChange` |
-| `hsv.{h,s,v}` + `handleChangeSaturationPanel` | `SaturationPanel`     | `hue` / `saturation` / `value` / `onChange` |
-| `mode` + `currentHue` + hue handler  | `HueSlider`                    | `mode` / `value` / `onChange` (`isOklch ? handleChangeOklchHue : handleChangeHsvHue`) |
-| `alpha` + `solidColor` + `handleChangeAlpha` | `AlphaSlider`          | `value` / `color` / `onChange` |
-| `displayValue` + `handleChangeColorInput` | `ColorInput`              | `value` / `onChange`          |
-| `swatchColor`                        | `Swatch`                       | `color` (optional `children` for icon overlay) |
-| `mode` + `handleClickMode`           | `ModeSelector`                 | `mode` / `onClick`            |
-| `displayFormat` / `outputFormat` + handlers | `SettingsMenu`          | `displayFormat` / `outputFormat` / `onChangeDisplayFormat` / `onChangeOutputFormat` |
-| `solidColor` + `mode` + `handleChangeColorInput` | `ChannelSliders`   | `color` / `mode` / `onChange` |
-| `showGamutWarning`                   | `ColorInput endContent`        | render `<GamutWarning />` conditionally |
+| Hook field | Sub-component | Prop |
+| --- | --- | --- |
+| `rootRef` | root `<div>` | `ref` |
+| `oklch.{l,c,h}` + `handleChangeOklchPanel` | `OKLCHPanel` | `lightness` / `chroma` / `hue` / `onChange` |
+| `hsv.{h,s,v}` + `handleChangeSaturationPanel` | `SaturationPanel` | `hue` / `saturation` / `value` / `onChange` |
+| `mode` + `currentHue` + hue handler | `HueSlider` | `mode` / `value` / `onChange` (`isOklch ? handleChangeOklchHue : handleChangeHsvHue`) |
+| `alpha` + `solidColor` + `handleChangeAlpha` | `AlphaSlider` | `value` / `color` / `onChange` |
+| `displayValue` + `handleChangeColorInput` | `ColorInput` | `value` / `onChange` |
+| `swatchColor` | `Swatch` | `color` (optional `children` for icon overlay) |
+| `mode` + `handleClickMode` | `ModeSelector` | `mode` / `onClick` |
+| `displayFormat` / `outputFormat` + handlers | `SettingsMenu` | `displayFormat` / `outputFormat` / `onChangeDisplayFormat` / `onChangeOutputFormat` |
+| `solidColor` + `mode` + `handleChangeColorInput` | `ChannelSliders` | `color` / `mode` / `onChange` |
+| `showGamutWarning` | `ColorInput endContent` | render `<GamutWarning />` conditionally |
 
 ---
 

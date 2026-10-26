@@ -20,7 +20,6 @@ A modern, OKLCH-first React/Tailwind color picker.
     👉 <a href="https://transience.github.io/color-picker/?path=/story/colorpicker--default" target="_blank">Live Demo <img alt="Open story" src="https://cdn.svglogos.dev/logos/storybook-icon.svg" width="16" /></a>
 </h3>
 
-
 ## Setup
 
 ```bash
@@ -49,7 +48,7 @@ Your app's Tailwind build must scan the package's compiled source so the utiliti
 **Tailwind v4** (CSS-first):
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 @source "../node_modules/@transience/color-picker/dist";
 ```
 
@@ -79,32 +78,32 @@ See the [Storybook demo](https://transience.github.io/color-picker/) for layout 
 
 ## Props
 
-| Prop                                                                                                                                                                                                                                  | Type | Default |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- | --- |
-| **channels**<br />Per-channel toggles: `hidden`, `disabled`.<br />Keys irrelevant to the active mode are ignored.                                                                                                                     | `ChannelsConfig` | — |
-| **classNames**<br />Slot-based className overrides for every internal part. See [Styling](#styling).                                                                                                                                  | `ColorPickerClassNames` | — |
-| **labels**<br />Slot-based text/aria overrides per component. Each rendered component reads only its own slot.                                                                                                                        | `ColorPickerLabels` | — |
-| **color**<br />Controlled color value. Any CSS color string.<br />Falls back to the internal default when `undefined`.                                                                                                                | `string` | `'oklch(54% 0.194 250)'` |
-| **defaultMode**<br />Initial mode for the 2D panel and channel controls.                                                                                                                                                              | `'oklch'` \| `'hsl'` \| `'rgb'` | `'oklch'` |
-| **displayFormat**<br />Text format for the `ColorInput` (visual only — does not affect `onChange`). `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`. When set, source of truth (settings radio disabled).                            | `ColorFormat` | `'auto'` |
-| **modes**<br />Modes shown in the mode switcher.                                                                                                                                                                                      | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
-| **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`.                                                                                                                                           | `(value: string) => void` | — |
+| Prop | Type | Default |
+| --- | --- | --- |
+| **channels**<br />Per-channel toggles: `hidden`, `disabled`.<br />Keys irrelevant to the active mode are ignored. | `ChannelsConfig` | — |
+| **classNames**<br />Slot-based className overrides for every internal part. See [Styling](#styling). | `ColorPickerClassNames` | — |
+| **labels**<br />Slot-based text/aria overrides per component. Each rendered component reads only its own slot. | `ColorPickerLabels` | — |
+| **color**<br />Controlled color value. Any CSS color string.<br />Falls back to the internal default when `undefined`. | `string` | `'oklch(54% 0.194 250)'` |
+| **defaultMode**<br />Initial mode for the 2D panel and channel controls. | `'oklch'` \| `'hsl'` \| `'rgb'` | `'oklch'` |
+| **displayFormat**<br />Text format for the `ColorInput` (visual only — does not affect `onChange`). `'auto'` → `'oklch'` in OKLCH mode, else `'hex'`. When set, source of truth (settings radio disabled). | `ColorFormat` | `'auto'` |
+| **modes**<br />Modes shown in the mode switcher. | `ColorMode[]` | `['oklch', 'hsl', 'rgb']` |
+| **onChange**<br />Called on every color change. Format follows the resolved `outputFormat`. | `(value: string) => void` | — |
 | **onChangeStart**<br />Fires once when the user begins interacting with any slider, panel, or `ChannelInputs` field — `pointerdown` or first value-changing keystroke after idle. `ColorInput` and `EyeDropper` emit only `onChange`. | `(value: string) => void` | — |
-| **onChangeEnd**<br />Fires once when the user finishes interacting — pointer release, 600 ms after the last keystroke, or numeric-input blur.                                                                                         | `(value: string) => void` | — |
-| **onChangeMode**<br />Called when the user flips the mode via the switcher.                                                                                                                                                           | `(mode: ColorMode) => void` | — |
-| **outputFormat**<br />Format `onChange` emits in. `'auto'` follows `mode` (`'oklch'` → `'oklch'`, else `'hex'`). When set, source of truth (settings radio disabled); runtime change re-emits via `onChange`.                         | `ColorFormat` | `'auto'` |
-| **precision**<br />Decimal digits for non-hex output. Ignored for `hex`.                                                                                                                                                              | `number` | `5` |
-| **showAlpha**<br />Renders an alpha slider and appends alpha to emitted values when `< 1`.                                                                                                                                            | `boolean` | `false` |
-| **showColorInput**<br />Shows the text color input with the current value formatted per `displayFormat`.                                                                                                                              | `boolean` | `true` |
-| **showEyeDropper**<br />Adds a screen color picker button. Silently omitted in browsers without `window.EyeDropper` (currently Chromium-only).                                                                                        | `boolean` | `true` |
-| **showGlobalHue**<br />Shows the global (mode-independent) hue slider in the toolbar.                                                                                                                                                 | `boolean` | `false` |
-| **showInputs**<br />Shows numeric input fields per channel. Inline when `showSliders` is on, standalone row otherwise.                                                                                                                | `boolean` | `true` |
-| **showModeSelector**<br />Shows the OKLCH/HSL/RGB mode switcher.                                                                                                                                                                      | `boolean` | `true` |
-| **showPanel**<br />Shows the 2D color panel (saturation/value for HSL/RGB, chroma/lightness for OKLCH).                                                                                                                               | `boolean` | `true` |
-| **showSettings**<br />Adds a menu to expose display and output format choices to end users.<br />Opens in a portal with the `data-color-picker-portal` attribute.                                                                                                                                      | `boolean` | `false` |
-| **showSliders**<br />Shows the per-channel sliders matching the active mode (L/C/H, H/S/L, or R/G/B).                                                                                                                                 | `boolean` | `true` |
+| **onChangeEnd**<br />Fires once when the user finishes interacting — pointer release, 600 ms after the last keystroke, or numeric-input blur. | `(value: string) => void` | — |
+| **onChangeMode**<br />Called when the user flips the mode via the switcher. | `(mode: ColorMode) => void` | — |
+| **outputFormat**<br />Format `onChange` emits in. `'auto'` follows `mode` (`'oklch'` → `'oklch'`, else `'hex'`). When set, source of truth (settings radio disabled); runtime change re-emits via `onChange`. | `ColorFormat` | `'auto'` |
+| **precision**<br />Decimal digits for non-hex output. Ignored for `hex`. | `number` | `5` |
+| **showAlpha**<br />Renders an alpha slider and appends alpha to emitted values when `< 1`. | `boolean` | `false` |
+| **showColorInput**<br />Shows the text color input with the current value formatted per `displayFormat`. | `boolean` | `true` |
+| **showEyeDropper**<br />Adds a screen color picker button. Silently omitted in browsers without `window.EyeDropper` (currently Chromium-only). | `boolean` | `true` |
+| **showGlobalHue**<br />Shows the global (mode-independent) hue slider in the toolbar. | `boolean` | `false` |
+| **showInputs**<br />Shows numeric input fields per channel. Inline when `showSliders` is on, standalone row otherwise. | `boolean` | `true` |
+| **showModeSelector**<br />Shows the OKLCH/HSL/RGB mode switcher. | `boolean` | `true` |
+| **showPanel**<br />Shows the 2D color panel (saturation/value for HSL/RGB, chroma/lightness for OKLCH). | `boolean` | `true` |
+| **showSettings**<br />Adds a menu to expose display and output format choices to end users.<br />Opens in a portal with the `data-color-picker-portal` attribute. | `boolean` | `false` |
+| **showSliders**<br />Shows the per-channel sliders matching the active mode (L/C/H, H/S/L, or R/G/B). | `boolean` | `true` |
 | **showSRGBBoundary**<br />Draws the sRGB gamut boundary over the OKLCH panel. | `boolean` | `true` |
-| **showSwatch**<br />Shows the circular color preview next to the color input.                                                                                                                                                         | `boolean` | `true` |
+| **showSwatch**<br />Shows the circular color preview next to the color input. | `boolean` | `true` |
 
 ## Color modes and formats
 
@@ -140,23 +139,23 @@ Most Tailwind apps already ship `tailwind-merge`, so it dedupes in your bundle. 
 
 Individual parts are also exported as standalone widgets — drop a swatch, alpha slider, or mode switcher anywhere in your UI.
 
-| Export                                                  | Purpose         |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| <a href="https://transience.github.io/color-picker/?path=/story/colorpicker--default" target="_blank">Color Picker</a> | The full picker.                                                                 |
-| <a href="https://transience.github.io/color-picker/?path=/story/usecolorpicker--custom-layout" target="_blank">useColorPicker</a> | State hook powering `ColorPicker`. See [Hook](#hook).                            |
-| <a href="https://transience.github.io/color-picker/?path=/story/alphaslider--default" target="_blank">AlphaSlider</a> | Checkerboard-backed alpha slider.                                                |
-| <a href="https://transience.github.io/color-picker/?path=/story/channelinputs--default" target="_blank">ChannelInputs</a> | Per-mode input group (L/C/H, H/S/L, or R/G/B).                                   |
-| <a href="https://transience.github.io/color-picker/?path=/story/channelsliders--default" target="_blank">ChannelSliders</a> | Per-mode slider group (L/C/H, H/S/L, or R/G/B).                                  |
-| <a href="https://transience.github.io/color-picker/?path=/story/colorinput--default" target="_blank">ColorInput</a> | CSS color string input with validation.                                          |
-| <a href="https://transience.github.io/color-picker/?path=/story/eyedropper--default" target="_blank">EyeDropper</a> | Screen color picker button (omits when `window.EyeDropper` is unavailable).      |
-| <a href="https://transience.github.io/color-picker/?path=/story/gamutwarning--default" target="_blank">GamutWarning</a> | Popover-anchored icon shown when an OKLCH color falls outside sRGB.              |
-| <a href="https://transience.github.io/color-picker/?path=/story/gradientslider--default" target="_blank">GradientSlider</a> | Low-level 1D slider with a CSS-gradient track.                                   |
-| <a href="https://transience.github.io/color-picker/?path=/story/hueslider--default" target="_blank">HueSlider</a> | Standalone mode-aware hue slider (OKLCH or HSL gradient).                        |
-| <a href="https://transience.github.io/color-picker/?path=/story/modeselector--default" target="_blank">ModeSelector</a> | OKLCH / HSL / RGB mode switcher.                                                 |
-| <a href="https://transience.github.io/color-picker/?path=/story/oklchpanel--default" target="_blank">OKLCHPanel</a> | 2D OKLCH chroma/lightness panel with sRGB gamut overlay.                         |
-| <a href="https://transience.github.io/color-picker/?path=/story/saturationpanel--default" target="_blank">SaturationPanel</a> | 2D HSV saturation/value panel (used for HSL and RGB modes).                      |
-| <a href="https://transience.github.io/color-picker/?path=/story/settingsmenu--default" target="_blank">SettingsMenu</a> | Display/output format picker popover.                                            |
-| <a href="https://transience.github.io/color-picker/?path=/story/swatch--default" target="_blank">Swatch</a>  | Circular color preview over a checkerboard. Accepts `children` for icon overlays. |
+| Export | Purpose |
+| --- | --- |
+| <a href="https://transience.github.io/color-picker/?path=/story/colorpicker--default" target="_blank">Color Picker</a> | The full picker. |
+| <a href="https://transience.github.io/color-picker/?path=/story/usecolorpicker--custom-layout" target="_blank">useColorPicker</a> | State hook powering `ColorPicker`. See [Hook](#hook). |
+| <a href="https://transience.github.io/color-picker/?path=/story/alphaslider--default" target="_blank">AlphaSlider</a> | Checkerboard-backed alpha slider. |
+| <a href="https://transience.github.io/color-picker/?path=/story/channelinputs--default" target="_blank">ChannelInputs</a> | Per-mode input group (L/C/H, H/S/L, or R/G/B). |
+| <a href="https://transience.github.io/color-picker/?path=/story/channelsliders--default" target="_blank">ChannelSliders</a> | Per-mode slider group (L/C/H, H/S/L, or R/G/B). |
+| <a href="https://transience.github.io/color-picker/?path=/story/colorinput--default" target="_blank">ColorInput</a> | CSS color string input with validation. |
+| <a href="https://transience.github.io/color-picker/?path=/story/eyedropper--default" target="_blank">EyeDropper</a> | Screen color picker button (omits when `window.EyeDropper` is unavailable). |
+| <a href="https://transience.github.io/color-picker/?path=/story/gamutwarning--default" target="_blank">GamutWarning</a> | Popover-anchored icon shown when an OKLCH color falls outside sRGB. |
+| <a href="https://transience.github.io/color-picker/?path=/story/gradientslider--default" target="_blank">GradientSlider</a> | Low-level 1D slider with a CSS-gradient track. |
+| <a href="https://transience.github.io/color-picker/?path=/story/hueslider--default" target="_blank">HueSlider</a> | Standalone mode-aware hue slider (OKLCH or HSL gradient). |
+| <a href="https://transience.github.io/color-picker/?path=/story/modeselector--default" target="_blank">ModeSelector</a> | OKLCH / HSL / RGB mode switcher. |
+| <a href="https://transience.github.io/color-picker/?path=/story/oklchpanel--default" target="_blank">OKLCHPanel</a> | 2D OKLCH chroma/lightness panel with sRGB gamut overlay. |
+| <a href="https://transience.github.io/color-picker/?path=/story/saturationpanel--default" target="_blank">SaturationPanel</a> | 2D HSV saturation/value panel (used for HSL and RGB modes). |
+| <a href="https://transience.github.io/color-picker/?path=/story/settingsmenu--default" target="_blank">SettingsMenu</a> | Display/output format picker popover. |
+| <a href="https://transience.github.io/color-picker/?path=/story/swatch--default" target="_blank">Swatch</a> | Circular color preview over a checkerboard. Accepts `children` for icon overlays. |
 
 The constants (`hslHueGradient`, `oklchHueGradient`) and all types (`ColorPickerProps`, `UseColorPickerReturn`, `ColorMode`, `ColorFormat`, `OklchColor`, `HSV`, `ChannelsConfig`, `ColorPickerClassNames`, etc.) are also exported.
 
