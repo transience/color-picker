@@ -1,9 +1,8 @@
 import {
+  type ChangeEvent,
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
-  useEffect,
-  useRef,
   useState,
 } from 'react';
 import { isValidColor } from 'colorizr';
@@ -34,7 +33,8 @@ interface ColorInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange
   /** Content rendered at the left edge of the input. */
   startContent?: ReactNode;
   /**
-   * Displayed color string when the input is not focused. The caller supplies
+   * Displayed color string when the input is not being edited (unfocused, or
+   * right after a paste or Enter commits). The caller supplies
    * this in its preferred format (hex, `oklch(...)`, etc.).
    * @default DEFAULT_COLOR
    */
@@ -80,18 +80,11 @@ export default function ColorInput(props: ColorInputProps) {
   } = mergeProps(defaultProps, props);
   const [editValue, setEditValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const pendingSyncRef = useRef(false);
 
+  // While editing, the input shows the typed text. A commit (whole-value
+  // paste, Enter) ends editing so it shows `value` — the parent's canonical
+  // form — and the next keystroke resumes editing from there.
   const displayValue = isEditing ? editValue : value;
-
-  // Sync editValue ← value after an explicit commit event (paste, Enter)
-  // so the input reflects the parent's canonical/reformatted color.
-  useEffect(() => {
-    if (pendingSyncRef.current) {
-      setEditValue(value);
-      pendingSyncRef.current = false;
-    }
-  }, [value]);
 
   const handleFocus = () => {
     setIsEditing(true);
@@ -100,62 +93,52 @@ export default function ColorInput(props: ColorInputProps) {
 
   const handleBlur = () => {
     setIsEditing(false);
-    pendingSyncRef.current = false;
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== 'Enter') return;
+    // After a commit, editValue is the already-emitted text, not an edit.
+    if (event.key !== 'Enter' || !isEditing) return;
 
-    // `#rgba` is held while typing; Enter commits it and syncs the display
-    // once the parent echoes the canonical value.
+    // `#rgba` is held while typing; Enter commits it. Anything else valid was
+    // already emitted during typing.
     const hex = completeHex(editValue.trim(), true);
 
     if (hex?.length === 5) {
-      pendingSyncRef.current = true;
       onChange?.(hex);
-
-      return;
     }
 
-    // Anything else was already emitted during typing; just sync the display.
-    setEditValue(value);
+    setIsEditing(false);
   };
 
-  const handlePaste = () => {
-    pendingSyncRef.current = true;
-  };
-
-  const handleChange = (text: string) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const text = event.target.value;
     const trimmed = text.trim();
+    // Per event, so it can't outlive the paste. Drops don't count.
+    const isPaste = (event.nativeEvent as InputEvent).inputType === 'insertFromPaste';
+    let emitted: string | null = null;
 
     if (HEX_PATTERN.test(trimmed)) {
-      const hex = completeHex(trimmed, pendingSyncRef.current);
-
-      // Bare hex (e.g. "ff008e") is shown prefixed once complete; incomplete
-      // hex waits for more input.
-      setEditValue(hex ?? text);
-
-      if (hex) onChange?.(hex);
-
-      return;
-    }
-
-    setEditValue(text);
-
-    if (isValidColor(trimmed)) {
-      onChange?.(trimmed);
+      // Bare hex (e.g. "ff008e") is shown and emitted prefixed once complete;
+      // incomplete hex waits for more input.
+      emitted = completeHex(trimmed, isPaste);
+      setEditValue(emitted ?? text);
     } else {
-      pendingSyncRef.current = false;
+      emitted = isValidColor(trimmed) ? trimmed : null;
+      setEditValue(text);
     }
+
+    if (emitted) {
+      onChange?.(emitted);
+    }
+
+    setIsEditing(!(isPaste && emitted));
   };
 
   return (
     <div
       className={cn(
         'flex items-center gap-2 w-full h-8 bg-black/10 dark:bg-white/10 rounded-lg px-2',
-        {
-          'ring-1 ring-neutral-300 dark:ring-neutral-600': isEditing,
-        },
+        'focus-within:ring-1 focus-within:ring-neutral-300 dark:focus-within:ring-neutral-600',
         className,
         classNames?.root,
       )}
@@ -167,10 +150,9 @@ export default function ColorInput(props: ColorInputProps) {
         aria-label={ariaLabel}
         className={cn('w-full bg-transparent text-sm outline-none', classNames?.input)}
         onBlur={handleBlur}
-        onChange={event => handleChange(event.target.value)}
+        onChange={handleChange}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
-        onPaste={handlePaste}
         value={displayValue}
       />
       {endContent}
